@@ -1,0 +1,14 @@
+---
+title: "Clases"
+output:
+  html_document:
+      toc: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Aqui van las clases
+
+

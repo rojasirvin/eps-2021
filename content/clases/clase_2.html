@@ -1,0 +1,1092 @@
+---
+title: "Inferencia causal"
+author: "Irvin Rojas"
+institute: "CIDE"
+date: "19 de agosto de 2021"
+header-includes:
+  - \usepackage{tikz}
+  - \usetikzlibrary{shapes, shadows,arrows}
+output:
+  xaringan::moon_reader:
+    css: [default, "libs/cide.css", metropolis-fonts, "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css", "https://use.fontawesome.com/releases/v5.7.2/css/all.css", "https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css"]
+    seal: false
+    chakra: "https://remarkjs.com/downloads/remark-latest.min.js"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      titleSlideClass: ["middle", "center"]
+      ratio: "16:9"
+      beforeInit: ["https://platform.twitter.com/widgets.js", "libs/cols_macro.js"]
+      navigation:
+        scroll: false
+
+
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
+<link href="/rmarkdown-libs/lightable/lightable.css" rel="stylesheet" />
+
+
+<p>class: title-slide</p>
+<p>.title[
+# Sesión 2. Inferencia causal]
+.subtitle[
+## Evaluación de Programas]
+.author[
+### Irvin Rojas <br> <a href="https://www.rojasirvin.com/">rojasirvin.com</a> <br> <a href="https://github.com/rojasirvin"><i class="fab fa-github"></i></a> <a href="https://twitter.com/RojasIrvin"><i class="fab fa-twitter"></i></a> <a href="https://scholar.google.com/citations?user=FUwdSTMAAAAJ&amp;hl=en"><i class="ai ai-google-scholar"></i></a>]</p>
+<p>.affiliation[
+### Centro de Investigación y Docencia Económicas <br> División de Economía]</p>
+<table style="width:6%;">
+<colgroup>
+<col width="5%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td># Agenda</td>
+</tr>
+<tr class="even">
+<td>1. ¿Por qué evaluar?</td>
+</tr>
+<tr class="odd">
+<td>1. Sobre la importancia del diseño</td>
+</tr>
+<tr class="even">
+<td>1. Causalidad</td>
+</tr>
+<tr class="odd">
+<td>1. El experimento ideal</td>
+</tr>
+</tbody>
+</table>
+<p>class: inverse, middle, center</p>
+<div id="por-qué-evaluar" class="section level1">
+<h1>¿Por qué evaluar?</h1>
+<hr />
+</div>
+<div id="por-qué-evaluar-1" class="section level1">
+<h1>¿Por qué evaluar?</h1>
+<ul>
+<li><p>Probar teoría económica</p></li>
+<li><p>Explicar las características de los abundantes datos microeconómicos</p></li>
+<li><p>Desde la perspectiva de políticas públicas</p>
+<ul>
+<li><p>Rendición de cuentas</p></li>
+<li><p>Estimación de relaciones costo-beneficio</p></li>
+<li><p>Replicabilidad</p></li>
+<li><p>Competencia por fondos</p></li>
+</ul></li>
+</ul>
+<p>–</p>
+<ul>
+<li><p>Queremos evidencia más allá de las anécdotas</p></li>
+<li><p>Una evaluación responde a la pregunta de <em>qué parte de un cambio <span class="math inline">\(\Delta y\)</span> en una variable de interés se puede atribuir a un programa <span class="math inline">\(T\)</span></em></p></li>
+</ul>
+<hr />
+</div>
+<div id="programas-implementados-de-forma-deliberada" class="section level1">
+<h1>Programas implementados de forma deliberada</h1>
+<ul>
+<li><p>Gobiernos en todos los niveles implementan programas públicos con distintos objetivos:</p>
+<ul>
+<li><p>Salud</p></li>
+<li><p>Educación</p></li>
+<li><p>Empleo</p></li>
+<li><p>Mejoras urbanas</p></li>
+</ul></li>
+<li><p>Siempre encontrarán referencias al extinto <em>PROGRESA</em> - <em>OPORTUNIDADES</em> - <em>PROSPERA</em> que fue parte fundamental del diseño de intervenciones diseñadas para ser evaluadas</p></li>
+<li><p>¿Qué saben de este programa?</p></li>
+</ul>
+<hr />
+</div>
+<div id="impacto-de-otro-tipo-de-cambios-exógenos" class="section level1">
+<h1>Impacto de otro tipo de cambios exógenos</h1>
+<ul>
+<li><p>Lo que aprenderemos puede aplicarse a otras preguntas causales</p>
+<ul>
+<li><p>El impacto de la aparición en la primera página de una boleta en la probabilidad de ser electo</p></li>
+<li><p>El impacto del cambio de legislación relativa al divorcio o al aborto</p></li>
+<li><p>El efecto de cambios geopolíticos, como la reunificación de Alemania</p></li>
+<li><p>El impacto del cambio climático en la productividad</p></li>
+</ul></li>
+</ul>
+<p>–</p>
+<ul>
+<li><p>En todas estas preguntas estamos pensando en la idea de <strong>causalidad</strong></p></li>
+<li><p>Lo que queremos conocer es qué le hubiera pasado a la población que recibió la intervención de no haberla recibido: el <strong>contrafactual</strong></p></li>
+</ul>
+<hr />
+</div>
+<div id="consideraciones-éticas" class="section level1">
+<h1>Consideraciones éticas</h1>
+<ul>
+<li><p>Un aspecto muy relevante en la evaluación es la dimensión ética</p></li>
+<li><p>No negar intervenciones con beneficios conocidos por motivos de evaluación</p></li>
+<li><p>Que el programa no esté supeditado a las preguntas que los evaluadores quieren responder</p></li>
+</ul>
+<p>–</p>
+<ul>
+<li><p>Características que debe cumplir una evaluación</p>
+<ul>
+<li><p>Objetiva</p></li>
+<li><p>Transparente</p></li>
+<li><p>Reproducible</p></li>
+</ul></li>
+<li><p>Dedicaremos una sesión a discusiones alrededor de estas preocupaciones</p></li>
+</ul>
+<hr />
+<p>class: inverse, middle, center</p>
+</div>
+<div id="la-epidemiología-está-de-moda" class="section level1">
+<h1>La epidemiología está de moda</h1>
+<hr />
+</div>
+<div id="la-epidemia-de-cólera-en-londres" class="section level1">
+<h1>La epidemia de cólera en Londres</h1>
+<ul>
+<li><p>En aquellos tiempos (1854) se creía que el cólera se transmitía por medio del <em>miasma</em> en el aire</p></li>
+<li><p>Snow conjeturaba que la causa era un organismo vivo que se introducía en el cuerpo</p></li>
+<li><p>Siguió una estrategia que podemos imitar:</p></li>
+</ul>
+<p>–</p>
+<ol style="list-style-type: decimal">
+<li><p>Localizar el primer caso</p></li>
+<li><p>Rastrear al segundo y notar que ocupó el mismo espacio que el primero</p></li>
+<li><p>Notar las diferencias en la limpieza entre los hogares infectados y los adyacentes</p></li>
+<li><p>Creó un mapa para rastrear a los infectados</p></li>
+<li><p>Notó que los infectados eran atendidos por la ciertas compañías de agua</p></li>
+<li><p>Experimentó cortando el suministro de compañías sospechosas</p></li>
+</ol>
+<hr />
+</div>
+<div id="para-los-que-aman-los-mapas" class="section level1">
+<h1>Para los que aman los mapas</h1>
+<p>.pull-left[</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-1"></span>
+<img src="https://thumbs-prod.si-cdn.com/trC5qb_ILIffjzsnX3kEbvscwM0=/fit-in/1072x0/https://public-media.si-cdn.com/filer/20110520102403643px-Snow-cholera-map-1-300x279.jpg" alt="Fuente: Smithsonian Magazine" width="90%" />
+<p class="caption">
+Figure 1: Fuente: Smithsonian Magazine
+</p>
+</div>
+<p>]</p>
+<p>.pull-right[
+<iframe width='100%' height='450' frameborder='0' src='https://simonrogers.carto.com/tables/john_snow/embed_map?title=false&description=false&search=true&shareable=true&cartodb_logo=true&sql=SELECT%20*%20FROM%20john_snow%20ORDER%20BY%20num_deaths%2C%20geom_type%20ASC&sw_lat=51.51177397755052&sw_lon=-0.1421356201171875&ne_lat=51.51477858782044&ne_lon=-0.1318359375' allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>]</p>
+<ul>
+<li>Acá les dejo una nota en <a href="https://www.theguardian.com/news/datablog/2013/mar/15/john-snow-cholera-map">The Guardian</a> sobre los mapas para hacer periodismo</li>
+</ul>
+<hr />
+</div>
+<div id="el-problema-era-el-agua" class="section level1">
+<h1>El problema era el agua</h1>
+<p>.pull-left[
+- La Tabla 1 nos muestra la idea básica de su <strong>diseño</strong></p>
+<ul>
+<li><p>Es como si hubiera habido un experimento: casas comparativamente iguales recibían agua de distintas compañías</p></li>
+<li><p>Podemos notar las diferencias en el número de muertes por compañía</p></li>
+<li><p>Muchas veces no neceistaremos cosas más complicadas que esto</p></li>
+<li><p>A partir de estos hallazgos se propusieron algunas políticas que eran consistentes con la hipótesis de transmisión</p></li>
+<li><p>En muchos sentidos Snow hizo un trabajo de detective
+]</p></li>
+</ul>
+<p>.pull-right[</p>
+<table class=" lightable-paper lightable-hover" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;">
+<thead>
+<tr>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;" colspan="4">
+<div style="TRUE">
+Tabla XI de Snow
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+Ciudad
+</th>
+<th style="text-align:center;">
+Hogares
+</th>
+<th style="text-align:center;">
+Muertes por cólera
+</th>
+<th style="text-align:center;">
+Muertes / 10 mil hogares
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Southwark y Vauxhall
+</td>
+<td style="text-align:center;">
+40,046
+</td>
+<td style="text-align:center;">
+1,263
+</td>
+<td style="text-align:center;">
+315
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lambeth
+</td>
+<td style="text-align:center;">
+26,107
+</td>
+<td style="text-align:center;">
+98
+</td>
+<td style="text-align:center;">
+37
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Resto de Londres
+</td>
+<td style="text-align:center;">
+256,423
+</td>
+<td style="text-align:center;">
+1,422
+</td>
+<td style="text-align:center;">
+59
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Nota:</span> <sup></sup> Reproducida por Freedman (1991).
+</td>
+</tr>
+</tfoot>
+</table>
+<p>]</p>
+<hr />
+</div>
+<div id="el-caso-del-asbesto" class="section level1">
+<h1>El caso del asbesto</h1>
+<ul>
+<li><p>Un estudio publicado en el <em>American Journal of Epidemiology</em> mostraba que la fibra de asbesto <strong>causaba</strong> cáncer de pulmón (Kanarek et al., 1980)</p></li>
+<li><p>Se estudiaron 722 secciones censales en San Francisco</p></li>
+<li><p>Se formuló un modelo econométrico del tipo</p></li>
+</ul>
+<p><span class="math display">\[tasa=f(sexo,raza,estado\,civil, educación, ingreso, ocupación)\]</span>
+- ¿Qué salió mal?</p>
+<p>–</p>
+<ul>
+<li><p>Variable omitida: fumar</p></li>
+<li><p>Se corrieron 200 regresiones y solo en una <span class="math inline">\(p&lt;0.001\)</span></p></li>
+<li><p>Se antepusieron las técnicas estadísticas y los supuestos a la lógica y el razonamiento</p></li>
+</ul>
+<hr />
+</div>
+<div id="asumir-causalidad-de-una-regresión" class="section level1">
+<h1>Asumir causalidad de una regresión</h1>
+<ul>
+<li><p>¿Confiar más o menos en la KGB te hace más o menos políticamente activo (Bahry y Silver (1987)?</p></li>
+<li><p>¿Y si la relación es a la inversa?</p></li>
+<li><p>¿Qué otras cosas como estas no se leen a diario en los periódicos?</p></li>
+</ul>
+<p>–</p>
+<ul>
+<li><p>¿Los estados en Estados Unidos tienen diferentes <em>culturas</em> (Erikson et al. 1987)?</p></li>
+<li><p>¿Puede una serie de variables <em>dummy</em> capturar la diferencia de culturas?</p></li>
+</ul>
+<hr />
+</div>
+<div id="regresión-para-derivar-causalidad" class="section level1">
+<h1>Regresión para derivar causalidad</h1>
+<hr />
+</div>
+<div id="conclusión-de-freedman-sobre-la-regresión" class="section level1">
+<h1>Conclusión de Freedman sobre la regresión</h1>
+<ul>
+<li><p>Bastante pesimista sobre la utilidad de la econometría</p></li>
+<li><p>Refinamiento técnico no resuelve el problema</p></li>
+<li><p>LaLonde (1986) compara estimadores experimentales vs no experimentales</p></li>
+<li><p>Crítica a la minería de datos y a correr miles de modelos</p></li>
+</ul>
+<p>–</p>
+<ul>
+<li><p>La regresión no revela por sí sola una causalidad</p></li>
+<li><p>Hay que poner énfasis en el diseño</p></li>
+</ul>
+<p>–</p>
+<ul>
+<li>Yo no soy tan pesimista como Freedman</li>
+</ul>
+<hr />
+<p>class: inverse, middle, center</p>
+</div>
+<div id="el-problema-de-la-causalidad-en-economía" class="section level1">
+<h1>El problema de la causalidad en economía</h1>
+<hr />
+</div>
+<div id="efecto-causal" class="section level1">
+<h1>Efecto causal</h1>
+<ul>
+<li>Pensemos en un tratamiento binario</li>
+</ul>
+<p><span class="math display">\[T_i=\begin{cases}
+1 \quad\text{tratado} \\
+0 \quad\text{no tratado}
+\end{cases}\]</span></p>
+<ul>
+<li><p>El resultado que cada individuo tendría bajo cada régimen de tratamiento:</p>
+<ul>
+<li><p><span class="math inline">\(y_{1i}\)</span> con <span class="math inline">\(T_i=1\)</span></p></li>
+<li><p><span class="math inline">\(y_{0i}\)</span> con <span class="math inline">\(T_i=0\)</span></p></li>
+</ul></li>
+<li><p>Supongamos que el tratamiento es recibir un trasplante y el resultado es morir (1) o seguir vivo (0) cinco días después de recibirlo (Hernan &amp; Robins, 2018)</p>
+<ul>
+<li><p>Supongamos que Zeus recibió el trasplante y a los cinco días había fallecido</p></li>
+<li><p>Por otro lado, Hena no recibió el trasplante y a los cinco días seguía viva</p></li>
+</ul></li>
+</ul>
+<p>–</p>
+<ul>
+<li>No tardarían nuestros columnistas en decir que hay que prohibir los trasplantes</li>
+</ul>
+<hr />
+</div>
+<div id="efecto-causal-1" class="section level1">
+<h1>Efecto causal</h1>
+<ul>
+<li>Supongamos también que podemos conocer que:</li>
+</ul>
+<p><span class="math display">\[y_{Zeus}=\begin{cases}
+y_{1,Zeus}=1\\
+y_{0,Zeuz}=0
+\end{cases}\]</span></p>
+<p>es decir, si no hubiera recibo el trasplante, estaría vivo cinco días después</p>
+<ul>
+<li>Similarmente, conocemos que:</li>
+</ul>
+<p><span class="math display">\[y_{Hena}=\begin{cases}
+y_{1,Hena}=0\\
+y_{0,Hena}=0
+\end{cases}\]</span></p>
+<ul>
+<li><p><strong>Efecto causal para un individuo</strong>: el tratamiento tiene un efecto causal para <span class="math inline">\(i\)</span> si <span class="math inline">\(y_{1i}\neq y_{0i}\)</span></p></li>
+<li><p>En nuestro ejemplo, el tratamiento tuvo un efecto causal en Zeus, pero no en Hena</p></li>
+</ul>
+<hr />
+</div>
+<div id="resultados-potenciales" class="section level1">
+<h1>Resultados potenciales</h1>
+<ul>
+<li><p><span class="math inline">\(y_{1i}\)</span> y <span class="math inline">\(y_{0i}\)</span> se conocen como resultados potenciales o contrafactuales</p></li>
+<li><p>El término <em>potencial</em> se debe a que solo vemos uno de ellos</p></li>
+<li><p>En nuestro ejemplo, solo observamos que <span class="math inline">\(y_{Zeus}=y_{1,Zeus}=1\)</span></p></li>
+<li><p>En general, el efecto causal para un individuo no puede ser identificado</p></li>
+</ul>
+<hr />
+</div>
+<div id="efectos-causales-promedio" class="section level1">
+<h1>Efectos causales promedio</h1>
+<ul>
+<li>Supongamos que podemos estudiar a la familia de Zeus, <span class="math inline">\(N=20\)</span></li>
+</ul>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:70%; ">
+<table class=" lightable-paper lightable-hover" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="3">
+<div style="TRUE">
+Efectos individuales
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Persona
+</th>
+<th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;">
+y0
+</th>
+<th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;">
+y1
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+11
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+12
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+13
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+14
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+15
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+16
+</td>
+<td style="text-align:center;">
+0
+</td>
+<td style="text-align:center;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+17
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+18
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+19
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+20
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr />
+</div>
+<div id="efectos-causales-promedio-1" class="section level1">
+<h1>Efectos causales promedio</h1>
+<ul>
+<li><p>De la tabla podemos concluir que <span class="math inline">\(P(y{1i}=1)=10/20=0.5\)</span>, es decir, la mitad de quienes reciben el trasplante morirían después de cinco días</p></li>
+<li><p>Y también observamos que <span class="math inline">\(P(y_{0i}=1)=0.5\)</span>, es decir, que la probabilidad de morir de no haber recibido el tratamiento es también de 0.5</p></li>
+</ul>
+<p>–</p>
+<ul>
+<li><p>En el anterior ejemplo, el tratamiento no tiene un efecto causal pues la probabilidad de morir con y sin el tratamiento es igual</p></li>
+<li><p><strong>Efecto causal promedio</strong> en una población: un efecto causal promedio de <span class="math inline">\(T\)</span> en el resultado <span class="math inline">\(y\)</span> está presente si <span class="math inline">\(P(Y_{1i}=1\neq Y_{0i}=1)\)</span> en la población de interés</p></li>
+<li><p>Cuando pensamos en <strong>poblaciones</strong>, podemos usar expectativas para definir el efecto causal promedio: <span class="math inline">\(E(Y_{1i}\neq E_{0i})\)</span>, lo cual permite generalizar a resultados no binarios</p></li>
+<li><p>La ausencia de efectos individuales promedio no implica ausencia de efectos individuales</p></li>
+</ul>
+<p>–</p>
+<ul>
+<li>Cuando no hay efecto causal individual para ningún individuo, <span class="math inline">\(y_{0i}=y_{1i}\)</span>, para todo <span class="math inline">\(i\)</span>, decimos que la hipótesis <strong>estricta</strong> (<em>sharp</em>) de efecto de tratamiento nulo es verdadera</li>
+</ul>
+<hr />
+</div>
+<div id="variabilidad-aleatoria" class="section level1">
+<h1>Variabilidad aleatoria</h1>
+<ul>
+<li><p>En la práctica, casi nunca podemos observar a la población de interés, sino solo a una muestra</p></li>
+<li><p>Por tanto, <span class="math inline">\(P(y_{ti}=y)\)</span> no puede ser observada sino estimada</p></li>
+<li><p>Debido al error muestral, la proporción que muere en la muestra no es numéricamente igual a la proporción que muere en la población</p></li>
+</ul>
+<p>–</p>
+<ul>
+<li><p>La hipótesis que queremos probar es que hay un efecto causal en la población</p></li>
+<li><p>Pero al trabajar con muestras, puede haber diferencias que surjan solo por el muestreo</p></li>
+<li><p>Nuestra tarea es tratar de distinguir estas diferencias de los verdaderos efectos causales</p></li>
+</ul>
+<hr />
+<p>class: inverse, middle, center</p>
+</div>
+<div id="el-experimento-ideal" class="section level1">
+<h1>El experimento ideal</h1>
+<hr />
+</div>
+<div id="el-efecto-de-los-hospitales" class="section level1">
+<h1>El efecto de los hospitales</h1>
+<ul>
+<li><p>¿Los hospitales hacen que la gente sea más sana?</p></li>
+<li><p>Podemos conseguir datos de encuestas sobre cuántas veces las personas han ido al hospital en el último año</p></li>
+</ul>
+<table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
+<thead>
+<tr>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;" colspan="4">
+<div style="TRUE">
+El efecto de los hospitales
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+Grupo
+</th>
+<th style="text-align:center;">
+N
+</th>
+<th style="text-align:center;">
+Salud (0-5)
+</th>
+<th style="text-align:center;">
+Error estándar
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Hospitalizados
+</td>
+<td style="text-align:center;">
+7,774
+</td>
+<td style="text-align:center;">
+3.21
+</td>
+<td style="text-align:center;">
+0.014
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+No hospitalizados
+</td>
+<td style="text-align:center;">
+90,049
+</td>
+<td style="text-align:center;">
+3.93
+</td>
+<td style="text-align:center;">
+0.003
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Diferencia
+</td>
+<td style="text-align:center;">
+</td>
+<td style="text-align:center;">
+0.72
+</td>
+<td style="text-align:center;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<ol start="20" style="list-style-type: lower-alpha">
+<li></td>
+<td style="text-align:center;">
+</td>
+<td style="text-align:center;">
+(58.9)
+</td>
+<td style="text-align:center;">
+</td>
+</tr>
+</tbody>
+</table></li>
+</ol>
+<p>–</p>
+<ul>
+<li><p>¿Tiene sentido? ¿Los hospitales enferman?</p></li>
+<li><p>¿Qué sucede?</p></li>
+</ul>
+<hr />
+</div>
+<div id="comparaciones-observacionales" class="section level1">
+<h1>Comparaciones observacionales</h1>
+<ul>
+<li>Pensemos de nuevo en términos del <em>Modelo de Rubin</em> de resultados potenciales</li>
+</ul>
+<p><span class="math display">\[y_{i}=\begin{cases}
+y_{1i}=1\quad\text{si }D_i=1\\
+y_{0i}=0 \quad \text{si } D_i=0
+\end{cases}\]</span></p>
+<ul>
+<li>Solo vemos al individuo en una situación, <span class="math inline">\(y_i\)</span>:</li>
+</ul>
+<div id="y_iy_0iy_1i-y_0id_i" class="section level2">
+<h2><span class="math display">\[y_i=y_{0i}+(y_{1i}-y_{0i})D_i\]</span></h2>
+<ul>
+<li><p>¿Qué nos dicen las comparaciones observacionales?</p></li>
+<li><p>Supongamos que tenemos acceso a datos sobre tratados y no tratados</p></li>
+<li><p>Podemos calcular <span class="math inline">\(E(y_i|D_i=1)-E(y_i|D_i=0)\)</span>:</p></li>
+</ul>
+<p><span class="math display">\[
+\begin{aligned}
+E(y_i|D_i=1)-E(y_i|D_i=0)=&amp;E(y_{1i}|D_i=1)-E(y_{oi}|D_i=0)+\\&amp; \underbrace{E(y_{0i}|D_i=1)-E(y_{0i}|D_i=1)}_0 
+\end{aligned}
+\]</span>
+—</p>
+</div>
+</div>
+<div id="sesgo-de-selección" class="section level1">
+<h1>Sesgo de selección</h1>
+<ul>
+<li>Reordenando:</li>
+</ul>
+<p><span class="math display">\[
+\begin{aligned}
+E(y_i|D_i=1)-E(y_i|D_i=0)=&amp;\overbrace{ E(y_{1i}|D_i=1)-E(y_{0i}|D_i=1)}^{\text{Efecto promedio en los tratados}}+\\&amp; \underbrace{E(y_{0i}|D_i=1)-E(y_{oi}|D_i=0)}_{\text{Sesgo de selección}}
+\end{aligned}
+\]</span></p>
+<ul>
+<li><p>El primer término nos da la diferencia promedio en la variable de salud entre los hospitalizados y lo que les hubiera pasado si no hubieran sido hospitalizados</p></li>
+<li><p>En nuestro ejemplo, el <strong>sesgo</strong> de selección es la diferencia en salud entre los hospitalizados y los no hospitalizados</p></li>
+<li><p>Específicamente, si quienes van al hospital tienen una peor salud, podemos esperar que <span class="math inline">\(E(y_{0i}|D_i=1)-E(y_{oi}|D_i=0)&lt;0\)</span></p></li>
+</ul>
+<hr />
+</div>
+<div id="sesgo-de-selección-1" class="section level1">
+<h1>Sesgo de selección</h1>
+<ul>
+<li><p>Al hacer aseveraciones basadas en comparaciones observacionales se incluye el efecto causal del tratamiento, pero también el sesgo de selección</p></li>
+<li><p>El sesgo de selección puede ser positivo o negativo</p></li>
+<li><p>El objetivo de las estrategias de evaluación es eliminar el sesgo de selección</p></li>
+</ul>
+<hr />
+</div>
+<div id="tratamiento-aleatorio" class="section level1">
+<h1>Tratamiento aleatorio</h1>
+<ul>
+<li><p>Supongamos que tenemos la posibilidad de aleatorizar el tratamiento, es decir, hacer que <span class="math inline">\(Y_i\)</span> y <span class="math inline">\(D_i\)</span> sean independientes</p></li>
+<li><p>En ese caso, por independencia: <span class="math inline">\(E(Y_{0i}|D_i=0)=E(Y_{0i}|D_i=1)\)</span></p></li>
+<li><p>De la definición de comparación observacional:</p></li>
+</ul>
+<p><span class="math display">\[
+\begin{aligned}
+E(y_i|D_i=1)-E(y_i|D_i=0)=&amp;E(y_{1i}|D_i=1)-E(y_{0i}|D_i=0)
+\end{aligned}
+\]</span></p>
+<ul>
+<li>Sustituyendo el resultado de independencia:</li>
+</ul>
+<p><span class="math display">\[
+\begin{aligned}
+E(y_i|D_i=1)-E(y_i|D_i=0)&amp;=E(y_{1i}|D_i=1)-E(y_{0i}|D_i=1) \\
+&amp; =E(y_{1i}-y_{0i}|D_i=1) \\
+&amp; =\underbrace{E(y_{1i}-y_{0i})}_{\text{Efecto causal}}
+\end{aligned}
+\]</span></p>
+<hr />
+</div>
+<div id="no-siempre-es-factible" class="section level1">
+<h1>No siempre es factible</h1>
+<ul>
+<li><p>La aleatorización resuelve muchas cosas, pero muchas veces no es factible</p></li>
+<li><p>¿Qué tendríamos que hacer en el caso de estudio, “¿Los hospitales matan?”</p></li>
+</ul>
+<p>–</p>
+<ul>
+<li><p>Pensemos en un programa de empleo para ex convictos</p></li>
+<li><p>Seguramente una comparación observacional indicaría que estos ganan menos que el resto de la población</p></li>
+<li><p>Pero esto no significa que el programa cause un efecto negativo en el ingreso</p></li>
+<li><p>Siempre tenemos que pensar en el contrafactual</p></li>
+</ul>
+<hr />
+</div>
+<div id="el-experimento-star" class="section level1">
+<h1>El experimento STAR</h1>
+<ul>
+<li>¿En qué consistió?</li>
+</ul>
+<p>–</p>
+<ul>
+<li><p>Dos tipos de tratamiento:</p>
+<ul>
+<li><span class="math inline">\(T_1\)</span>: clase pequeña (13-17) con maestro de tiempo completo</li>
+<li><span class="math inline">\(T_2\)</span>: tamaño normal pero con asistente para el maestro</li>
+</ul></li>
+<li><p>Un grupo <span class="math inline">\(C\)</span> al que no se le hizo cambio alguno (22.3 alumnos en promedio)</p></li>
+</ul>
+<p>–</p>
+<ul>
+<li><p>¿Cuál es el efecto de tener clases más pequeñas?</p></li>
+<li><p>¿Por qué esto sería relevante? ¿Qué implicaciones de política tendría?</p></li>
+</ul>
+<hr />
+</div>
+<div id="el-balance" class="section level1">
+<h1>El balance</h1>
+<p>.pull-left[</p>
+<ul>
+<li><p>¿Qué vemos en la Tabla 2.2.1 de MHE</p></li>
+<li><p>¿Qué nos indican los valores <span class="math inline">\(p\)</span>?</p></li>
+<li><p>¿Cuál es la hipótesis nula?</p></li>
+<li><p>¿Qué significa <em>atrición</em>?</p></li>
+<li><p>¿Se logró el objetivo del experimento?</p></li>
+</ul>
+<p>]</p>
+<p>.pull-right[</p>
+<table class=" lightable-paper lightable-hover" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;">
+<thead>
+<tr>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;" colspan="5">
+<div style="TRUE">
+Balance de observables
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:center;">
+<code>T_1</code>
+</th>
+<th style="text-align:center;">
+<code>C</code>
+</th>
+<th style="text-align:center;">
+<code>T_2</code>
+</th>
+<th style="text-align:center;">
+<code>p</code>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Lunch gratis
+</td>
+<td style="text-align:center;">
+0.47
+</td>
+<td style="text-align:center;">
+0.48
+</td>
+<td style="text-align:center;">
+0.5
+</td>
+<td style="text-align:center;">
+0.09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Blanco / asiático
+</td>
+<td style="text-align:center;">
+0.68
+</td>
+<td style="text-align:center;">
+0.67
+</td>
+<td style="text-align:center;">
+0.66
+</td>
+<td style="text-align:center;">
+0.26
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Edad (1985)
+</td>
+<td style="text-align:center;">
+5.44
+</td>
+<td style="text-align:center;">
+5.43
+</td>
+<td style="text-align:center;">
+5.42
+</td>
+<td style="text-align:center;">
+0.32
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Atrición
+</td>
+<td style="text-align:center;">
+0.49
+</td>
+<td style="text-align:center;">
+0.52
+</td>
+<td style="text-align:center;">
+0.53
+</td>
+<td style="text-align:center;">
+0.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tamaño de clase
+</td>
+<td style="text-align:center;">
+15.1
+</td>
+<td style="text-align:center;">
+22.4
+</td>
+<td style="text-align:center;">
+22.8
+</td>
+<td style="text-align:center;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Calificación
+</td>
+<td style="text-align:center;">
+54.7
+</td>
+<td style="text-align:center;">
+48.9
+</td>
+<td style="text-align:center;">
+50
+</td>
+<td style="text-align:center;">
+0
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<span style="font-style: italic;">Nota:</span> <sup></sup> Tomada de Angrist y Pischke (2009), Tabla 2.2.1.
+</td>
+</tr>
+</tfoot>
+</table>
+<p>]</p>
+<hr />
+</div>
+<div id="desventajas" class="section level1">
+<h1>Desventajas</h1>
+<ul>
+<li><p>Tiempo</p></li>
+<li><p>Costo: 12 millones de USD del proyecto STAR</p></li>
+<li><p>Preocupaciones legales y éticas</p></li>
+</ul>
+<p>–</p>
+<ul>
+<li><p>A veces es posible hacer experimentos, a veces es muy difícil y a veces es imposible</p></li>
+<li><p>Usando métodos no experimentales, Angrist y Lavy (1999) encuentran resultados parecidos (pero con otros métodos)</p></li>
+</ul>
+<table style="width:6%;">
+<colgroup>
+<col width="5%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td># Próxima sesión</td>
+</tr>
+<tr class="even">
+<td>- Pregunta: ¿están libres el lunes por la mañana?</td>
+</tr>
+<tr class="odd">
+<td>- Analizaremos el papel de la regresión en el análisis de efectos de tratamiento</td>
+</tr>
+<tr class="even">
+<td>- MM, Capítulo 1, Apéndice</td>
+</tr>
+<tr class="odd">
+<td>- CT, Capítulo 25, Secciones 1 y 2</td>
+</tr>
+<tr class="even">
+<td>- Avancemos con dos ejemplos:</td>
+</tr>
+<tr class="odd">
+<td>- Baird, S., McIntosh, C., &amp; Özler, B. (2011). Cash or condition? Evidence from a cash transfer experiment. The <em>Quarterly journal of economics</em>, 126(4), 1709-1753.</td>
+</tr>
+<tr class="even">
+<td>- Banerjee, A., Duflo, E., Goldberg, N., Karlan, D., Osei, R., Parienté, W., Shapiro, J., Thuysbaert, B. &amp; Udry, C. (2015). A multifaceted program causes lasting progress for the very poor: Evidence from six countries. <em>Science</em>, 348(6236), 1260799.</td>
+</tr>
+</tbody>
+</table>
+<p>class: center, middle</p>
+<p>Presentación creada usando el paquete <a href="https://github.com/yihui/xaringan"><strong>xaringan</strong></a> en R.</p>
+<p>El <em>chakra</em> viene de <a href="https://remarkjs.com">remark.js</a>, <a href="http://yihui.org/knitr"><strong>knitr</strong></a>, y <a href="https://rmarkdown.rstudio.com">R Markdown</a>.</p>
+<p>Material de clase en versión preliminar.</p>
+<p><strong>No reproducir, no distribuir, no citar.</strong></p>
+</div>

@@ -1,0 +1,720 @@
+---
+title: "Inferencia causal"
+author: "Irvin Rojas"
+institute: "CIDE"
+date: "19 de agosto de 2021"
+header-includes:
+  - \usepackage{tikz}
+  - \usetikzlibrary{shapes, shadows,arrows}
+output:
+  xaringan::moon_reader:
+    css: [default, "libs/cide.css", metropolis-fonts, "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css", "https://use.fontawesome.com/releases/v5.7.2/css/all.css", "https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css"]
+    seal: false
+    chakra: "https://remarkjs.com/downloads/remark-latest.min.js"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      titleSlideClass: ["middle", "center"]
+      ratio: "16:9"
+      beforeInit: ["https://platform.twitter.com/widgets.js", "libs/cols_macro.js"]
+      navigation:
+        scroll: false
+
+
+---
+class: title-slide
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.path = "figures/")
+library(tidyverse)
+library(magick)
+library(reticulate)
+library(knitr)
+library(kableExtra)
+xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
+```
+
+.title[
+# Sesión 2. Inferencia causal
+]
+.subtitle[
+## Evaluación de Programas
+]
+.author[
+### Irvin Rojas <br> [rojasirvin.com](https://www.rojasirvin.com/) <br> [<i class="fab fa-github"></i>](https://github.com/rojasirvin) [<i class="fab fa-twitter"></i>](https://twitter.com/RojasIrvin) [<i class="ai ai-google-scholar"></i>](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas <br> División de Economía
+]
+
+---
+# Agenda
+
+1. ¿Por qué evaluar?
+
+1. Sobre la importancia del diseño
+
+1. Causalidad
+
+1. El experimento ideal
+
+
+---
+
+class: inverse, middle, center
+
+# ¿Por qué evaluar?
+
+
+---
+
+# ¿Por qué evaluar?
+
+- Probar teoría económica
+
+- Explicar las características de los abundantes datos microeconómicos
+
+- Desde la perspectiva de políticas públicas
+
+  - Rendición de cuentas
+  
+  - Estimación de relaciones costo-beneficio
+  
+  - Replicabilidad
+  
+  - Competencia por fondos
+  
+--
+
+- Queremos evidencia más allá de las anécdotas
+
+- Una evaluación responde a la pregunta de *qué parte de un cambio $\Delta y$ en una variable de interés se puede atribuir a un programa $T$*
+
+---
+
+# Programas implementados de forma deliberada
+
+- Gobiernos en todos los niveles implementan programas públicos con distintos objetivos:
+
+  - Salud
+  
+  - Educación
+  
+  - Empleo
+  
+  - Mejoras urbanas
+
+- Siempre encontrarán referencias al extinto *PROGRESA* - *OPORTUNIDADES* - *PROSPERA* que fue parte fundamental del diseño de intervenciones diseñadas para ser evaluadas
+
+- ¿Qué saben de este programa?
+
+---
+
+# Impacto de otro tipo de cambios exógenos
+
+- Lo que aprenderemos puede aplicarse a otras preguntas causales
+
+  - El impacto de la aparición en la primera página de una boleta en la probabilidad de ser electo
+  
+  - El impacto del cambio de legislación relativa al divorcio o al aborto
+  
+  - El efecto de cambios geopolíticos, como la reunificación de Alemania
+  
+  - El impacto del cambio climático en la productividad
+  
+--
+
+- En todas estas preguntas estamos pensando en la idea de **causalidad**
+
+- Lo que queremos conocer es qué le hubiera pasado a la población que recibió la intervención de no haberla recibido: el **contrafactual**
+
+---
+
+# Consideraciones éticas
+
+- Un aspecto muy relevante en la evaluación es la dimensión ética
+
+- No negar intervenciones con beneficios conocidos por motivos de evaluación
+  
+- Que el programa no esté supeditado a las preguntas que los evaluadores quieren responder
+  
+--
+
+- Características que debe cumplir una evaluación
+
+  - Objetiva
+  
+  - Transparente
+  
+  - Reproducible
+
+- Dedicaremos una sesión a discusiones alrededor de estas preocupaciones
+
+---
+
+class: inverse, middle, center
+
+# La epidemiología está de moda
+
+
+---
+
+# La epidemia de cólera en Londres
+
+- En aquellos tiempos (1854) se creía que el cólera se transmitía por medio del *miasma* en el aire
+
+- Snow conjeturaba que la causa era un organismo vivo que se introducía en el cuerpo
+
+- Siguió una estrategia que podemos imitar:
+
+--
+
+  1. Localizar el primer caso
+  
+  1. Rastrear al segundo y notar que ocupó el mismo espacio que el primero
+  
+  1. Notar las diferencias en la limpieza entre los hogares infectados y los adyacentes
+  
+  1. Creó un mapa para rastrear a los infectados
+  
+  1. Notó que los infectados eran atendidos por la ciertas compañías de agua
+  
+  1. Experimentó cortando el suministro de compañías sospechosas
+  
+---
+
+# Para los que aman los mapas
+.pull-left[
+
+```{r, out.width="90%", fig.align='center', fig.cap='Fuente: Smithsonian Magazine'}
+knitr::include_graphics("https://thumbs-prod.si-cdn.com/trC5qb_ILIffjzsnX3kEbvscwM0=/fit-in/1072x0/https://public-media.si-cdn.com/filer/20110520102403643px-Snow-cholera-map-1-300x279.jpg")
+```
+]
+
+
+.pull-right[
+<iframe width='100%' height='450' frameborder='0' src='https://simonrogers.carto.com/tables/john_snow/embed_map?title=false&description=false&search=true&shareable=true&cartodb_logo=true&sql=SELECT%20*%20FROM%20john_snow%20ORDER%20BY%20num_deaths%2C%20geom_type%20ASC&sw_lat=51.51177397755052&sw_lon=-0.1421356201171875&ne_lat=51.51477858782044&ne_lon=-0.1318359375' allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>
+]
+
+- Acá les dejo una nota en [The Guardian](https://www.theguardian.com/news/datablog/2013/mar/15/john-snow-cholera-map) sobre los mapas para hacer periodismo
+
+---
+
+# El problema era el agua
+
+
+.pull-left[
+- La Tabla 1 nos muestra la idea básica de su **diseño**
+
+- Es como si hubiera habido un experimento: casas comparativamente iguales recibían agua de distintas compañías
+
+- Podemos notar las diferencias en el número de muertes por compañía
+
+- Muchas veces no neceistaremos cosas más complicadas que esto
+
+- A partir de estos hallazgos se propusieron algunas políticas que eran consistentes con la hipótesis de transmisión
+
+- En muchos sentidos Snow hizo un trabajo de detective
+]
+
+.pull-right[
+
+
+```{r table.snow, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+ciudad <- c("Southwark y Vauxhall", "Lambeth", "Resto de Londres")
+hogares <- c("40,046","26,107","256,423")
+muertes <- c("1,263","98","1,422")
+muertes10mil <- c("315","37","59")
+
+table.snow <- data.frame(cbind(ciudad, hogares, muertes, muertes10mil))
+
+colnames(table.snow) = c("Ciudad","Hogares","Muertes por cólera", "Muertes / 10 mil hogares")
+
+table.snow %>%
+  kbl(align = "lccc") %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>%
+  add_header_above(c("Tabla XI de Snow" = 4 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+  footnote(general = "Reproducida por Freedman (1991).",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
+```
+
+]
+
+---
+
+# El caso del asbesto
+
+- Un estudio publicado en el *American Journal of Epidemiology* mostraba que la fibra de asbesto **causaba** cáncer de pulmón (Kanarek et al., 1980)
+
+- Se estudiaron 722 secciones censales en San Francisco
+
+- Se formuló un modelo econométrico del tipo
+
+$$tasa=f(sexo,raza,estado\,civil, educación, ingreso, ocupación)$$
+- ¿Qué salió mal?
+
+--
+
+- Variable omitida: fumar
+
+- Se corrieron 200 regresiones y solo en una $p<0.001$
+
+- Se antepusieron las técnicas estadísticas y los supuestos a la lógica y el razonamiento
+
+---
+
+# Asumir causalidad de una regresión
+
+- ¿Confiar más o menos en la KGB te hace más o menos políticamente activo (Bahry y Silver (1987)?
+
+- ¿Y si la relación es a la inversa?
+
+- ¿Qué otras cosas como estas no se leen a diario en los periódicos?
+
+--
+
+- ¿Los estados en Estados Unidos tienen diferentes *culturas* (Erikson et al. 1987)?
+
+- ¿Puede una serie de variables *dummy* capturar la diferencia de culturas?
+
+
+---
+
+# Regresión para derivar causalidad
+
+
+---
+
+# Conclusión de Freedman sobre la regresión
+
+- Bastante pesimista sobre la utilidad de la econometría
+
+- Refinamiento técnico no resuelve el problema
+
+- LaLonde (1986) compara estimadores experimentales vs no experimentales
+
+- Crítica a la minería de datos y a correr miles de modelos
+
+--
+
+- La regresión no revela por sí sola una causalidad
+
+- Hay que poner énfasis en el diseño
+
+--
+
+- Yo no soy tan pesimista como Freedman
+
+
+---
+
+class: inverse, middle, center
+
+# El problema de la causalidad en economía
+
+
+---
+
+# Efecto causal
+
+- Pensemos en un tratamiento binario
+
+$$T_i=\begin{cases}
+1 \quad\text{tratado} \\
+0 \quad\text{no tratado}
+\end{cases}$$
+
+- El resultado que cada individuo tendría bajo cada régimen de tratamiento:
+  - $y_{1i}$ con $T_i=1$
+  
+  - $y_{0i}$ con $T_i=0$
+
+
+- Supongamos que el tratamiento es recibir un trasplante y el resultado es morir (1) o seguir vivo (0) cinco días después de recibirlo (Hernan & Robins, 2018)
+
+  - Supongamos que Zeus recibió el trasplante y a los cinco días había fallecido
+  
+  - Por otro lado, Hena no recibió el trasplante y a los cinco días seguía viva
+  
+--
+  
+- No tardarían nuestros columnistas en decir que hay que prohibir los trasplantes
+
+
+---
+
+# Efecto causal
+  
+- Supongamos también que podemos conocer que:
+  
+$$y_{Zeus}=\begin{cases}
+y_{1,Zeus}=1\\
+y_{0,Zeuz}=0
+\end{cases}$$
+
+es decir, si no hubiera recibo el trasplante, estaría vivo cinco días después
+
+- Similarmente, conocemos que:
+
+$$y_{Hena}=\begin{cases}
+y_{1,Hena}=0\\
+y_{0,Hena}=0
+\end{cases}$$
+
+- **Efecto causal para un individuo**: el tratamiento tiene un efecto causal para $i$ si $y_{1i}\neq y_{0i}$
+  
+- En nuestro ejemplo, el tratamiento tuvo un efecto causal en Zeus, pero no en Hena
+
+---
+
+# Resultados potenciales
+
+- $y_{1i}$ y $y_{0i}$ se conocen como resultados potenciales o contrafactuales
+
+- El término *potencial* se debe a que solo vemos uno de ellos
+
+- En nuestro ejemplo, solo observamos que $y_{Zeus}=y_{1,Zeus}=1$
+
+- En general, el efecto causal para un individuo no puede ser identificado
+
+---
+
+# Efectos causales promedio
+
+- Supongamos que podemos estudiar a la familia de Zeus, $N=20$
+
+```{r table.personas, echo=FALSE, message=FALSE, warnings=FALSE}
+
+personaid <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")
+y0 <- c(0,1,0,0,0,1,0,0,1,1,0,1,1,0,0,0,1,1,1,1)
+y1 <- c(1,0,0,0,0,0,0,1,1,0,1,1,1,1,1,1,1,0,0,0)
+
+table.personas <- data.frame(cbind(personaid, y0,y1))
+
+colnames(table.personas) = c("Persona","y0","y1")
+
+table.personas %>%
+  kbl(align = "lcc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>% 
+  add_header_above(c("Efectos individuales" = 3 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+    scroll_box(height = "70%")
+
+```
+
+
+
+
+---
+
+# Efectos causales promedio
+
+- De la tabla podemos concluir que $P(y{1i}=1)=10/20=0.5$, es decir, la mitad de quienes reciben el trasplante morirían después de cinco días
+
+- Y también observamos que $P(y_{0i}=1)=0.5$, es decir, que la probabilidad de morir de no haber recibido el tratamiento es también de 0.5
+
+--
+
+- En el anterior ejemplo, el tratamiento no tiene un efecto causal pues la probabilidad de morir con y sin el tratamiento es igual
+
+- **Efecto causal promedio** en una población: un efecto causal promedio de $T$ en el resultado $y$ está presente si $P(Y_{1i}=1\neq Y_{0i}=1)$ en la población de interés
+
+- Cuando pensamos en **poblaciones**, podemos usar expectativas para definir el efecto causal promedio: $E(Y_{1i}\neq E_{0i})$, lo cual permite generalizar a resultados no binarios
+
+- La ausencia de efectos individuales promedio no implica ausencia de efectos individuales
+
+--
+
+- Cuando no hay efecto causal individual para ningún individuo, $y_{0i}=y_{1i}$, para todo $i$, decimos que la hipótesis **estricta** (*sharp*) de efecto de tratamiento nulo es verdadera
+
+---
+
+# Variabilidad aleatoria
+
+- En la práctica, casi nunca podemos observar a la población de interés, sino solo a una muestra
+
+- Por tanto, $P(y_{ti}=y)$ no puede ser observada sino estimada
+
+- Debido al error muestral, la proporción que muere en la muestra no es numéricamente igual a la proporción que muere en la población
+
+--
+
+- La hipótesis que queremos probar es que hay un efecto causal en la población
+
+- Pero al trabajar con muestras, puede haber diferencias que surjan solo por el muestreo
+
+- Nuestra tarea es tratar de distinguir estas diferencias de los verdaderos efectos causales
+
+---
+
+class: inverse, middle, center
+
+# El experimento ideal
+
+---
+
+# El efecto de los hospitales
+
+- ¿Los hospitales hacen que la gente sea más sana?
+
+- Podemos conseguir datos de encuestas sobre cuántas veces las personas han ido al hospital en el último año
+
+
+```{r table.hospital, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+grupo <- c("Hospitalizados", "No hospitalizados", "Diferencia", "(t)")
+size <- c("7,774","90,049"," "," ")
+salud <- c("3.21", "3.93","0.72","(58.9)")
+error <- c("0.014","0.003"," ", " ")
+
+table.hospital <- data.frame(cbind(grupo, size, salud, error))
+colnames(table.hospital) = c("Grupo","N","Salud (0-5)", "Error estándar")
+
+table.hospital %>%
+  kbl(align = "lccc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>% 
+  add_header_above(c("El efecto de los hospitales" = 4 ),
+                   bold = TRUE,
+                   background = "white")
+
+
+
+```
+
+--
+
+
+- ¿Tiene sentido? ¿Los hospitales enferman?
+
+- ¿Qué sucede?
+
+
+
+---
+
+# Comparaciones observacionales
+
+- Pensemos de nuevo en términos del *Modelo de Rubin* de resultados potenciales
+
+$$y_{i}=\begin{cases}
+y_{1i}=1\quad\text{si }D_i=1\\
+y_{0i}=0 \quad \text{si } D_i=0
+\end{cases}$$
+
+
+- Solo vemos al individuo en una situación, $y_i$:
+
+$$y_i=y_{0i}+(y_{1i}-y_{0i})D_i$$
+--
+
+- ¿Qué nos dicen las comparaciones observacionales?
+
+- Supongamos que tenemos acceso a datos sobre tratados y no tratados
+
+- Podemos calcular $E(y_i|D_i=1)-E(y_i|D_i=0)$:
+
+$$
+\begin{aligned}
+E(y_i|D_i=1)-E(y_i|D_i=0)=&E(y_{1i}|D_i=1)-E(y_{oi}|D_i=0)+\\& \underbrace{E(y_{0i}|D_i=1)-E(y_{0i}|D_i=1)}_0 
+\end{aligned}
+$$
+---
+
+# Sesgo de selección
+
+
+- Reordenando:
+
+$$
+\begin{aligned}
+E(y_i|D_i=1)-E(y_i|D_i=0)=&\overbrace{ E(y_{1i}|D_i=1)-E(y_{0i}|D_i=1)}^{\text{Efecto promedio en los tratados}}+\\& \underbrace{E(y_{0i}|D_i=1)-E(y_{oi}|D_i=0)}_{\text{Sesgo de selección}}
+\end{aligned}
+$$
+
+- El primer término nos da la diferencia promedio en la variable de salud entre los hospitalizados y lo que les hubiera pasado si no hubieran sido hospitalizados
+
+- En nuestro ejemplo, el **sesgo** de selección es la diferencia en salud entre los hospitalizados y los no hospitalizados
+
+- Específicamente, si quienes van al hospital tienen una peor salud, podemos esperar que $E(y_{0i}|D_i=1)-E(y_{oi}|D_i=0)<0$
+
+---
+
+# Sesgo de selección
+
+- Al hacer aseveraciones basadas en comparaciones observacionales se incluye el efecto causal del tratamiento, pero también el sesgo de selección
+
+- El sesgo de selección puede ser positivo o negativo
+
+- El objetivo de las estrategias de evaluación es eliminar el sesgo de selección
+
+---
+
+# Tratamiento aleatorio
+
+- Supongamos que tenemos la posibilidad de aleatorizar el tratamiento, es decir, hacer que $Y_i$ y $D_i$ sean independientes
+
+- En ese caso, por independencia: $E(Y_{0i}|D_i=0)=E(Y_{0i}|D_i=1)$
+
+- De la definición de comparación observacional:
+
+$$
+\begin{aligned}
+E(y_i|D_i=1)-E(y_i|D_i=0)=&E(y_{1i}|D_i=1)-E(y_{0i}|D_i=0)
+\end{aligned}
+$$
+
+- Sustituyendo el resultado de independencia:
+
+$$
+\begin{aligned}
+E(y_i|D_i=1)-E(y_i|D_i=0)&=E(y_{1i}|D_i=1)-E(y_{0i}|D_i=1) \\
+& =E(y_{1i}-y_{0i}|D_i=1) \\
+& =\underbrace{E(y_{1i}-y_{0i})}_{\text{Efecto causal}}
+\end{aligned}
+$$
+
+---
+
+# No siempre es factible
+
+- La aleatorización resuelve muchas cosas, pero muchas veces no es factible
+
+- ¿Qué tendríamos que hacer en el caso de estudio, "¿Los hospitales matan?"
+
+--
+
+- Pensemos en un programa de empleo para ex convictos
+
+- Seguramente una comparación observacional indicaría que estos ganan menos que el resto de la población
+
+- Pero esto no significa que el programa cause un efecto negativo en el ingreso
+
+- Siempre tenemos que pensar en el contrafactual
+
+---
+
+# El experimento STAR
+
+- ¿En qué consistió?
+
+--
+
+- Dos tipos de tratamiento:
+
+  - $T_1$: clase pequeña (13-17) con maestro de tiempo completo
+  - $T_2$: tamaño normal pero con asistente para el maestro
+  
+- Un grupo $C$ al que no se le hizo cambio alguno (22.3 alumnos en promedio)
+
+--
+
+- ¿Cuál es el efecto de tener clases más pequeñas?
+
+- ¿Por qué esto sería relevante? ¿Qué implicaciones de política tendría?
+
+---
+
+# El balance
+
+.pull-left[
+
+- ¿Qué vemos en la Tabla 2.2.1 de MHE
+
+- ¿Qué nos indican los valores $p$?
+
+- ¿Cuál es la hipótesis nula?
+
+- ¿Qué significa *atrición*?
+
+- ¿Se logró el objetivo del experimento?
+
+]
+
+.pull-right[
+
+```{r table.balance, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+variable <- c("Lunch gratis", "Blanco / asiático", "Edad (1985)", "Atrición", "Tamaño de clase","Calificación")
+t1 <- c(0.47,0.68,5.44,0.49,15.1,54.7)
+control <- c(0.48,0.67,5.43,0.52,22.4,48.9)
+t2 <- c(0.50,0.66,5.42,0.53,22.8,50.0)
+pvalue <- c(0.09,0.26,0.32,0.02,0.00,0.00)
+
+table.balance <- data.frame(cbind(variable,t1, control,t2,pvalue))
+colnames(table.balance) = c("Variable","`T_1`","`C`", "`T_2`", "`p`")
+
+table.balance %>%
+  kbl(align = "lcccc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>% 
+  add_header_above(c("Balance de observables" = 5 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+  footnote(general = "Tomada de Angrist y Pischke (2009), Tabla 2.2.1.",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
+
+```
+]
+
+
+---
+
+# Desventajas
+
+- Tiempo
+
+- Costo: 12 millones de USD del proyecto STAR
+
+- Preocupaciones legales y éticas
+
+--
+
+- A veces es posible hacer experimentos, a veces es muy difícil y a veces es imposible
+
+- Usando métodos no experimentales, Angrist y Lavy (1999) encuentran resultados parecidos (pero con otros métodos)
+
+
+---
+# Próxima sesión
+
+- Pregunta: ¿están libres el lunes por la mañana?
+
+- Analizaremos el papel de la regresión en el análisis de efectos de tratamiento
+
+  - MM, Capítulo 1, Apéndice
+  
+  - CT, Capítulo 25, Secciones 1 y 2
+  
+- Avancemos con dos ejemplos:
+
+  - Baird, S., McIntosh, C., & Özler, B. (2011). Cash or condition? Evidence from a cash transfer experiment. The *Quarterly journal of economics*, 126(4), 1709-1753.
+  
+  - Banerjee, A., Duflo, E., Goldberg, N., Karlan, D., Osei, R., Parienté, W., Shapiro, J., Thuysbaert, B. & Udry, C. (2015). A multifaceted program causes lasting progress for the very poor: Evidence from six countries. *Science*, 348(6236), 1260799. 
+
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+
+
