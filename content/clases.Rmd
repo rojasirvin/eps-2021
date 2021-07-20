@@ -9,6 +9,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Aqui van las clases
+
+[Clase 1](https://eps-2021.netlify.app/clases/clase_1.html#1). Evaluación: diseño y econometría
+
+[Clase 2](https://eps-2021.netlify.app/clases/clase_2.html#1). Inferencia causal
 
 
