@@ -4,7 +4,7 @@
 # This file is formatted using YAML syntax - learn more at https://learnxinyminutes.com/docs/yaml/
 
 title: Online Courses # Website name
-baseurl: 'https://rojasirvin.github.io/eps-2021/' # Website URL
+baseurl: 'https://eps-2021.netlify.app' # Website URL
 copyright: '' # Footer text, e.g. '© {year} Me'
 
 ############################
