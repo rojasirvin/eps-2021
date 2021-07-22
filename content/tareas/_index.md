@@ -6,4 +6,6 @@ date: 2021-07-21
 weight: 40
 ---
 
-{{< list_children >}}
+[Tarea 1]({{< ref "/tareas/tarea_1/" >}})
+
+[Tarea 2]({{< ref "/tareas/tarea_2/" >}})

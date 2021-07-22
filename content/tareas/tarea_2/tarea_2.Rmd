@@ -1,6 +1,6 @@
 ---
 title: "Tarea 2"
-summary: "Fecha de entrega: por definir."
+summary: " "
 weight: 1
 type: book
 toc: false
