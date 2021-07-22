@@ -10,19 +10,17 @@ main:
   - name: Programa
     url: '/programa'
     weight: 20
-  - name: Courses
-    url: '/course'
+  - name: Reglas
+    url: '/reglas'
     weight: 30
-    identifier: courses
-  - name: Data science
-    url: '/course/example/'
+  - name: Lecturas
+    url: '/lecturas'
     weight: 40
-    parent: courses
-  - name: Blog
-    url: '/post'
+  - name: Tareas
+    url: '/tareas'
     weight: 50
-  - name: Contact
-    url: '/contact'
+  - name: Presentaciones
+    url: '/presentaciones'
     weight: 60
   - name: Clases
     url: '/clases'

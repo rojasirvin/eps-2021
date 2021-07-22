@@ -7,7 +7,7 @@ header:
   caption: ""
   image: ""
 share: false
-title: Privacy Policy
+title: Sobre este sitio
 ---
 
-Add your privacy policy here and set `draft: false` to publish it. Otherwise, delete this file if you don't need it.
+Todos los materiales y archivos contenidos en este sitio son para fines educativos y uso personal. Por favor, no los reproduzca, ni cite, ni distribuya.

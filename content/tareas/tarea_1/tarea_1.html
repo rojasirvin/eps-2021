@@ -1,0 +1,111 @@
+---
+title: "Tarea 1"
+summary: "Fecha de entrega: 10 de septiembre a las 8:00."
+weight: 1
+type: book
+toc: false
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="instrucciones" class="section level2">
+<h2>Instrucciones</h2>
+<p>La tarea debe entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las secciones teóricas pueden estar desarrolladas en un procesador de textos y enviadas en formato .docx o .pdf.</p>
+<p>Las secciones prácticas deberán contener archivos de código replicable y archivos de salida en R (o similares, en caso de usar otro software) para considerarse completas. Las tareas deben entregarse antes de la fecha límite a través de Teams. Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.</p>
+</div>
+<div id="archivos" class="section level2">
+<h2>Archivos</h2>
+<p><a href="/tareas_files/STAR_public_use.csv">Bajar STAR_public_use.csv</a></p>
+</div>
+<div id="pregunta-1" class="section level2">
+<h2>Pregunta 1</h2>
+<p>Suponga que para un experimento en un laboratorio se asignó a un grupo estudiantes a un brazo de tratamiento o a uno de control. Antes de comenzar el experimento se recolectaron una serie de características <span class="math inline">\(x_{ji}\)</span>, <span class="math inline">\(j=1,\ldots 5\)</span>, de cada estudiante. Se busca medir el efecto del tratamiento sobre una variable de resultados <span class="math inline">\(y_i\)</span>.</p>
+<p>El investigador A quedó a cargo de comprobar el balance de la asignación del tratamiento y le reporta lo siguiente:</p>
+<p><em>Para verificar que la aleatorización fue exitosa, tomé la serie de variables pre-intervención y la dummy de asignación al tratamiento <span class="math inline">\(T_i\)</span> para correr la siguiente regresión:</em></p>
+<p><span class="math display">\[T_i=\alpha+\sum_{j=1}^{5}x_{ji}&#39;\beta +\varepsilon_i\]</span></p>
+<p><em>Después realicé una prueba <span class="math inline">\(F\)</span> de significancia conjunta sobre los coeficientes <span class="math inline">\(\beta_j\)</span> que resultó tener un valor <span class="math inline">\(p\)</span> de 0.003.</em></p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[5 puntos] Explique qué interpretación tiene la prueba realizada por el investigador A y qué se esperaría de haberse logrado una aleatorización exitosa del tratamiento?</p></li>
+<li><p>[5 puntos] ¿Qué concluye a partir de lo que le reporta el investigador A?</p></li>
+</ol>
+<p>El investigador B le reporta lo siguiente:</p>
+<p><em>Yo realicé un análisis adicional para determinar el balance en la asignación del tratamiento. Para cada una de las características <span class="math inline">\(x_{ji}\)</span> corrí la siguiente regresión:</em></p>
+<p><span class="math display">\[x_{ji}=\gamma+\pi T_i+u_i\]</span></p>
+<p><em>A continuación, le reporto una tabla con los valores p asociados al coeficiente estimado de <span class="math inline">\(\pi\)</span> en cada una de las 5 regresiones.</em></p>
+<table>
+<thead>
+<tr class="header">
+<th><strong>Característica</strong></th>
+<th><strong>Valor <span class="math inline">\(p\)</span></strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(x_{1i}\)</span></td>
+<td>0.0012</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(x_{2i}\)</span></td>
+<td>0.0312</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(x_{3i}\)</span></td>
+<td>0.0127</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(x_{4i}\)</span></td>
+<td>0.0076</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(x_{5i}\)</span></td>
+<td>0.0902</td>
+</tr>
+</tbody>
+</table>
+<ol style="list-style-type: lower-alpha">
+<li><p>[5 puntos] Explique qué interpretación tienen las pruebas por el investigador B y qué se esperaría de haberse logrado una aleatorización exitosa del tratamiento?</p></li>
+<li><p>[5 puntos] ¿Cómo reconcilia la evidencia encontrada por sus asistentes y qué concluye sobre el balance en la asignación del tratamiento? ¿Qué características tendría una diferencia de medias de <span class="math inline">\(y_i\)</span> después del tratamiento como estimador del impacto de este?</p></li>
+</ol>
+</div>
+<div id="pregunta-2" class="section level2">
+<h2>Pregunta 2</h2>
+<p>Suponga que desea evaluar el impacto de las medidas de sana distancia realizadas por el gobierno de un país para reducir la mortalidad causada por el covid-19. Suponga que hubiera tenido la oportunidad implementar un experimento <strong>antes</strong> de que la epidemia se realizara.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[10 puntos] Describa cómo diseñaría su experimento ideal para responder a esta pregunta.</p></li>
+<li><p>[5 puntos] Escriba la regresión que usaría para estimar los efectos de las medidas implementadas en una variable de mortalidad.</p></li>
+<li><p>[5 puntos] ¿Cuáles considera que serían las distintas dificultades prácticas, institucionales y éticas en la implementación de su experimento ideal?</p></li>
+</ol>
+</div>
+<div id="pregunta-3" class="section level2">
+<h2>Pregunta 3</h2>
+<p>Replique el ejercicio de representar la FEC de salarios en función de educación para México, como en la Figura 3.1.1 de MHE (p. 39), usando los datos del cuarto trimestre de 2019 de la ENOE. El gráfico es complejo, pero recibirá crédito completo si reproduce, al menos por separado, los dos siguientes tipos de gráficos:</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[10 puntos] Gráfico de la relación promedio entre años de educación e ingresos.</p></li>
+<li><p>[10 puntos] Gráfico de la distribución de ingresos para cuatro niveles de educación que usted considere relevante destacar. Argumente sobre los niveles de educación elegidos.</p></li>
+</ol>
+</div>
+<div id="pregunta-4" class="section level2">
+<h2>Pregunta 4</h2>
+<p>se los datos del archivo <em>STAR_public_use.csv</em> para este problema. En este problema replicará la fila correspondiente a la variable <strong>age</strong> de la Tabla 1 en <a href="https://pubs.aeaweb.org/doi/pdfplus/10.1257/app.1.1.136">Angrist et al. (2009)</a>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[5 puntos] Obtenga la media y la desviación estándar en el grupo de control (columna 1), restringiendo la muestra a aquellos individuos con <strong>noshow</strong> igual a 0.</p></li>
+<li><p>[10 puntos] Usando una regresión lineal, muestre que el tratamiento es independiente de la edad. De nuevo, debe restringir la muestra quienes tienen <strong>noshow</strong> igual a 0. Reporte los coeficientes y los errores estándar (columnas 2 a 4).</p></li>
+<li><p>[5 puntos] Realice una prueba de significancia conjunta de los coeficientes obtenidos en el punto b. Reporte el estadístico <span class="math inline">\(F\)</span> y el valor <span class="math inline">\(p\)</span> asociado (columna 5).</p></li>
+</ol>
+</div>
+<div id="pregunta-5" class="section level2">
+<h2>Pregunta 5</h2>
+<p>Nuevamente, use los datos del archivo <em>STAR_public_use.csv</em> para este problema. En este problema, replicará dos columnas del efecto de tratamiento de la Tabla 5. Note que de nuevo se deben usar solo las observaciones que tienen <strong>noshow</strong> igual a 0. Además, note que se usan las siguientes variables de control: <strong>sex</strong>, <strong>mtongue</strong>, <strong>hsgroup</strong>, <strong>numcourses_nov1</strong>, <strong>lastmin</strong>, <strong>mom_edn</strong>, y <strong>dad_edn</strong>, todas ellas categóricas.</p>
+<p>Antes de estimar los efectos, sustituya <strong>gpa_year1</strong> por missing cuando <strong>grade_20059_fall</strong> es missing y sustituya <strong>grade_20059_fall</strong> por missing cuando <strong>gpa_year1</strong> es missing. Esto le permitirá quedarse con los individuos que tienen información completa.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[10 puntos] Estime el efecto de cada tipo de tratamiento sobre el <em>GPA</em>, es decir, sobre la variable <strong>gpa_year1</strong>, para toda la muestra (Panel B, columna 1). Ponga atención a los errores estándar.</p></li>
+<li><p>[10 puntos] Estime el efecto de recibir cada tipo de tratamiento, considerando los tratamientos SSP o SFP (de cualquier tipo) en las mujeres de la muestra (Panel B, columna 6). Ponga atención a los errores estándar.</p></li>
+</ol>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Angrist, J., Lang, D., y Oreopoulos, P. (2009). Incentives and services for college achievement: Evidence from a randomized trial. <em>American Economic Journal: Applied Economics</em>, 1(1), 136-63.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
