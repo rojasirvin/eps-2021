@@ -1,18 +1,40 @@
 ---
 title: "Tarea 2"
-summary: " "
+summary: "Jueves 30 de septiembre a las 8:00"
 weight: 1
 type: book
 toc: false
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
 ## Instrucciones
   
-La tarea debe entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las secciones teóricas deben estar desarrolladas en un procesador de textos y enviadas en formato .docx o .pdf. Las secciones prácticas deberán contener archivos de código replicable y archivos de salida en R (o similares, en caso de usar otro software) para considerarse completas. Las tareas deben entregarse antes de la fecha límite a través de Teams. Puede crear una carpeta comprimida que contenga todos sus archivos y subir esta carpeta en Teams. Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.
+Las tareas deben entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las tareas deberán entregarse en Teams antes de la fecha y hora señalada. No se aceptarán tareas fuera de tiempo. Por favor, **no comprima los archivos** en carpetas comprimidas. Las tareas deberán contener dos archivos:
+
+Un primer documento de respuestas donde se incluyan las respuestas a las preguntas teóricas y conceptuales. Este documento puede ser redactado en Word o cualquier otro software, o si lo prefiere, a mano, pero deberá estar impreso en .pdf. En este documento también se deben incluir las respuestas a preguntas sobre conclusiones que se desprenden de las secciones prácticas. Por ejemplo, si una pregunta pide obtener la media de la variable x en cierta base de datos, entonces el documento de respuestas debe incluir la pregunta y respuesta correspondiente: “la media de la variable x es 32.6”. En este documento también deberán incluirse las tablas y gráficas que se soliciten.
+
+Un segundo archivo deberá contener el código replicable usado para generar los resultados de la sección práctica. El código debe también crear las tablas y gráficas solicitadas. Los archivos de código se verificarán para comprobar su replicabilidad.
+
+Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.
+
+## Fecha de entrega
+
+Jueves 30 de septiembre a las 8:00.
+
+## Archivos
+
+[crepon_morocco_analysis.csv](/tareas/tarea_2/crepon_morocco_analysis.csv)
+
+[STAR_public_use.csv](/tareas/tarea_2/STAR_public_use.csv)
+
+[pvalues.csv](/tareas/tarea_2/pvalues.csv)
 
 ## Pregunta 1
 
-1. En la [Sesión 7](https://rojasirvin.github.io/EPS2020/sesiones/s7/sesion7.html#19) introducimos los datos de una intervención en Marruecos en la que un producto financiero fue ofrecido de manera aleatoria, pero la adopción del producto obedeció a un proceso de selección. Para este problema use la base *crepon_morocco_analysis.csv*, que tiene un subconjunto de los datos usados en dicha sesión ya listos para su análisis. La variable **treatment** contiene la variable de tratamiento y la variable **client** es la variable de adopción. En esta pregunta nos enfocaremos en el efecto causal de la adopción en el gasto total de los hogares, **expense_total**.
+En la Sesión 7 introducimos los datos de una intervención en Marruecos en la que un producto financiero fue ofrecido de manera aleatoria, pero la adopción del producto obedeció a un proceso de selección. Para este problema use la base *crepon_morocco_analysis.csv*, que tiene un subconjunto de los datos usados en dicha sesión ya listos para su análisis. La variable **treatment** contiene la variable de tratamiento y la variable **client** es la variable de adopción. En esta pregunta nos enfocaremos en el efecto causal de la adopción en el gasto total de los hogares, **expense_total**.
 
 a. [5 puntos] Primero mostraremos cómo el estimador de Wald es equivalente al estimador de VI cuando no hay controles y cuando las variables de asignación y adopción son binarias. Obtenga el estimador de Wald como el cociente de la diferencia en gasto total promedio entre los hogares asignados a tratamiento y control dividido por la diferencia en la probabilidad de adopción entre los hogares asignados a tratamiento y control.
 
@@ -24,39 +46,36 @@ a. [2 puntos] Estime ahora la **primera etapa**, es decir, estime por MCO el efe
 
 a. [5 puntos] Considere la columna 3 del panel A en la Tabla 9 del artículo. Aquí se reporta la estimación por MCO de la relación entre **client** y gasto total, con los mismos controles y tipo de errores que en c. Replique este resultado. ¿Se puede interpretar de forma causal el coeficiente sobre **client**?
 
-a.	[5 puntos] ¿Cuáles son los supuestos econométricos que permiten la estimación del Local Average Treatment Effect (LATE) en el contexto de este problema? Comente sobre la evidencia que respalda el supuesto de que los instrumentos no son débiles en este problema.
+a.	[5 puntos] ¿Cuáles son los supuestos que permiten la estimación del Local Average Treatment Effect (LATE) en el contexto de este problema? Comente sobre la evidencia que respalda el supuesto de que los instrumentos no son débiles en este problema.
 
 a.	[5 puntos] Estime el efecto del cumplimiento sobre el gasto total, usando la asignación aleatoria como instrumento del cumplimiento. Es decir, estime el LATE. Use los mismos controles y tipo de errores que en c. Este resultado se reporta en la columna 3 del panel B en la Tabla 9. ¿Cuál es la interpretación del coeficiente de la variable **client**?
 
 
 ## Pregunta 2
 
-En la Pregunta 1 obtuvo el estimador de Wald para aproximar el efecto de la adopción en el gasto total. Considere dicho cálculo sin controles.
+En la Pregunta 1 obtuvo el estimador de Wald para aproximar el efecto de la adopción en el gasto total. Considere dicho cálculo sin controles para lo que resta de esta pregunta.
 
-b.	[5 puntos] Utilice un procedimiento bootstrap *a mano* para estimar el error estándar del estimador de Wald usando 50 repeticiones. Es decir, debe realizar un remuestreo de los datos originales y para cada muestra obtener el estimador de Wald. Luego, obtenga la desviación estándar de los 50 estadísticos calculados. Utilice una semilla para poder replicar sus resultados.
+a.	[5 puntos] Utilice un procedimiento bootstrap *a mano* para estimar el error estándar del estimador de Wald usando 50 repeticiones. Es decir, debe realizar un remuestreo de los datos originales y para cada muestra obtener el estimador de Wald. Luego, obtenga la desviación estándar de los 50 estadísticos calculados. Utilice una semilla para poder replicar sus resultados.
 
 a.	[5 puntos] Reemplace la semilla de la parte a. por una nueva semilla y estime nuevamente el error estándar del estimador de Wald con 50 repeticiones. Comente sobre la diferencia entre este error estándar y el de la parte a.
 
-b.	[5 puntos] Regrese el valor de la semilla al usado en a. y estime nuevamente el error estándar del estimador de Wald, esta vez usando 1000 repeticiones. Comente sobre la diferencia entre este error estándar y el de la parte a.
-
-
+a.	[5 puntos] Regrese el valor de la semilla al usado en a. y estime nuevamente el error estándar del estimador de Wald, esta vez usando 1000 repeticiones. Comente sobre la diferencia entre este error estándar y el de la parte a.
 
 ## Pregunta 3
 
-1. Se propone evaluar el efecto de usar cubrebocas en la tasa de transmisión del covid-19 en el país A, que está compuesto por cientos de islas y donde cada isla es una ciudad. Al inicio de la epidemia, se prohibieron los viajes entre islas. Se dispone de datos de la tasa de fatalidad en varias ciudades en los momentos $t=0$ y $t=1$. Entre el periodo $0$ y el $1$ se sabe que en un subconjunto de cinco ciudades se ordenó el uso obligatorio del cubrebocas.
+El país A se propone evaluar el efecto de una exención fiscal para las empresas sobre la tasa de desempleo. El país A está compuesto por cientos de islas y, durante el periodo analizado, el movimiento de personas y empresas entre islas estuvo prohibido. El programa fue implementado por los gobiernos de las islas que así lo decidieron. Se dispone de datos de la tasa de desempleo en varias islas en los momentos $t=0$ y $t=1$. Entre el periodo $0$ y el $1$ se sabe que en alrededor de un tercio de las ciudades se implementó una medida para fiscal que, en la práctica, se tradujo en un menor impuesto sobre la nómina de las empresas. En el resto de las islas, el no hubo cambios económicos relevantes.
 
-a.	[5 puntos] ¿Cómo evaluar los resultados de ordenar el uso del cubrebocas por medio de diferencia en diferencias? ¿Cómo seleccionaria al grupo de ciudades que se usarían para llevar a cabo esta evaluación?
+a.	[5 puntos] ¿Cómo evaluar los resultados de los cambios fiscales por medio de diferencia en diferencias? ¿Le preocupa que haya islas con alto y bajo desempleo en el periodo $0$? ¿Le preocupa que las islas que implementaron el programa sean aquellas que tenían un nivel alto de inversión?
 
-b.	[5 puntos] ¿Cuáles son los supuestos sobre los que recae la estrategia de evaluación por diferencia en diferencias? ¿Qué factores podrían amenazar el uso de esta estrategia para evaluar el efecto de la intervención?
+a.	[5 puntos] ¿Cuáles son los supuestos sobre los que recae la estrategia de evaluación por diferencia en diferencias? ¿Qué factores podrían amenazar el uso de esta estrategia para evaluar el efecto de la intervención?
 
-d.	[5 puntos] Suponga que un archipiélago vecino, el país B, también conformado por 1000 ciudades-isla implementa un programa de entrega de cubrebocas. El país solo puede entregar cubrebocas en 100 de las ciudades, las cuales serán escogidas en una lotería pública con un generador de números aleatorios. Expliqué cómo usaría inferencia por aleatorización (*randomization inference*) para estimar el impacto de la interevención en la tasa de fatalidad. Describa con detalle el procedimiento seguido y cómo juzgaría la significancia estadística de las diferencias que observe.
-
+d.	[5 puntos] Suponga que un archipiélago vecino, el país B, también conformado por 1000 ciudades-isla implementa también un programa de entrega de exenciones fiscales, pero a diferencia de la isla A, en la isla B las exenciones se asignaron de manera aleatoria. Por razones presupuestales, el país B solo puede hacer exenciones fiscales en 100 islas. Las islas asignadas al tratamiento son escogidas en una lotería pública con un generador de números aleatorios. Explique cómo usaría inferencia por aleatorización (*randomization inference*) para estimar el impacto de la intervención en la tasa de desempleo Describa con detalle el procedimiento seguido y cómo juzgaría la significancia estadística de las diferencias que observe.
 
 ## Pregunta 4
 
-Considere nuevamente la base *STAR_public_use.csv* usada en la Tarea 1. del artículo Angrist, Lang y Oreopoulos (2009)[^2]. En esta pregunta nos concentraremos en los efectos de la intervención en el año 2, mostrados en la columna (4) de la Tabla 6, sobre dos variables, el promedio de calificaciones **gpa_year2** y los créditos completados **credits_earned2**.
+Considere nuevamente la base *STAR_public_use.csv* usada en la Tarea 1 del artículo Angrist, Lang y Oreopoulos (2009)[^2]. En esta pregunta nos concentraremos en los efectos de la intervención en el año 2, mostrados en la columna (4) de la Tabla 6, sobre dos variables, el promedio de calificaciones **gpa_year2** y los créditos completados **credits_earned2**.
 
-El propósito de esta pregunta es mostrar la función de los $z$-scores en el análisis de efectos de tratamiento. De nuevo, puede quedarse solo con las obervaciones que tienen **noshow** igual a 0. Antes de comenzar su análisis, sustituya por NA los valores en **credits_earned2** para aquellas observaciones que tienen $NA$ en la variable **prob_year1**.
+El propósito de esta pregunta es mostrar la función de los $z$-scores en el análisis de efectos de tratamiento. De nuevo, puede quedarse solo con las observaciones que tienen **noshow** igual a 0. Antes de comenzar su análisis, sustituya por NA los valores en **credits_earned2** para aquellas observaciones que tienen $NA$ en la variable **prob_year1**.
 
 a. [5 puntos] Para tener un punto de comparación, estime la ecuación del efecto de tratamiento para **credits_earned2** usando la misma especificación que en la pregunta 5 de la Tarea 1. Use también errores robustos. Deberá poder replicar los coeficientes y errores estándar del panel D, columna (4). ¿Cómo se interpretan el coeficiente sobre la variable **ssp**?
 
@@ -64,26 +83,13 @@ a. [5 puntos] Genere un $z$-score para la variable **credits_earned2** al que ll
 
 a. [5 puntos] Realice la misma estimación que en la parte a., pero ahora use como variable dependiente **credits_earned2_sd**. ¿Cómo se interpreta el coeficiente sobre **ssp**? ¿Qué es diferente y qué es igual entre los resultados obtenidos en esta parte y los obtenidos en la parte a.?
 
-a. [5 puntos] Ahora realizaremos un índice de mejora en educación, al agregar los resultados de estos dos indicadores en una sola variable, como se describe en Banerjee et al. (2015)[^3]. Para ello, primero genere **gpa_year2_sd**, que será la versión estandarizada de **gpa_year2**, siguiendo el mismo procedimiento que en la parte b. En seguida, genere una nueva variable llamda **promedio_vars**, que será el promedio de **credits_earned2_sd** y **gpa_year2_sd**. Luego, calcule la media y la desviación estándar de **promedio_vars** en el grupo de control. Finalmente, genere una nueva variable **promedio_vars_sd** restándole a **promedio_vars** la media antes calculada y dividiendo esta diferencia por la desviación estándar antes calculada. Muestre que la variable **promedio_vars_sd** tiene media 0 y desviación estándar 1 en el grupo de control.
+a. [5 puntos] Ahora realizaremos un índice de mejora en educación, al agregar los resultados de estos dos indicadores en una sola variable, como se describe en Banerjee et al. (2015)[^3]. Para ello, primero genere **gpa_year2_sd**, que será la versión estandarizada de **gpa_year2**, siguiendo el mismo procedimiento que en la parte b. En seguida, genere una nueva variable llamada **promedio_vars**, que será el promedio de **credits_earned2_sd** y **gpa_year2_sd**. Luego, calcule la media y la desviación estándar de **promedio_vars** en el grupo de control. Finalmente, genere una nueva variable **promedio_vars_sd** restándole a **promedio_vars** la media antes calculada y dividiendo esta diferencia por la desviación estándar antes calculada. Muestre que la variable **promedio_vars_sd** tiene media 0 y desviación estándar 1 en el grupo de control.
 
 a. [5 puntos] Estime ahora el efecto de tratamiento sobre **promedio_vars_sd**, siguiendo la misma especificación econométrica que en la parte a. y usando errores robustos. ¿Qué concluye?
 
 ## Pregunta 5
 
-Considere los valores $p$ del archivo *pvalues.csv*. Cada valor $p_i$ está asociado a una prueba de hipótesis $i$. La variable familia denota tres grupos de hipótesis sobre las cuales estamos interesados en hacer correcciones de múltiples hipótesis. La investigación en cuestión emplea $\alpha=0.05$.
-
-a. [5 puntos] Para cada una de las pruebas de hipótesis, genere un cuadro como el que se presenta a continuación y diga si se rechaza o no la hipótesis nula, bajo los siguientes criterios:
-
-    | | Hipótesis	sin corrección	| Corrigiendo $\alpha$ dentro de la familia usando el método de Bonferroni |	Corrigiendo por la tasa de falso descubrimiento dentro de la familia usando el método de Benjamini y Hochberg |
-    |:----:|----|----|----|
-    | 1 | | | |			
-    | $\vdots$	|	| | |
-    | 15 | | | |			
-
-a. [5 puntos] Suponga que encuentra buenas razones conceptuales para afirmar que las familias 2 y 3 deben ser consideraras una sola familia. Tendríamos ahora solo dos familias, la familia 1 original y una nueva familia numerada como 4, como se indica en la variable familia_corregida. ¿Cómo cambian sus conclusiones respecto a la parte a. de esta pregunta? Genere un nuevo cuadro con esta redefinición.
-
-a. [5 puntos] Suponga que su asistente de investigación olvidó el concepto de familia y realiza las correcciones por pruebas de múltiples hipótesis ignorando las familias. ¿Qué concluiría en este caso? Genere un nuevo cuadro bajo esta circunstancia. Comente sobre la diferencia en las conclusiones entre las partes b. y c.
-
+**PENDIENTE**
 
 [^1]: Por ejemplo, suponga que estima un modelo al que llame *modelo1*. Entonces, si ejecuta
     ```{r include=T, echo=T, eval=F}
