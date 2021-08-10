@@ -2,7 +2,7 @@
 linkTitle: Programa
 title: "Programa del curso"
 type: book
-date: 2021-07-21
+date: 2021-08-09
 toc: true
 weight: 10
 ---
@@ -20,42 +20,44 @@ weight: 10
 
 El curso se basa en los siguientes textos:
 
-* \* (MHE) Angrist, J.D. y Pischke, J.S. (2013). *Mostly Harmless Econometrics: An Empiricists Companion*. Princeton University Press.
+* (MHE) Angrist, J.D. y Pischke, J.S. (2013). *Mostly Harmless Econometrics: An Empiricists Companion*. Princeton University Press.
 
-* \* (MM) Angrist, J.D. y Pischke, J.S. (2014). *Mastering 'Metrics: The Path from Cause to Effect*. Princeton University Press.
+* (MM) Angrist, J.D. y Pischke, J.S. (2014). *Mastering 'Metrics: The Path from Cause to Effect*. Princeton University Press.
 
-* \* Cameron, A.C. y P.K. Trivedi (2005). *Microeconometrics: Methods and applications*. Oxford University Press.
+* Cameron, A.C. y P.K. Trivedi. (2005). *Microeconometrics: Methods and applications*. Oxford University Press.
 
-* DiNardo, J. y D.S. Lee (2011). Program Evaluation and Research Designs. En *Handbook of Labor Economics*, 4A: 463-536.
+* (MT) Cunningham, S. (2021). Causal inference: The mixtape. Yale University Press. Disponible en: https://mixtape.scunning.com/index.html.
 
-* \* (GMPRV) Gertler, P.J., S. Martinez, P. Premand, L.B., Rawlings, y C.M.J. Vermeersch. (2011). *La evaluación de impacto en la práctica*. Banco Interamericano de Desarrollo y Banco Mundial, segunda edición. Disponible en: https://publications.iadb.org/publications/spanish/document/La-evaluaci%C3%B3n-de-impacto-en-la-pr%C3%A1ctica-Segunda-edici%C3%B3n.pdf.
+* DiNardo, J. y D.S. Lee. (2011). Program Evaluation and Research Designs. En *Handbook of Labor Economics*, 4A: 463-536.
+
+* (GMPRV) Gertler, P.J., S. Martinez, P. Premand, L.B., Rawlings, y C.M.J. Vermeersch. (2011). *La evaluación de impacto en la práctica*. Banco Interamericano de Desarrollo y Banco Mundial, segunda edición. Disponible en: https://publications.iadb.org/publications/spanish/document/La-evaluaci%C3%B3n-de-impacto-en-la-pr%C3%A1ctica-Segunda-edici%C3%B3n.pdf.
 
 ## Contenido temático
 
 Unidad 1. Introducción
 
 * Fundamentos de la evaluación de impacto
-  - ¿Por qué evaluar?
   - Inferencia causal
   - Revisión de métodos de regresión
 
 Unidad 2. Métodos de evaluación
 
 * Evaluación experimental
-  - ATE y ATT
-  - LATE y variables instrumentales
+  - *ATE* y *ATT*
+  - *LATE* y variables instrumentales
   - Aplicaciones de evaluación experimental
   - Ventajas y desventajas de los experimentos en evaluación
 
 * Extensiones I
-  - Inferencia por aleatorización
   - Errores estándar
+  - Inferencia por aleatorización
   - Corrección por prueba de múltiples hipótesis
-  - ANCOVA
 
 * Diferencia en diferencias
   - Supuestos fundamentales
   - Efectos fijos individuales
+  - DID desfasado
+  - ANCOVA
   - Aplicaciones de DID
 
 * Métodos de pareamiento
@@ -79,7 +81,6 @@ Unidad 2. Métodos de evaluación
 Unidad 3. Temas actuales de evaluación
 
 * Extensiones II
-  - Replicabilidad, credibilidad, cientificidad y ética
   - Modelos estructurales en evaluación
   - Evaluaciones de impacto a nivel de economía local (LEWIE)
   - Aprendizaje automatizado y _big data_ en la evaluación de impacto
@@ -95,14 +96,19 @@ Unidad 3. Temas actuales de evaluación
 
 
 ## Tareas
-Cuatro tareas teórico-prácticas. Las tareas deben entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las secciones teóricas deben estar desarrolladas en un procesador de textos y enviadas en formato .docx o .pdf. Las secciones prácticas deberán contener archivos de código replicable y archivos de salida en R (o similares, en caso de usar otro software) para considerarse completas. Las tareas deben entregarse el día señalado antes del inicio de la clase, a través de Teams.
+Cuatro tareas teórico-prácticas. Las tareas deben entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las tareas deberán entregarse en Teams antes de la fecha y hora señalada. No se aceptarán tareas fuera de tiempo. Por favor, **no comprima los archivos** en carpetas comprimidas. Las tareas deberán contener dos archivos:
+
+Un primer documento de respuestas donde se incluyan las respuestas a las preguntas teóricas y conceptuales. Este documento puede ser redactado en Word o cualquier otro software, o si lo prefiere, a mano, pero deberá estar impreso en .pdf. En este documento también se deben incluir las respuestas a preguntas sobre conclusiones que se desprenden de las secciones prácticas. Por ejemplo, si una pregunta pide obtener la media de la variable x en cierta base de datos, entonces el documento de respuestas debe incluir la pregunta y respuesta correspondiente: “la media de la variable x es 32.6”. En este documento también deberán incluirse las tablas y gráficas que se soliciten.
+
+Un segundo archivo deberá contener el código replicable usado para generar los resultados de la sección práctica. El código debe también crear las tablas y gráficas solicitadas. Los archivos de código se verificarán para comprobar su replicabilidad.
+
 
 ## Software
 
-R será el paquete por defecto usado en las sesiones prácticas. Más aún, el uso de cualquier software es aceptado siempre que se cumplan con los requisitos de replicabilidad y reportes de salidas en las tareas y exámenes.
+R será el paquete standard usado en las sesiones prácticas. Más aún, el uso de cualquier software es aceptado siempre que se cumplan con los requisitos de replicabilidad y reportes de las tareas y exámenes.
 
 ## Exámenes
-+ Examen parcial: martes 5 de octubre de 2020 en el horario de clase
++ Examen parcial: martes 5 de octubre de 2021 en el horario de clase
 + Examen final: por definir
 
 
@@ -113,6 +119,3 @@ Cada alumno realizará una presentación de uno los artículos aplicados marcado
 El proyecto final consistirá en un protocolo de investigación de una evaluación de impacto. El tema y la metodología es libre, pero se evaluará el potencial para realizarse en el corto plazo. Se aconseja seleccionar un tema para el que se empleen datos de libre acceso. El protocolo deberá incluir, mínimamente: 1) una revisión de literatura, 2) un bosquejo de las motivaciones teóricas del problema, 3) la metodología empírica a emplear, 4) la fuente de datos a usar, y 5) los resultados preliminares. El proyecto debe presentarse en formato escrito con una extensión máxima de 20 cuartillas. Se recomienda ampliamente dar seguimiento al proyecto en horas de oficina para recibir retroalimentación respecto a los avances y resolver posibles dudas y dificultades.
 
 Entrega: fecha por definir, a través de Teams.
-
-
-

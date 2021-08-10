@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Evaluación: diseño y econometría</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Irvin Rojas" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="libs/cide.css" type="text/css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: title-slide
+
+
+
+.title[
+# Sesión 1. Evaluación: diseño y econometría
+]
+.subtitle[
+## Evaluación de Programas
+]
+.author[
+### Irvin Rojas &lt;br&gt; [rojasirvin.com](https://www.rojasirvin.com/) &lt;br&gt; [&lt;i class="fab fa-github"&gt;&lt;/i&gt;](https://github.com/rojasirvin) [&lt;i class="fab fa-twitter"&gt;&lt;/i&gt;](https://twitter.com/RojasIrvin) [&lt;i class="ai ai-google-scholar"&gt;&lt;/i&gt;](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&amp;hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas &lt;br&gt; División de Economía
+]
+
+---
+# Agenda
+
+1. Presentación mía y de ustedes
+
+1. Descripción general del curso
+
+1. El papel de la teoría, el diseño y la econometría
+
+1. ¿Qué utilidad tiene el curso en su formación?
+
+---
+
+# Descripción general del curso
+
+1. Logística del curso
+
+1. Evaluación
+
+1. Tareas
+
+1. Laboratorios
+
+1. Presentaciones
+
+1. Tiempos para horario de oficina
+
+1. Proyecto final
+
+1. Usemos **Microsoft Teams** para administrar tareas, exámenes y calificaciones
+
+---
+
+# Modo a distancia
+
+- Trataremos de hacer la experiencia de aprendizaje lo más cercana posible a la experiencia presencial
+
+- Pero no podemos actuar como si nada pasara
+
+--
+
+- Cosas parecidas
+
+  - Búsquenme para platicar en horas de oficina sobre sus dudas
+  - Lean antes de clase
+  - Tienen que colaborar para la clase
+  
+--
+
+- Cosas distintas
+
+  - Cámaras encendidas en clase
+  - No grabaremos las sesiones
+  - Trataré de partir la clase en bloques: teoría, artículos, código, exposiciones, etc.
+  - Tienen que colaborar **más** para la clase con algunos de los bloques
+
+
+---
+
+class: inverse, middle, center
+
+# Evaluación: diseño y econometría
+
+---
+
+# Evaluación de programas
+
+- Este curso está enfocado en métodos para identificar relaciones causales
+
+- Entre ellas están las relaciones que surgen por la implementación deliberada de programas públicos
+
+- Pero no nos limitamos a este tipo de acciones: nos interesa comprender la teoría y la práctica para dar respuesta a relaciones que surgen
+
+  - De la legislación nacional o subnacional
+  
+  - De fenómenos naturales
+  
+  - Del funcionamiento de los mercados y las instituciones
+
+--
+
+- En el curso enfatizaremos lo siguiente:
+
+  1. La importancia de las preguntas
+  2. El diseño para responder dichas preguntas
+  3. Las técnicas apropiadas para implementar el diseño
+  
+---
+
+class: inverse, middle, center
+
+# 1. La importancia de las preguntas
+
+---
+
+# Las preguntas
+
+- Podemos estimar relaciones causales casi de cualquier cosa
+
+- Pero no todas las relaciones causales son de interés
+
+- Y muchas cosas que son de interés son difíciles de estudiar desde el punto de vista de las relaciones causales
+
+---
+
+# La importancia de la teoría
+
+- En este curso enfatizacermos la evaluación relacionada a la respuesta de una relación teórica
+
+- Para los economistas, los datos no *hablan* solos
+
+- La teoría es necesaria para establecer la relación entre `\(x\)` y `\(y\)`
+
+- Tenemos la fortuna de disponer cada vez de mejores datos
+
+- Mejores datos nos permiten probar mejor modelos cada vez más ricos
+
+---
+
+# Series de tiempo vs microeconometría
+
+- Teoría económica usaba modelos y deducía de ellos los efectos de cambios de polítca
+
+- O usaba series de tiempo agregadas que trataban de ser ligadas a modelos con consumidores o empresas representativas
+
+--
+
+- Cosas que han cambiado:
+
+  - Disponibilidad de microdatos
+  - Demanda por probar empíricamente modelos más ricos
+  - Capacidad de cómputo
+
+--
+  
+- De hecho, algunos macroeconomistas están volteando a ver los métodos de la microeconomía aplicada:
+
+  - Estudios de evento
+  - Controles sintéticos
+
+---
+
+# Tipos de problemas de evaluación
+
+1. *Efectos de tratamiento*
+
+  - ¿Cuál es el efecto de `\(T\)` sobre los participantes o no participantes de cierta política?
+  
+  - ¿Funciona un determinado programa?
+  
+  - Se requieren condiciones débiles
+  
+  - No es fácil extrapolar las conclusiones a otros contextos
+
+--
+
+1. *Estimación estructural*
+
+  - ¿Cuál es el efecto potencial de un nuevo `\(T\)` en una población?
+  
+  - Problema parecido a determinar la demanda de un bien recién introducido al mercado
+  
+  - Se imponen condiciones fuertes
+  
+  - Se trata de estimar una serie de parámetros que caracterizan las preferencias y tecnología de individuos, hogares y empresas
+
+---
+
+# Ejemplo: impuestos
+
+- Consideremos el cambio en la tasa del impuesto al ingreso `\(t\)`
+
+- La oferta es función del salario `\(W\)`, de características observadas `\(X\)` y de inobservables `\(U\)`  `\(H=\phi(W,X,U)\)`
+
+- La pregunta de evaluación es encontrar la magnitud de `\(\phi(W(1-t'),X,U)-\phi(W(1-t),X,U)\)` para cada individuo
+
+--
+
+- Tenemos tres posibles tipos de evaluaciones, dependiendo del tipo de impuesto y dónde se va a implementar:
+
+  1. Un impuesto que ya ha existido antes en una población y queremos saber su efecto en la misma población, caracterizada por su distribución de `\((W,X,U)\)`
+  
+  2. El impuesto ha existido antes, pero queremos conocer su efecto en una población distinta, con una distribución distinta de `\((W,X,U)\)`
+  
+  3. El impuesto nunca ha sido implementado y queremos predecir su efecto en la población usada para estimar la oferta laboral o en otra población
+
+---
+
+# Caso 1. Un impuesto ya conocido en la misma población
+
+- Supongamos que la población ha vivido distintos regímenes de impuestos `\(t_j\)`, con `\(j=1,\ldots, J\)` y tenemos datos sobre la oferta laboral bajo estos regímenes
+
+- Este es un problema relativamente simple pues tenemos los datos para calcular la oferta laboral esperada para cada impuesto:
+
+`$$E(H|W,X,t)=\int\phi(W(1-t_j),X,U)dG(U|X,W)$$`
+- No necesitamos un contrafactual pues podemos esperar que lo ocurrido antes aplique para el futuro si `\(\phi(\cdot)\)` y `\(G(\cdot)\)` no cambiaron
+
+
+---
+
+# Caso 2. Decir algo sobre una política en un nuevo contexto
+
+- Problema mucho más complicado
+
+- Debemos estimar `\(\phi'(\cdot)\)` y `\(G'(\cdot)\)` en el nuevo ambiente, o tratar determinar la relación entre `\(\phi\)` y `\(\phi¿\)` y entre `\(G\)` y `\(G'\)`
+
+--
+
+&gt; "La existencia de un problema radica en que el futuro es distinto que el pasado, mientras que la posibilidad de una solución depende de que el futuro se parezca al pasado."
+&gt;
+&gt; --- Kinight (1921)
+
+--
+
+- Este es el tipo de problemas en donde la estimación estructural es de gran valor
+
+---
+
+# Caso 3. Mucho más complicado
+
+- ¿Qué pasa si nunca ha existido un impuesto similar en el país de interés?
+
+- ¿Podemos identificar el efecto del impuesto a partir de variaciones en el salario?
+
+- Solo si asumimos que el efecto del impuesto actúa vía el salario
+
+---
+
+class: inverse, middle, center
+
+# 2. El diseño para responder las preguntas
+
+---
+
+# Causalidad y evaluación de políticas
+
+- Los diseños experimentales han puesto pie firme como el *gold standard* para la evaluación de políticas
+
+- Los investigadores pelean por fondos de gobiernos, ONGs y *think tanks* para evaluar políticas realizando asignaciones experimentales de tratamientos
+
+- Esther Duflo, Michael Kremer y Abhijit Banerjee ganaron el Nobel de Economía en 2019 por sus contribuciones a la lucha contra la pobreza, donde los experimentos tienen un papel primordial
+
+- El modelo de causal de Rubin o de *resultados potenciales* permite conceptualizar la mayoría de los problemas de evaluación pensando en qué *resultado* obtendría una unidad con y sin intervención
+
+- Sin embargo, el **problema fundamental de la inferencia causal** implica que solo podemos observar a cada unidad en uno de los estados posibles
+
+---
+
+# Sesgo de selección
+
+- En la práctica tenemos que comparar entre unidades que han recibido y que no han recibido el tratamiento
+
+- Esto da original al *sesgo de selección*, es decir, a la existencia de factores que afectan tanto la asignación del tratamiento como del resultado mismo
+
+- Veremos cómo la experimentación resuelve el sesgo de selección
+
+--
+
+- Pero también estudiaremos una amplia literatura que recae en una serie de supuestos bajo los cuales la asignación del tratamiento aproxima a una asignación aleatoria
+
+- Esta literatura incluye métodos muy estudiados como las técnicas de *matching* y el uso de variables instrumentales
+
+---
+
+# Nuevas avenidas
+
+- Nuevas avenidas en la investigación han dado lugar a nuevas estrategias de identificación
+
+- Diseños de regresión discontinua
+
+  - Pliegues en regresión
+  
+  - Discontinuidades geográficas
+
+- Diferencia y diferencias y control sintético
+
+- Efectos de tratamiento con tratamiento multivariado y con intensidad de tratamiento
+
+- Efectos en el largo plazo
+
+- Papel para *machine learning* y *big data*
+
+---
+
+class: inverse, middle, center
+
+# 3. Las técnicas apropiadas para implementar el diseño
+
+---
+
+# La econometría como herramienta
+
+- Nuestras preguntas requieren diseño
+
+- Y nuestros diseños requieren una implementación apropiada
+
+- Parte importante de nuestro curso será:
+
+  1. Conocer la teoría que permite la identificación de efectos de tratamiento en los distintos diseños
+  
+  1. Implementar las estrategias empíricas con datos en *R*
+
+
+---
+
+# Algunos temas que abordaremos en el curso incluyen
+
+- Regresión por MCO, variables instrumentales y modelos no lineales
+
+- Errores estándar robustos y agrupados
+
+- Rutinas *bootstrap*
+
+- Análisis con placebos
+
+- Pruebas de hipótesis
+
+- Métodos no paramétricos
+
+- Métodos de optimización
+
+
+---
+
+class: inverse, middle, center
+
+# Habilidades de economista
+
+---
+
+# Espero que al final del curso puedan
+
+- Identificar relaciones causales
+
+- Proponer estrategias para evaluar
+
+- Usar datos y programar sus estrategias empíricas
+
+- Identificar literatura relevante, huecos en ella y avenidas para investigación futura
+
+- Argumentar y presentar ideas de forma oral y escrita
+
+---
+
+class: inverse, middle, center
+
+# Pendientes
+
+---
+
+# ¿Se vale probar?
+
+- ¡Sí!
+
+--
+
+- Se vale que estén en el curso el tiempo máximo que las reglas del CIDE permiten para dar de baja cursos e inscribirse en otros
+
+- Les pido la cortesía de enviarme un correo si deciden dar de baja el curso
+
+- Como ven, nuestro plan de exposiciones y del blog dependerá del número de estudiantes que estén inscritos
+
+- Entre más pronto podamos conocer el número final de estudiantes, mejor para todos
+
+---
+
+# Próxima sesión
+
+- GMPRV, Capítulos 1 y 3 como introducción
+
+- Freedman (1991) sobre la importancia del diseño
+
+- MHE, Capítulo 2 nos permite pensar en cómo podemos pensar los problemas causales como si fueran *experimentos*
+
+- A lo largo del curso vamos a profundizar en los diseños experimentales, pero vamos también a ser críticos sobre ellos y a estudiar otros métodos igual de importantes y útiles
+
+- Nos importan más las preguntas y la teoría detrás de ellas, por eso aprenderemos distintos métodos y trataremos de usar el mejor
+
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script src="libs/cols_macro.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

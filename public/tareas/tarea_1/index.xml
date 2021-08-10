@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tarea 1 | Evaluación de Programas 2021</title>
+    <link>https://eps-2021.netlify.app/tareas/tarea_1/</link>
+      <atom:link href="https://eps-2021.netlify.app/tareas/tarea_1/index.xml" rel="self" type="application/rss+xml" />
+    <description>Tarea 1</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2021 Irvin Rojas</copyright>
+    <image>
+      <url>https://eps-2021.netlify.app/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url>
+      <title>Tarea 1</title>
+      <link>https://eps-2021.netlify.app/tareas/tarea_1/</link>
+    </image>
+    
+    <item>
+      <title>Tarea 1</title>
+      <link>https://eps-2021.netlify.app/tareas/tarea_1/tarea_1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://eps-2021.netlify.app/tareas/tarea_1/tarea_1/</guid>
+      <description>
+&lt;script src=&#34;https://eps-2021.netlify.app/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;div id=&#34;instrucciones&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Instrucciones&lt;/h2&gt;
+&lt;p&gt;La tarea debe entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las secciones teóricas pueden estar desarrolladas en un procesador de textos y enviadas en formato .docx o .pdf.&lt;/p&gt;
+&lt;p&gt;Las secciones prácticas deberán contener archivos de código replicable y archivos de salida en R (o similares, en caso de usar otro software) para considerarse completas. Las tareas deben entregarse antes de la fecha límite a través de Teams. Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;archivos&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Archivos&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://eps-2021.netlify.app/tareas/tarea_1/STAR_public_use.csv&#34;&gt;Bajar STAR_public_use.csv&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 1&lt;/h2&gt;
+&lt;p&gt;Suponga que para un experimento en un laboratorio se asignó a un grupo estudiantes a un brazo de tratamiento o a uno de control. Antes de comenzar el experimento se recolectaron una serie de características &lt;span class=&#34;math inline&#34;&gt;\(x_{ji}\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(j=1,\ldots 5\)&lt;/span&gt;, de cada estudiante. Se busca medir el efecto del tratamiento sobre una variable de resultados &lt;span class=&#34;math inline&#34;&gt;\(y_i\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;El investigador A quedó a cargo de comprobar el balance de la asignación del tratamiento y le reporta lo siguiente:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Para verificar que la aleatorización fue exitosa, tomé la serie de variables pre-intervención y la dummy de asignación al tratamiento &lt;span class=&#34;math inline&#34;&gt;\(T_i\)&lt;/span&gt; para correr la siguiente regresión:&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[T_i=\alpha+\sum_{j=1}^{5}x_{ji}&amp;#39;\beta +\varepsilon_i\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Después realicé una prueba &lt;span class=&#34;math inline&#34;&gt;\(F\)&lt;/span&gt; de significancia conjunta sobre los coeficientes &lt;span class=&#34;math inline&#34;&gt;\(\beta_j\)&lt;/span&gt; que resultó tener un valor &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt; de 0.003.&lt;/em&gt;&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Explique qué interpretación tiene la prueba realizada por el investigador A y qué se esperaría de haberse logrado una aleatorización exitosa del tratamiento?&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] ¿Qué concluye a partir de lo que le reporta el investigador A?&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;El investigador B le reporta lo siguiente:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Yo realicé un análisis adicional para determinar el balance en la asignación del tratamiento. Para cada una de las características &lt;span class=&#34;math inline&#34;&gt;\(x_{ji}\)&lt;/span&gt; corrí la siguiente regresión:&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[x_{ji}=\gamma+\pi T_i+u_i\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;A continuación, le reporto una tabla con los valores p asociados al coeficiente estimado de &lt;span class=&#34;math inline&#34;&gt;\(\pi\)&lt;/span&gt; en cada una de las 5 regresiones.&lt;/em&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th&gt;&lt;strong&gt;Característica&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Valor &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;&lt;span class=&#34;math inline&#34;&gt;\(x_{1i}\)&lt;/span&gt;&lt;/td&gt;
+&lt;td&gt;0.0012&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;&lt;span class=&#34;math inline&#34;&gt;\(x_{2i}\)&lt;/span&gt;&lt;/td&gt;
+&lt;td&gt;0.0312&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;&lt;span class=&#34;math inline&#34;&gt;\(x_{3i}\)&lt;/span&gt;&lt;/td&gt;
+&lt;td&gt;0.0127&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;&lt;span class=&#34;math inline&#34;&gt;\(x_{4i}\)&lt;/span&gt;&lt;/td&gt;
+&lt;td&gt;0.0076&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;&lt;span class=&#34;math inline&#34;&gt;\(x_{5i}\)&lt;/span&gt;&lt;/td&gt;
+&lt;td&gt;0.0902&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Explique qué interpretación tienen las pruebas por el investigador B y qué se esperaría de haberse logrado una aleatorización exitosa del tratamiento?&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] ¿Cómo reconcilia la evidencia encontrada por sus asistentes y qué concluye sobre el balance en la asignación del tratamiento? ¿Qué características tendría una diferencia de medias de &lt;span class=&#34;math inline&#34;&gt;\(y_i\)&lt;/span&gt; después del tratamiento como estimador del impacto de este?&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-2&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 2&lt;/h2&gt;
+&lt;p&gt;Suponga que desea evaluar el impacto de las medidas de sana distancia realizadas por el gobierno de un país para reducir la mortalidad causada por el covid-19. Suponga que hubiera tenido la oportunidad implementar un experimento &lt;strong&gt;antes&lt;/strong&gt; de que la epidemia se realizara.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[10 puntos] Describa cómo diseñaría su experimento ideal para responder a esta pregunta.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Escriba la regresión que usaría para estimar los efectos de las medidas implementadas en una variable de mortalidad.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] ¿Cuáles considera que serían las distintas dificultades prácticas, institucionales y éticas en la implementación de su experimento ideal?&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-3&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 3&lt;/h2&gt;
+&lt;p&gt;Replique el ejercicio de representar la FEC de salarios en función de educación para México, como en la Figura 3.1.1 de MHE (p. 39), usando los datos del cuarto trimestre de 2019 de la ENOE. El gráfico es complejo, pero recibirá crédito completo si reproduce, al menos por separado, los dos siguientes tipos de gráficos:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[10 puntos] Gráfico de la relación promedio entre años de educación e ingresos.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[10 puntos] Gráfico de la distribución de ingresos para cuatro niveles de educación que usted considere relevante destacar. Argumente sobre los niveles de educación elegidos.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-4&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 4&lt;/h2&gt;
+&lt;p&gt;se los datos del archivo &lt;em&gt;STAR_public_use.csv&lt;/em&gt; para este problema. En este problema replicará la fila correspondiente a la variable &lt;strong&gt;age&lt;/strong&gt; de la Tabla 1 en &lt;a href=&#34;https://pubs.aeaweb.org/doi/pdfplus/10.1257/app.1.1.136&#34;&gt;Angrist et al. (2009)&lt;/a&gt;.&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Obtenga la media y la desviación estándar en el grupo de control (columna 1), restringiendo la muestra a aquellos individuos con &lt;strong&gt;noshow&lt;/strong&gt; igual a 0.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[10 puntos] Usando una regresión lineal, muestre que el tratamiento es independiente de la edad. De nuevo, debe restringir la muestra quienes tienen &lt;strong&gt;noshow&lt;/strong&gt; igual a 0. Reporte los coeficientes y los errores estándar (columnas 2 a 4).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Realice una prueba de significancia conjunta de los coeficientes obtenidos en el punto b. Reporte el estadístico &lt;span class=&#34;math inline&#34;&gt;\(F\)&lt;/span&gt; y el valor &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt; asociado (columna 5).&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-5&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 5&lt;/h2&gt;
+&lt;p&gt;Nuevamente, use los datos del archivo &lt;em&gt;STAR_public_use.csv&lt;/em&gt; para este problema. En este problema, replicará dos columnas del efecto de tratamiento de la Tabla 5. Note que de nuevo se deben usar solo las observaciones que tienen &lt;strong&gt;noshow&lt;/strong&gt; igual a 0. Además, note que se usan las siguientes variables de control: &lt;strong&gt;sex&lt;/strong&gt;, &lt;strong&gt;mtongue&lt;/strong&gt;, &lt;strong&gt;hsgroup&lt;/strong&gt;, &lt;strong&gt;numcourses_nov1&lt;/strong&gt;, &lt;strong&gt;lastmin&lt;/strong&gt;, &lt;strong&gt;mom_edn&lt;/strong&gt;, y &lt;strong&gt;dad_edn&lt;/strong&gt;, todas ellas categóricas.&lt;/p&gt;
+&lt;p&gt;Antes de estimar los efectos, sustituya &lt;strong&gt;gpa_year1&lt;/strong&gt; por missing cuando &lt;strong&gt;grade_20059_fall&lt;/strong&gt; es missing y sustituya &lt;strong&gt;grade_20059_fall&lt;/strong&gt; por missing cuando &lt;strong&gt;gpa_year1&lt;/strong&gt; es missing. Esto le permitirá quedarse con los individuos que tienen información completa.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[10 puntos] Estime el efecto de cada tipo de tratamiento sobre el &lt;em&gt;GPA&lt;/em&gt;, es decir, sobre la variable &lt;strong&gt;gpa_year1&lt;/strong&gt;, para toda la muestra (Panel B, columna 1). Ponga atención a los errores estándar.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[10 puntos] Estime el efecto de recibir cada tipo de tratamiento, considerando los tratamientos SSP o SFP (de cualquier tipo) en las mujeres de la muestra (Panel B, columna 6). Ponga atención a los errores estándar.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Angrist, J., Lang, D., y Oreopoulos, P. (2009). Incentives and services for college achievement: Evidence from a randomized trial. &lt;em&gt;American Economic Journal: Applied Economics&lt;/em&gt;, 1(1), 136-63.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

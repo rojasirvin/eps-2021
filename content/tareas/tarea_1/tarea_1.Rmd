@@ -1,6 +1,6 @@
 ---
 title: "Tarea 1"
-summary: " "
+summary: "Martes 14 de septiembre a las 8:00"
 weight: 1
 type: book
 toc: false
@@ -12,56 +12,61 @@ knitr::opts_chunk$set(collapse = TRUE)
 
 ## Instrucciones
   
-La tarea debe entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las secciones teóricas pueden estar desarrolladas en un procesador de textos y enviadas en formato .docx o .pdf.
+Las tareas deben entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las tareas deberán entregarse en Teams antes de la fecha y hora señalada. No se aceptarán tareas fuera de tiempo. Por favor, **no comprima los archivos** en carpetas comprimidas. Las tareas deberán contener dos archivos:
 
+Un primer documento de respuestas donde se incluyan las respuestas a las preguntas teóricas y conceptuales. Este documento puede ser redactado en Word o cualquier otro software, o si lo prefiere, a mano, pero deberá estar impreso en .pdf. En este documento también se deben incluir las respuestas a preguntas sobre conclusiones que se desprenden de las secciones prácticas. Por ejemplo, si una pregunta pide obtener la media de la variable x en cierta base de datos, entonces el documento de respuestas debe incluir la pregunta y respuesta correspondiente: “la media de la variable x es 32.6”. En este documento también deberán incluirse las tablas y gráficas que se soliciten.
 
-Las secciones prácticas deberán contener archivos de código replicable y archivos de salida en R (o similares, en caso de usar otro software) para considerarse completas. Las tareas deben entregarse antes de la fecha límite a través de Teams. Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.
+Un segundo archivo deberá contener el código replicable usado para generar los resultados de la sección práctica. El código debe también crear las tablas y gráficas solicitadas. Los archivos de código se verificarán para comprobar su replicabilidad.
+
+Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.
+
+## Fecha de entrega
+
+Martes 14 de septiembre a las 8:00.
+
 
 ## Archivos
 
-[Bajar STAR_public_use.csv](/tareas/tarea_1/STAR_public_use.csv)
+[STAR_public_use.csv](/tareas/tarea_1/STAR_public_use.csv)
 
 ## Pregunta 1
 
-Suponga que para un experimento en un laboratorio se asignó a un grupo estudiantes a un brazo de tratamiento o a uno de control. Antes de comenzar el experimento se recolectaron una serie de características $x_{ji}$, $j=1,\ldots 5$, de cada estudiante. Se busca medir el efecto del tratamiento sobre una variable de resultados $y_i$.
+Suponga que para un experimento en un laboratorio se asignó a un grupo pacientes a un brazo de tratamiento o a uno de control. Antes de comenzar el experimento se recolectaron una serie de características $x_{ji}$, $j=1,\ldots 10$, de cada paciente. Se busca medir el efecto del tratamiento sobre una variable de resultados $y_i$. En el experimento, se trabaja con $\alpha=0.10$.
 
-El investigador A quedó a cargo de comprobar el balance de la asignación del tratamiento y le reporta lo siguiente:
+a. [5 puntos] El investigador A quedó a cargo de comprobar el balance de la asignación del tratamiento y le reporta lo siguiente:
 
-*Para verificar que la aleatorización fue exitosa, tomé la serie de variables pre-intervención y la dummy de asignación al tratamiento $T_i$ para correr la siguiente regresión:*
+    *Para verificar que la aleatorización fue exitosa, tomé la serie de variables pre-intervención y la dummy de asignación al tratamiento $T_i$ para correr la siguiente regresión:*
+$$T_i=\alpha+\sum_{j=1}^{10}x_{ji}'\beta +\varepsilon_i$$
 
-$$T_i=\alpha+\sum_{j=1}^{5}x_{ji}'\beta +\varepsilon_i$$
+    *Después realicé una prueba $F$ de significancia conjunta sobre los coeficientes $\beta_j$ que resultó tener un valor $p$ de 0.52.*
 
-*Después realicé una prueba $F$ de significancia conjunta sobre los coeficientes $\beta_j$ que resultó tener un valor $p$ de 0.003.*
+    Explique cuál es la hipótesis nula en la prueba realizada y qué se esperaría de haberse logrado una aleatorización exitosa del tratamiento.
 
-a. [5 puntos] Explique qué interpretación tiene la prueba realizada por el investigador A y qué se esperaría de haberse logrado una aleatorización exitosa del tratamiento?
+b. [5 puntos] ¿Qué concluye a partir de lo que le reporta el investigador A?
 
-a. [5 puntos] ¿Qué concluye a partir de lo que le reporta el investigador A?
+a. [5 puntos] Por otro lado, el investigador B le reporta lo siguiente:
 
-El investigador B le reporta lo siguiente:
-
-*Yo realicé un análisis adicional para determinar el balance en la asignación del tratamiento. Para cada una de las características $x_{ji}$ corrí la siguiente regresión:*
-
+    *Yo realicé un análisis para determinar el balance en la asignación del tratamiento. Para cada una de las características $x_{ji}$ corrí la siguiente regresión:*
 $$x_{ji}=\gamma+\pi T_i+u_i$$
+*A continuación, le reporto una tabla con los valores p asociados al coeficiente estimado de $\pi$ en cada una de las 10 regresiones.*
 
-*A continuación, le reporto una tabla con los valores p asociados al coeficiente estimado de $\pi$ en cada una de las 5 regresiones.*
+    | **Característica** |	**Valor $p$** || **Característica** |	**Valor $p$**
+    |--- | --- |---|---|---|
+    | $x_{1i}$	| 0.25 | |$x_{6i}$	| 0.15 |
+    | $x_{2i}$	| 0.12 | |$x_{7i}$	| 0.33 |
+    | $x_{3i}$	| 0.27 | |$x_{8i}$	| 0.19 |
+    | $x_{4i}$	| 0.76 | |$x_{9i}$	| 0.28 |
+    | $x_{5i}$	| 0.02 | |$x_{10i}$	| 0.17 |
+    
+    Explique la hipótesis nula detrás de las pruebas que realizó el investigador B y qué se esperaría de haberse logrado una aleatorización exitosa del tratamiento,
 
-| **Característica** |	**Valor $p$** |
-|--- | --- |
-| $x_{1i}$	| 0.0012 |
-| $x_{2i}$	| 0.0312 |
-| $x_{3i}$	| 0.0127 |
-| $x_{4i}$	| 0.0076 |
-| $x_{5i}$	| 0.0902 |
-
-a. [5 puntos] Explique qué interpretación tienen las pruebas por el investigador B y qué se esperaría de haberse logrado una aleatorización exitosa del tratamiento?
-
-a. [5 puntos] ¿Cómo reconcilia la evidencia encontrada por sus asistentes y qué concluye sobre el balance en la asignación del tratamiento? ¿Qué características tendría una diferencia de medias de $y_i$ después del tratamiento como estimador del impacto de este?
+a. [5 puntos] ¿Cómo reconcilia la evidencia encontrada por el investigador A y el B y qué concluye sobre el balance en la asignación del tratamiento? ¿Qué características tendría una diferencia de medias de $y_i$ después del tratamiento como estimador del impacto de este?
 
 ## Pregunta 2
 
-Suponga que desea evaluar el impacto de las medidas de sana distancia realizadas por el gobierno de un país para reducir la mortalidad causada por el covid-19. Suponga que hubiera tenido la oportunidad implementar un experimento **antes** de que la epidemia se realizara.
+Suponga que desea evaluar el impacto de una vacuna contra el covid-19. Asuma que dispone de ilimitados recursos financieros y humanos. Considere por ahora a todos los tipos de vacunas como un mismo tratamiento. Se desea estudiar la efectividad de las vacunas para reducir la probabilidad de ser hospitaliazado por covid-19.
 
-a. [10 puntos] Describa cómo diseñaría su experimento ideal para responder a esta pregunta. 
+a. [10 puntos] Describa cómo diseñaría su experimento ideal para  determinar la efectividad de la vacuna para reducir la probabilidad de hospitalización.
 
 a. [5 puntos] Escriba la regresión que usaría para estimar los efectos de las medidas implementadas en una variable de mortalidad.
 
@@ -69,8 +74,7 @@ a. [5 puntos] ¿Cuáles considera que serían las distintas dificultades prácti
 
 ## Pregunta 3
 
-Replique el ejercicio de representar la FEC de salarios en función de educación para México, como en la Figura 3.1.1 de MHE (p. 39), usando los datos del cuarto trimestre de 2019 de la ENOE. El gráfico es complejo, pero recibirá crédito completo si reproduce, al menos por separado, los dos siguientes tipos de gráficos:
-
+Replique el ejercicio de representar la FEC de salarios en función de educación para México, como en la Figura 3.1.1 de MHE (p. 39), usando los datos del primer trimestre de 2021 de la ENOE. El gráfico es complejo, pero recibirá crédito completo si reproduce, al menos por separado, los dos siguientes tipos de gráficos:
 
 a.	[10 puntos] Gráfico de la relación promedio entre años de educación e ingresos.
 
@@ -78,24 +82,22 @@ a.	[10 puntos] Gráfico de la distribución de ingresos para cuatro niveles de e
 
 ## Pregunta 4
 
-se los datos del archivo *STAR_public_use.csv* para este problema. En este problema replicará la fila correspondiente a la variable **age** de la Tabla 1 en [Angrist et al. (2009)](https://pubs.aeaweb.org/doi/pdfplus/10.1257/app.1.1.136).[^1]
+Use los datos del archivo *STAR_public_use.csv* para este problema. En este problema replicará la fila correspondiente a la variable **age** de la Tabla 1 en [Angrist et al. (2009)](https://pubs.aeaweb.org/doi/pdfplus/10.1257/app.1.1.136).[^1]
   
 [^1]: Angrist, J., Lang, D., y Oreopoulos, P. (2009). Incentives and services for college achievement: Evidence from a randomized trial. *American Economic Journal: Applied Economics*, 1(1), 136-63.
 
-a. [5 puntos] Obtenga la media y la desviación estándar en el grupo de control (columna 1), restringiendo la muestra a aquellos individuos con **noshow** igual a 0.
+a. [5 puntos] Obtenga la media y la desviación estándar de la edad, **age**, en el grupo de control (columna 1), restringiendo la muestra a aquellos individuos con **noshow** igual a 0.
 
-a. [10 puntos] Usando una regresión lineal, muestre que el tratamiento es independiente de la edad. De nuevo, debe restringir la muestra quienes tienen **noshow** igual a 0. Reporte los coeficientes y los errores estándar (columnas 2 a 4).
+a. [10 puntos] Usando una regresión lineal, muestre que los distintos tratamientos son independientes de la edad. De nuevo, debe restringir la muestra quienes tienen **noshow** igual a 0. Reporte los coeficientes y los errores estándar (columnas 2 a 4).
 
 a. [5 puntos] Realice una prueba de significancia conjunta de los coeficientes obtenidos en el punto b. Reporte el estadístico $F$ y el valor $p$ asociado (columna 5).
-
 
 ## Pregunta 5
 
 Nuevamente, use los datos del archivo *STAR_public_use.csv* para este problema. En este problema, replicará dos columnas del efecto de tratamiento de la Tabla 5. Note que de nuevo se deben usar solo las observaciones que tienen **noshow** igual a 0. Además, note que se usan las siguientes variables de control: **sex**, **mtongue**, **hsgroup**, **numcourses_nov1**, **lastmin**, **mom_edn**, y **dad_edn**, todas ellas categóricas.
 
-Antes de estimar los efectos, sustituya **gpa_year1** por missing cuando **grade_20059_fall** es missing y sustituya **grade_20059_fall** por missing cuando **gpa_year1** es missing. Esto le permitirá quedarse con los individuos que tienen información completa.
+Antes de estimar los efectos, los autores sustituyen **gpa_year1** por NA cuando **grade_20059_fall** es NA y sustituyen **grade_20059_fall** por NA cuando **gpa_year1** es NA Esto le permitirá quedarse con los individuos que tienen información completa.
 
-a.	[10 puntos] Estime el efecto de cada tipo de tratamiento sobre el *GPA*, es decir, sobre la variable **gpa_year1**, para toda la muestra (Panel B, columna 1). Ponga atención a los errores estándar.
+a.	[10 puntos] Estime el efecto de cada tipo de tratamiento sobre el *GPA*, es decir, sobre la variable **gpa_year1**, para toda la muestra (Panel B, columna 1). Calcule correctamente los errores estándar. Interprete los resultados.
 
-a. [10 puntos] Estime el efecto de recibir cada tipo de tratamiento, considerando los tratamientos SSP o SFP (de cualquier tipo) en las mujeres de la muestra (Panel B, columna 6). Ponga atención a los errores estándar.
-
+a. [10 puntos] Estime el efecto de recibir cada tipo de tratamiento, considerando los tratamientos SSP o SFP (de cualquier tipo) en las mujeres de la muestra (Panel B, columna 6). Esto es, considere el tratamiento SSP como un primer tipo de tratamiento y, ya sea SFP o SFSP, como un segundo tipo de tratamiento. Calcule correctamente los errores estándar. Interprete sus resultados.

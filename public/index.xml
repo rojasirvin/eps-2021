@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Evaluación de Programas 2021</title>
+    <link>https://eps-2021.netlify.app/</link>
+      <atom:link href="https://eps-2021.netlify.app/index.xml" rel="self" type="application/rss+xml" />
+    <description>Evaluación de Programas 2021</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2021 Irvin Rojas</copyright><lastBuildDate>Wed, 21 Jul 2021 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://eps-2021.netlify.app/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url>
+      <title>Evaluación de Programas 2021</title>
+      <link>https://eps-2021.netlify.app/</link>
+    </image>
+    
+    <item>
+      <title>Tarea 1</title>
+      <link>https://eps-2021.netlify.app/tareas/tarea_1/tarea_1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://eps-2021.netlify.app/tareas/tarea_1/tarea_1/</guid>
+      <description>
+&lt;script src=&#34;https://eps-2021.netlify.app/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;div id=&#34;instrucciones&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Instrucciones&lt;/h2&gt;
+&lt;p&gt;La tarea debe entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las secciones teóricas pueden estar desarrolladas en un procesador de textos y enviadas en formato .docx o .pdf.&lt;/p&gt;
+&lt;p&gt;Las secciones prácticas deberán contener archivos de código replicable y archivos de salida en R (o similares, en caso de usar otro software) para considerarse completas. Las tareas deben entregarse antes de la fecha límite a través de Teams. Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;archivos&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Archivos&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://eps-2021.netlify.app/tareas/tarea_1/STAR_public_use.csv&#34;&gt;Bajar STAR_public_use.csv&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 1&lt;/h2&gt;
+&lt;p&gt;Suponga que para un experimento en un laboratorio se asignó a un grupo estudiantes a un brazo de tratamiento o a uno de control. Antes de comenzar el experimento se recolectaron una serie de características &lt;span class=&#34;math inline&#34;&gt;\(x_{ji}\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(j=1,\ldots 5\)&lt;/span&gt;, de cada estudiante. Se busca medir el efecto del tratamiento sobre una variable de resultados &lt;span class=&#34;math inline&#34;&gt;\(y_i\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;El investigador A quedó a cargo de comprobar el balance de la asignación del tratamiento y le reporta lo siguiente:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Para verificar que la aleatorización fue exitosa, tomé la serie de variables pre-intervención y la dummy de asignación al tratamiento &lt;span class=&#34;math inline&#34;&gt;\(T_i\)&lt;/span&gt; para correr la siguiente regresión:&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[T_i=\alpha+\sum_{j=1}^{5}x_{ji}&amp;#39;\beta +\varepsilon_i\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Después realicé una prueba &lt;span class=&#34;math inline&#34;&gt;\(F\)&lt;/span&gt; de significancia conjunta sobre los coeficientes &lt;span class=&#34;math inline&#34;&gt;\(\beta_j\)&lt;/span&gt; que resultó tener un valor &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt; de 0.003.&lt;/em&gt;&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Explique qué interpretación tiene la prueba realizada por el investigador A y qué se esperaría de haberse logrado una aleatorización exitosa del tratamiento?&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] ¿Qué concluye a partir de lo que le reporta el investigador A?&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;El investigador B le reporta lo siguiente:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Yo realicé un análisis adicional para determinar el balance en la asignación del tratamiento. Para cada una de las características &lt;span class=&#34;math inline&#34;&gt;\(x_{ji}\)&lt;/span&gt; corrí la siguiente regresión:&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[x_{ji}=\gamma+\pi T_i+u_i\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;A continuación, le reporto una tabla con los valores p asociados al coeficiente estimado de &lt;span class=&#34;math inline&#34;&gt;\(\pi\)&lt;/span&gt; en cada una de las 5 regresiones.&lt;/em&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th&gt;&lt;strong&gt;Característica&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;Valor &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;&lt;span class=&#34;math inline&#34;&gt;\(x_{1i}\)&lt;/span&gt;&lt;/td&gt;
+&lt;td&gt;0.0012&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;&lt;span class=&#34;math inline&#34;&gt;\(x_{2i}\)&lt;/span&gt;&lt;/td&gt;
+&lt;td&gt;0.0312&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;&lt;span class=&#34;math inline&#34;&gt;\(x_{3i}\)&lt;/span&gt;&lt;/td&gt;
+&lt;td&gt;0.0127&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td&gt;&lt;span class=&#34;math inline&#34;&gt;\(x_{4i}\)&lt;/span&gt;&lt;/td&gt;
+&lt;td&gt;0.0076&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td&gt;&lt;span class=&#34;math inline&#34;&gt;\(x_{5i}\)&lt;/span&gt;&lt;/td&gt;
+&lt;td&gt;0.0902&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Explique qué interpretación tienen las pruebas por el investigador B y qué se esperaría de haberse logrado una aleatorización exitosa del tratamiento?&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] ¿Cómo reconcilia la evidencia encontrada por sus asistentes y qué concluye sobre el balance en la asignación del tratamiento? ¿Qué características tendría una diferencia de medias de &lt;span class=&#34;math inline&#34;&gt;\(y_i\)&lt;/span&gt; después del tratamiento como estimador del impacto de este?&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-2&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 2&lt;/h2&gt;
+&lt;p&gt;Suponga que desea evaluar el impacto de las medidas de sana distancia realizadas por el gobierno de un país para reducir la mortalidad causada por el covid-19. Suponga que hubiera tenido la oportunidad implementar un experimento &lt;strong&gt;antes&lt;/strong&gt; de que la epidemia se realizara.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[10 puntos] Describa cómo diseñaría su experimento ideal para responder a esta pregunta.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Escriba la regresión que usaría para estimar los efectos de las medidas implementadas en una variable de mortalidad.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] ¿Cuáles considera que serían las distintas dificultades prácticas, institucionales y éticas en la implementación de su experimento ideal?&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-3&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 3&lt;/h2&gt;
+&lt;p&gt;Replique el ejercicio de representar la FEC de salarios en función de educación para México, como en la Figura 3.1.1 de MHE (p. 39), usando los datos del cuarto trimestre de 2019 de la ENOE. El gráfico es complejo, pero recibirá crédito completo si reproduce, al menos por separado, los dos siguientes tipos de gráficos:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[10 puntos] Gráfico de la relación promedio entre años de educación e ingresos.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[10 puntos] Gráfico de la distribución de ingresos para cuatro niveles de educación que usted considere relevante destacar. Argumente sobre los niveles de educación elegidos.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-4&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 4&lt;/h2&gt;
+&lt;p&gt;se los datos del archivo &lt;em&gt;STAR_public_use.csv&lt;/em&gt; para este problema. En este problema replicará la fila correspondiente a la variable &lt;strong&gt;age&lt;/strong&gt; de la Tabla 1 en &lt;a href=&#34;https://pubs.aeaweb.org/doi/pdfplus/10.1257/app.1.1.136&#34;&gt;Angrist et al. (2009)&lt;/a&gt;.&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Obtenga la media y la desviación estándar en el grupo de control (columna 1), restringiendo la muestra a aquellos individuos con &lt;strong&gt;noshow&lt;/strong&gt; igual a 0.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[10 puntos] Usando una regresión lineal, muestre que el tratamiento es independiente de la edad. De nuevo, debe restringir la muestra quienes tienen &lt;strong&gt;noshow&lt;/strong&gt; igual a 0. Reporte los coeficientes y los errores estándar (columnas 2 a 4).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Realice una prueba de significancia conjunta de los coeficientes obtenidos en el punto b. Reporte el estadístico &lt;span class=&#34;math inline&#34;&gt;\(F\)&lt;/span&gt; y el valor &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt; asociado (columna 5).&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-5&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 5&lt;/h2&gt;
+&lt;p&gt;Nuevamente, use los datos del archivo &lt;em&gt;STAR_public_use.csv&lt;/em&gt; para este problema. En este problema, replicará dos columnas del efecto de tratamiento de la Tabla 5. Note que de nuevo se deben usar solo las observaciones que tienen &lt;strong&gt;noshow&lt;/strong&gt; igual a 0. Además, note que se usan las siguientes variables de control: &lt;strong&gt;sex&lt;/strong&gt;, &lt;strong&gt;mtongue&lt;/strong&gt;, &lt;strong&gt;hsgroup&lt;/strong&gt;, &lt;strong&gt;numcourses_nov1&lt;/strong&gt;, &lt;strong&gt;lastmin&lt;/strong&gt;, &lt;strong&gt;mom_edn&lt;/strong&gt;, y &lt;strong&gt;dad_edn&lt;/strong&gt;, todas ellas categóricas.&lt;/p&gt;
+&lt;p&gt;Antes de estimar los efectos, sustituya &lt;strong&gt;gpa_year1&lt;/strong&gt; por missing cuando &lt;strong&gt;grade_20059_fall&lt;/strong&gt; es missing y sustituya &lt;strong&gt;grade_20059_fall&lt;/strong&gt; por missing cuando &lt;strong&gt;gpa_year1&lt;/strong&gt; es missing. Esto le permitirá quedarse con los individuos que tienen información completa.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[10 puntos] Estime el efecto de cada tipo de tratamiento sobre el &lt;em&gt;GPA&lt;/em&gt;, es decir, sobre la variable &lt;strong&gt;gpa_year1&lt;/strong&gt;, para toda la muestra (Panel B, columna 1). Ponga atención a los errores estándar.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[10 puntos] Estime el efecto de recibir cada tipo de tratamiento, considerando los tratamientos SSP o SFP (de cualquier tipo) en las mujeres de la muestra (Panel B, columna 6). Ponga atención a los errores estándar.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Angrist, J., Lang, D., y Oreopoulos, P. (2009). Incentives and services for college achievement: Evidence from a randomized trial. &lt;em&gt;American Economic Journal: Applied Economics&lt;/em&gt;, 1(1), 136-63.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Tarea 2</title>
+      <link>https://eps-2021.netlify.app/tareas/tarea_2/tarea_2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://eps-2021.netlify.app/tareas/tarea_2/tarea_2/</guid>
+      <description>
+&lt;script src=&#34;https://eps-2021.netlify.app/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;div id=&#34;instrucciones&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Instrucciones&lt;/h2&gt;
+&lt;p&gt;La tarea debe entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las secciones teóricas deben estar desarrolladas en un procesador de textos y enviadas en formato .docx o .pdf. Las secciones prácticas deberán contener archivos de código replicable y archivos de salida en R (o similares, en caso de usar otro software) para considerarse completas. Las tareas deben entregarse antes de la fecha límite a través de Teams. Puede crear una carpeta comprimida que contenga todos sus archivos y subir esta carpeta en Teams. Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 1&lt;/h2&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;En la &lt;a href=&#34;https://rojasirvin.github.io/EPS2020/sesiones/s7/sesion7.html#19&#34;&gt;Sesión 7&lt;/a&gt; introducimos los datos de una intervención en Marruecos en la que un producto financiero fue ofrecido de manera aleatoria, pero la adopción del producto obedeció a un proceso de selección. Para este problema use la base &lt;em&gt;crepon_morocco_analysis.csv&lt;/em&gt;, que tiene un subconjunto de los datos usados en dicha sesión ya listos para su análisis. La variable &lt;strong&gt;treatment&lt;/strong&gt; contiene la variable de tratamiento y la variable &lt;strong&gt;client&lt;/strong&gt; es la variable de adopción. En esta pregunta nos enfocaremos en el efecto causal de la adopción en el gasto total de los hogares, &lt;strong&gt;expense_total&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Primero mostraremos cómo el estimador de Wald es equivalente al estimador de VI cuando no hay controles y cuando las variables de asignación y adopción son binarias. Obtenga el estimador de Wald como el cociente de la diferencia en gasto total promedio entre los hogares asignados a tratamiento y control dividido por la diferencia en la probabilidad de adopción entre los hogares asignados a tratamiento y control.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Ahora estime por MC2E el efecto de la adopción sobre el gasto total, usando la variable de asignación como instrumento para la adopción. ¿Qué ventaja observa con respecto al estimador de Wald? En R, la función &lt;em&gt;ivreg&lt;/em&gt; del paquete &lt;em&gt;AER&lt;/em&gt; le permite hacer la estimación de MC2E.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[3 puntos] Estime la forma reducida del efecto de ser asignado al tratamiento sobre gasto total. Comente los resultados, en particular, comente sobre la magnitud y la significancia estadística de la variable &lt;strong&gt;treatment&lt;/strong&gt;. Aquí y en adelante, incluya los siguientes controles en la regresión: &lt;strong&gt;members_resid_bl&lt;/strong&gt;, &lt;strong&gt;nadults_resid_bl&lt;/strong&gt;, &lt;strong&gt;head_age_bl&lt;/strong&gt;, &lt;strong&gt;act_livestock_bl&lt;/strong&gt;, &lt;strong&gt;act_business_bl&lt;/strong&gt;, &lt;strong&gt;borrowed_total_bl&lt;/strong&gt;, &lt;strong&gt;members_resid_d_bl&lt;/strong&gt;, &lt;strong&gt;nadults_resid_d_bl&lt;/strong&gt;, &lt;strong&gt;head_age_d_bl&lt;/strong&gt;, &lt;strong&gt;act_livestock_d_bl&lt;/strong&gt;, &lt;strong&gt;act_business_d_bl&lt;/strong&gt;, &lt;strong&gt;borrowed_total_d_bl&lt;/strong&gt;, &lt;strong&gt;ccm_resp_activ&lt;/strong&gt;, &lt;strong&gt;other_resp_activ&lt;/strong&gt;, &lt;strong&gt;ccm_resp_activ_d&lt;/strong&gt; y &lt;strong&gt;other_resp_activ_d&lt;/strong&gt;. Además, incluya efectos fijos por pareja introduciendo la variable &lt;strong&gt;paire&lt;/strong&gt; como factor. Y finalmente, para realizar inferencia, reporte los errores estándar agrupados a nivel &lt;strong&gt;demi_paire&lt;/strong&gt; usando la función &lt;em&gt;coef_test&lt;/em&gt; del paquete &lt;em&gt;clubSandwich&lt;/em&gt;.&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[2 puntos] Estime ahora la &lt;strong&gt;primera etapa&lt;/strong&gt;, es decir, estime por MCO el efecto causal de la asignación sobre la adopción. Use los mismos controles que en la parte c. Comente sobre la magnitud, la significancia estadística y la interpretación de la variable &lt;strong&gt;treatment&lt;/strong&gt; en términos del comportamiento de los &lt;strong&gt;cumplidores&lt;/strong&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Considere la columna 3 del panel A en la Tabla 9 del artículo. Aquí se reporta la estimación por MCO de la relación entre &lt;strong&gt;client&lt;/strong&gt; y gasto total, con los mismos controles y tipo de errores que en c. Replique este resultado. ¿Se puede interpretar de forma causal el coeficiente sobre &lt;strong&gt;client&lt;/strong&gt;?&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] ¿Cuáles son los supuestos econométricos que permiten la estimación del Local Average Treatment Effect (LATE) en el contexto de este problema? Comente sobre la evidencia que respalda el supuesto de que los instrumentos no son débiles en este problema.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Estime el efecto del cumplimiento sobre el gasto total, usando la asignación aleatoria como instrumento del cumplimiento. Es decir, estime el LATE. Use los mismos controles y tipo de errores que en c. Este resultado se reporta en la columna 3 del panel B en la Tabla 9. ¿Cuál es la interpretación del coeficiente de la variable &lt;strong&gt;client&lt;/strong&gt;?&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-2&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 2&lt;/h2&gt;
+&lt;p&gt;En la Pregunta 1 obtuvo el estimador de Wald para aproximar el efecto de la adopción en el gasto total. Considere dicho cálculo sin controles.&lt;/p&gt;
+&lt;ol start=&#34;2&#34; style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Utilice un procedimiento bootstrap &lt;em&gt;a mano&lt;/em&gt; para estimar el error estándar del estimador de Wald usando 50 repeticiones. Es decir, debe realizar un remuestreo de los datos originales y para cada muestra obtener el estimador de Wald. Luego, obtenga la desviación estándar de los 50 estadísticos calculados. Utilice una semilla para poder replicar sus resultados.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Reemplace la semilla de la parte a. por una nueva semilla y estime nuevamente el error estándar del estimador de Wald con 50 repeticiones. Comente sobre la diferencia entre este error estándar y el de la parte a.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Regrese el valor de la semilla al usado en a. y estime nuevamente el error estándar del estimador de Wald, esta vez usando 1000 repeticiones. Comente sobre la diferencia entre este error estándar y el de la parte a.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-3&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 3&lt;/h2&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Se propone evaluar el efecto de usar cubrebocas en la tasa de transmisión del covid-19 en el país A, que está compuesto por cientos de islas y donde cada isla es una ciudad. Al inicio de la epidemia, se prohibieron los viajes entre islas. Se dispone de datos de la tasa de fatalidad en varias ciudades en los momentos &lt;span class=&#34;math inline&#34;&gt;\(t=0\)&lt;/span&gt; y &lt;span class=&#34;math inline&#34;&gt;\(t=1\)&lt;/span&gt;. Entre el periodo &lt;span class=&#34;math inline&#34;&gt;\(0\)&lt;/span&gt; y el &lt;span class=&#34;math inline&#34;&gt;\(1\)&lt;/span&gt; se sabe que en un subconjunto de cinco ciudades se ordenó el uso obligatorio del cubrebocas.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] ¿Cómo evaluar los resultados de ordenar el uso del cubrebocas por medio de diferencia en diferencias? ¿Cómo seleccionaria al grupo de ciudades que se usarían para llevar a cabo esta evaluación?&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] ¿Cuáles son los supuestos sobre los que recae la estrategia de evaluación por diferencia en diferencias? ¿Qué factores podrían amenazar el uso de esta estrategia para evaluar el efecto de la intervención?&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Suponga que un archipiélago vecino, el país B, también conformado por 1000 ciudades-isla implementa un programa de entrega de cubrebocas. El país solo puede entregar cubrebocas en 100 de las ciudades, las cuales serán escogidas en una lotería pública con un generador de números aleatorios. Expliqué cómo usaría inferencia por aleatorización (&lt;em&gt;randomization inference&lt;/em&gt;) para estimar el impacto de la interevención en la tasa de fatalidad. Describa con detalle el procedimiento seguido y cómo juzgaría la significancia estadística de las diferencias que observe.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-4&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 4&lt;/h2&gt;
+&lt;p&gt;Considere nuevamente la base &lt;em&gt;STAR_public_use.csv&lt;/em&gt; usada en la Tarea 1. del artículo Angrist, Lang y Oreopoulos (2009)&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;. En esta pregunta nos concentraremos en los efectos de la intervención en el año 2, mostrados en la columna (4) de la Tabla 6, sobre dos variables, el promedio de calificaciones &lt;strong&gt;gpa_year2&lt;/strong&gt; y los créditos completados &lt;strong&gt;credits_earned2&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;El propósito de esta pregunta es mostrar la función de los &lt;span class=&#34;math inline&#34;&gt;\(z\)&lt;/span&gt;-scores en el análisis de efectos de tratamiento. De nuevo, puede quedarse solo con las obervaciones que tienen &lt;strong&gt;noshow&lt;/strong&gt; igual a 0. Antes de comenzar su análisis, sustituya por NA los valores en &lt;strong&gt;credits_earned2&lt;/strong&gt; para aquellas observaciones que tienen &lt;span class=&#34;math inline&#34;&gt;\(NA\)&lt;/span&gt; en la variable &lt;strong&gt;prob_year1&lt;/strong&gt;.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Para tener un punto de comparación, estime la ecuación del efecto de tratamiento para &lt;strong&gt;credits_earned2&lt;/strong&gt; usando la misma especificación que en la pregunta 5 de la Tarea 1. Use también errores robustos. Deberá poder replicar los coeficientes y errores estándar del panel D, columna (4). ¿Cómo se interpretan el coeficiente sobre la variable &lt;strong&gt;ssp&lt;/strong&gt;?&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Genere un &lt;span class=&#34;math inline&#34;&gt;\(z\)&lt;/span&gt;-score para la variable &lt;strong&gt;credits_earned2&lt;/strong&gt; al que llame &lt;strong&gt;credits_earned2_sd&lt;/strong&gt;. Para ello, calcule la media y desviación estándar de &lt;strong&gt;credits_earned2&lt;/strong&gt; para el grupo de control y luego genere &lt;strong&gt;credits_earned2_sd&lt;/strong&gt; restándole a &lt;strong&gt;credits_earned2&lt;/strong&gt; la media obtenida y dividiendo esta diferencia por la desviación estándar obtenida. Compruebe que si calcula la media y la desviación estándar de &lt;strong&gt;credits_earned2_sd&lt;/strong&gt;, en el grupo de control estas deberían ser 0 y 1, respectivamente.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Realice la misma estimación que en la parte a., pero ahora use como variable dependiente &lt;strong&gt;credits_earned2_sd&lt;/strong&gt;. ¿Cómo se interpreta el coeficiente sobre &lt;strong&gt;ssp&lt;/strong&gt;? ¿Qué es diferente y qué es igual entre los resultados obtenidos en esta parte y los obtenidos en la parte a.?&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Ahora realizaremos un índice de mejora en educación, al agregar los resultados de estos dos indicadores en una sola variable, como se describe en Banerjee et al. (2015)&lt;a href=&#34;#fn3&#34; class=&#34;footnote-ref&#34; id=&#34;fnref3&#34;&gt;&lt;sup&gt;3&lt;/sup&gt;&lt;/a&gt;. Para ello, primero genere &lt;strong&gt;gpa_year2_sd&lt;/strong&gt;, que será la versión estandarizada de &lt;strong&gt;gpa_year2&lt;/strong&gt;, siguiendo el mismo procedimiento que en la parte b. En seguida, genere una nueva variable llamda &lt;strong&gt;promedio_vars&lt;/strong&gt;, que será el promedio de &lt;strong&gt;credits_earned2_sd&lt;/strong&gt; y &lt;strong&gt;gpa_year2_sd&lt;/strong&gt;. Luego, calcule la media y la desviación estándar de &lt;strong&gt;promedio_vars&lt;/strong&gt; en el grupo de control. Finalmente, genere una nueva variable &lt;strong&gt;promedio_vars_sd&lt;/strong&gt; restándole a &lt;strong&gt;promedio_vars&lt;/strong&gt; la media antes calculada y dividiendo esta diferencia por la desviación estándar antes calculada. Muestre que la variable &lt;strong&gt;promedio_vars_sd&lt;/strong&gt; tiene media 0 y desviación estándar 1 en el grupo de control.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Estime ahora el efecto de tratamiento sobre &lt;strong&gt;promedio_vars_sd&lt;/strong&gt;, siguiendo la misma especificación econométrica que en la parte a. y usando errores robustos. ¿Qué concluye?&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pregunta-5&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pregunta 5&lt;/h2&gt;
+&lt;p&gt;Considere los valores &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt; del archivo &lt;em&gt;pvalues.csv&lt;/em&gt;. Cada valor &lt;span class=&#34;math inline&#34;&gt;\(p_i\)&lt;/span&gt; está asociado a una prueba de hipótesis &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt;. La variable familia denota tres grupos de hipótesis sobre las cuales estamos interesados en hacer correcciones de múltiples hipótesis. La investigación en cuestión emplea &lt;span class=&#34;math inline&#34;&gt;\(\alpha=0.05\)&lt;/span&gt;.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: lower-alpha&#34;&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Para cada una de las pruebas de hipótesis, genere un cuadro como el que se presenta a continuación y diga si se rechaza o no la hipótesis nula, bajo los siguientes criterios:&lt;/p&gt;
+&lt;table&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;33%&#34; /&gt;
+&lt;col width=&#34;22%&#34; /&gt;
+&lt;col width=&#34;22%&#34; /&gt;
+&lt;col width=&#34;22%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;&lt;/th&gt;
+&lt;th&gt;Hipótesis sin corrección&lt;/th&gt;
+&lt;th&gt;Corrigiendo &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; dentro de la familia usando el método de Bonferroni&lt;/th&gt;
+&lt;th&gt;Corrigiendo por la tasa de falso descubrimiento dentro de la familia usando el método de Benjamini y Hochberg&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;span class=&#34;math inline&#34;&gt;\(\vdots\)&lt;/span&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;15&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Suponga que encuentra buenas razones conceptuales para afirmar que las familias 2 y 3 deben ser consideraras una sola familia. Tendríamos ahora solo dos familias, la familia 1 original y una nueva familia numerada como 4, como se indica en la variable familia_corregida. ¿Cómo cambian sus conclusiones respecto a la parte a. de esta pregunta? Genere un nuevo cuadro con esta redefinición.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;[5 puntos] Suponga que su asistente de investigación olvidó el concepto de familia y realiza las correcciones por pruebas de múltiples hipótesis ignorando las familias. ¿Qué concluiría en este caso? Genere un nuevo cuadro bajo esta circunstancia. Comente sobre la diferencia en las conclusiones entre las partes b. y c.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Por ejemplo, suponga que estima un modelo al que llame &lt;em&gt;modelo1&lt;/em&gt;. Entonces, si ejecuta&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;coef_test(modelo1, vcov=&amp;quot;CR1S&amp;quot;,cluster=mis_datos$demi_paire, test=&amp;quot;naive-t&amp;quot;)[1:2,]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;obtendrá los coeficientes con los errores agrupados requeridos. La opción &lt;em&gt;CR1S&lt;/em&gt; toma en cuenta el número de grupos o &lt;em&gt;clusters&lt;/em&gt; para realizar inferencia. Puede leer más al respecto en la ayuda al ejecutar &lt;em&gt;?vcovCR&lt;/em&gt;.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Angrist, J., Lang, D., y Oreopoulos, P. (2009). Incentives and services for college achievement: Evidence from a randomized trial. &lt;em&gt;American Economic Journal: Applied Economics&lt;/em&gt;, 1(1), 136-63.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn3&#34;&gt;&lt;p&gt;Banerjee, A. et al. (2015). A multifaceted program causes lasting progress for the very poor: Evidence from six countries. &lt;em&gt;Science&lt;/em&gt;, 348(6236).&lt;a href=&#34;#fnref3&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
