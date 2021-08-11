@@ -276,21 +276,21 @@ Las lecturas obligatorias (marcadas con “*”) permiten una discusión informa
 
 * Impactos de largo plazo  
   + Athey, S., Chetty, R., Imbens, G. W., & Kang, H. (2019). The surrogate index: Combining short-term proxies to estimate long-term treatment effects more rapidly and precisely, National Bureau of Economic Research, Working Paper 26463.
-    + Hamory, J., Miguel, E., Walker, M., Kremer, M., & Baird, S. (2021). Twenty-year economic impacts of deworming. *Proceedings of the National Academy of Sciences*, 118(14).
+  + Hamory, J., Miguel, E., Walker, M., Kremer, M., & Baird, S. (2021). Twenty-year economic impacts of deworming. *Proceedings of the National Academy of Sciences*, 118(14).
   + Dupas, P., Duflo, E. & Kremer, M. (2021). The Impact of Free Secondary Education: Experimental Evidence from Ghana. Stanford University Working Paper.  
-  + \+ Parker, S. W., & Vogl, T. (2018). Do conditional cash transfers improve economic outcomes in the next generation? Evidence from Mexico (No. w24303). National Bureau of Economic Research.
+  + Parker, S. W., & Vogl, T. (2018). Do conditional cash transfers improve economic outcomes in the next generation? Evidence from Mexico (No. w24303). National Bureau of Economic Research.
 
 * Replicabilidad, credibilidad y cientificidad
   + Amrhein, V., Greenland, S., & McShane, B. (2019). Scientists rise up against statistical significance. *Nature*. 567, 305-307.  
-  + \* Angrist, J. D., & Pischke, J. S. (2010). The credibility revolution in empirical economics: How better research design is taking the con out of econometrics. *Journal of economic perspectives*, 24(2), 3-30.  
-  + \* Christensen, G., & Miguel, E. (2018). Transparency, reproducibility, and the credibility of economics research. *Journal of Economic Literature*, 56(3), 920-80.  
-  + \* Sims, C. A. (2010). But economics is not an experimental science. *Journal of Economic Perspectives*, 24(2), 59-68.
-  + \* Greenland, S., Senn, S. J., Rothman, K. J., Carlin, J. B., Poole, C., Goodman, S. N., & Altman, D. G. (2016).   Statistical tests, P values, confidence intervals, and power: a guide to misinterpretations. *European journal of epidemiology*, 31(4), 337-350.  
-  + Leamer, E. E. (2010). Tantalus on the Road to Asymptopia. *Journal of Economic Perspectives*, 24(2), 31-46.  
-  + \* Nuzzo, R. (2014). Scientific method: statistical errors. *Nature News*, 506(7487), 150.
-  + \* Wasserstein, R. L., & Lazar, N. A. (2016). The ASA statement on p-values: context, process, and purpose. *The American Statistician*, 70(2), 129-133.
+  + Angrist, J. D., & Pischke, J. S. (2010). The credibility revolution in empirical economics: How better research design is taking the con out of econometrics. *Journal of economic perspectives*, 24(2), 3-30.  
+  + Christensen, G., & Miguel, E. (2018). Transparency, reproducibility, and the credibility of economics research. *Journal of Economic Literature*, 56(3), 920-80.  
+  + Greenland, S., Senn, S. J., Rothman, K. J., Carlin, J. B., Poole, C., Goodman, S. N., & Altman, D. G. (2016).   Statistical tests, P values, confidence intervals, and power: a guide to misinterpretations. *European journal of epidemiology*, 31(4), 337-350.  
+  + Leamer, E. E. (2010). Tantalus on the Road to Asymptopia. *Journal of Economic Perspectives*, 24(2), 31-46.
+  + Nuzzo, R. (2014). Scientific method: statistical errors. *Nature News*, 506(7487), 150.
+  + Sims, C. A. (2010). But economics is not an experimental science. *Journal of Economic Perspectives*, 24(2), 59-68.
+  + Wasserstein, R. L., & Lazar, N. A. (2016). The ASA statement on p-values: context, process, and purpose. *The American Statistician*, 70(2), 129-133.
   
 * Etica
   + Humphreys, M. (2015). Reflections on the ethics of social experimentation. *Journal of Globalization and Development*, 6(1), 87-112.
-  + \* Lewis, J. (2020). Experimental Design: Ethics, Integrity, and the Scientific Method. *Handbook of Research Ethics and Scientific Integrity*, 459-474.
-  + \* Rayzberg, M. S. (2019). Fairness in the field: The ethics of resource allocation in randomized controlled field experiments. *Science, Technology, & Human Values*, 44(3), 371-398.
+  + Lewis, J. (2020). Experimental Design: Ethics, Integrity, and the Scientific Method. *Handbook of Research Ethics and Scientific Integrity*, 459-474.
+  + Rayzberg, M. S. (2019). Fairness in the field: The ethics of resource allocation in randomized controlled field experiments. *Science, Technology, & Human Values*, 44(3), 371-398.
