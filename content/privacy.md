@@ -1,6 +1,6 @@
 ---
 commentable: false
-date: "2018-06-28T00:00:00+01:00"
+date: "`r as.Date(file.mtime(knitr::current_input()))`"
 draft: true
 editable: false
 header:

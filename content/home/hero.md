@@ -3,6 +3,7 @@ widget: hero
 headless: true
 weight: 10
 title: 'Evaluación de Programas 2021'
+date: "`r as.Date(file.mtime(knitr::current_input()))`"
 design:
   background:
     gradient_angle: 0

@@ -3,7 +3,7 @@ linkTitle: Reglas
 title: "Reglas de convivencia mínimas"
 type: book
 toc: false
-date: 2021-07-21
+date: "`r as.Date(file.mtime(knitr::current_input()))`"
 weight: 20
 ---
 

@@ -2,7 +2,7 @@
 linkTitle: Programa
 title: "Programa del curso"
 type: book
-date: 2021-08-09
+date: "`r as.Date(file.mtime(knitr::current_input()))`"
 toc: true
 weight: 10
 ---
