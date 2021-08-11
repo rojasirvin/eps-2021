@@ -2,7 +2,7 @@
 linkTitle: Lecturas
 title: "Lista de lecturas"
 type: book
-date: 2021-08-09
+date: "`r as.Date(file.mtime(knitr::current_input()))`"
 weight: 30
 ---
   
