@@ -27,7 +27,7 @@ Martes 14 de septiembre a las 8:00.
 
 ## Archivos
 
-[STAR_public_use.csv](/tareas/tarea_1/STAR_public_use.csv)
+[STAR_public_use.xlsx](/tareas/tarea_1/STAR_public_use.xlsx)
 
 ## Pregunta 1
 
