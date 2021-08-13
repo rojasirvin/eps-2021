@@ -25,8 +25,8 @@ advanced:
 
 Profesor: [Irvin Rojas](https://www.rojasirvin.com/) (irvin.rojas@cide.edu).
 
-Horario de clases: martes y jueves (8:00 a 9:30).
+Horario de clases: martes y jueves (8:00 a 9:30) en Zoom.
 
-Plataforma de enseñanza: Microsoft Teams.
+Plataforma del curso: Microsoft Teams.
 
 Horario de oficina: por definir.
