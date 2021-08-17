@@ -434,8 +434,6 @@ class: inverse, middle, center
 
 # Próxima sesión
 
-- GMPRV, Capítulos 1 y 3 como introducción
-
 - Freedman (1991) sobre la importancia del diseño
 
 - MHE, Capítulo 2 nos da las bases de un modelo conceptual pensar los problemas causales como si fueran *experimentos*
