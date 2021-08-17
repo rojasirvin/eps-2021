@@ -248,7 +248,7 @@ $$E(H|W,X,t)=\int\phi(W(1-t_j),X,U)dG(U|X,W)$$
 
 - Problema mucho más complicado
 
-- Debemos estimar $\phi'(\cdot)$ y $G'(\cdot)$ en el nuevo ambiente, o tratar determinar la relación entre $\phi$ y $\phi¿$ y entre $G$ y $G'$
+- Debemos estimar $\phi'(\cdot)$ y $G'(\cdot)$ en el nuevo ambiente, o tratar determinar la relación entre $\phi$ y $\phi'$ y entre $G$ y $G'$
 
 --
 
