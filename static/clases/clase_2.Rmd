@@ -133,28 +133,6 @@ class: inverse, middle, center
 
 ---
 
-# Consideraciones éticas
-
-- Un aspecto muy relevante en la evaluación es la dimensión ética
-
-- No negar intervenciones con beneficios conocidos por motivos de evaluación
-  
-- Que el programa no esté supeditado a las preguntas que los evaluadores quieren responder
-  
---
-
-- Características que debe cumplir una evaluación
-
-  - Objetiva
-  
-  - Transparente
-  
-  - Reproducible
-
-- Dedicaremos una sesión a discusiones alrededor de estas preocupaciones
-
----
-
 class: inverse, middle, center
 
 # La epidemiología está de moda
@@ -213,7 +191,7 @@ knitr::include_graphics("https://thumbs-prod.si-cdn.com/trC5qb_ILIffjzsnX3kEbvsc
 
 - Podemos notar las diferencias en el número de muertes por compañía
 
-- Muchas veces no neceistaremos cosas más complicadas que esto
+- Muchas veces no necesitaremos cosas más complicadas que esto
 
 - A partir de estos hallazgos se propusieron algunas políticas que eran consistentes con la hipótesis de transmisión
 
@@ -283,11 +261,6 @@ $$tasa=f(sexo,raza,estado\,civil, educación, ingreso, ocupación)$$
 - ¿Los estados en Estados Unidos tienen diferentes *culturas* (Erikson et al. 1987)?
 
 - ¿Puede una serie de variables *dummy* capturar la diferencia de culturas?
-
-
----
-
-# Regresión para derivar causalidad
 
 
 ---
@@ -380,7 +353,7 @@ y_{0,Hena}=0
 
 - El término *potencial* se debe a que solo vemos uno de ellos
 
-- En nuestro ejemplo, solo observamos que $y_{Zeus}=y_{1,Zeus}=1$
+- En nuestro ejemplo, solo observamos que $y_{0,Zeus}=y_{1,Zeus}=1$
 
 - En general, el efecto causal para un individuo no puede ser identificado
 
@@ -419,7 +392,7 @@ table.personas %>%
 
 # Efectos causales promedio
 
-- De la tabla podemos concluir que $P(y{1i}=1)=10/20=0.5$, es decir, la mitad de quienes reciben el trasplante morirían después de cinco días
+- De la tabla podemos concluir que $P(y_{1i}=1)=10/20=0.5$, es decir, la mitad de quienes reciben el trasplante morirían después de cinco días
 
 - Y también observamos que $P(y_{0i}=1)=0.5$, es decir, que la probabilidad de morir de no haber recibido el tratamiento es también de 0.5
 
@@ -429,7 +402,7 @@ table.personas %>%
 
 - **Efecto causal promedio** en una población: un efecto causal promedio de $T$ en el resultado $y$ está presente si $P(Y_{1i}=1\neq Y_{0i}=1)$ en la población de interés
 
-- Cuando pensamos en **poblaciones**, podemos usar expectativas para definir el efecto causal promedio: $E(Y_{1i}\neq E_{0i})$, lo cual permite generalizar a resultados no binarios
+- Cuando pensamos en **poblaciones**, podemos usar expectativas para definir el efecto causal promedio: $E(Y_{1i}\neq Y_{0i})$, lo cual permite generalizar a resultados no binarios
 
 - La ausencia de efectos individuales promedio no implica ausencia de efectos individuales
 
@@ -545,7 +518,7 @@ $$
 
 - El primer término nos da la diferencia promedio en la variable de salud entre los hospitalizados y lo que les hubiera pasado si no hubieran sido hospitalizados
 
-- En nuestro ejemplo, el **sesgo** de selección es la diferencia en salud entre los hospitalizados y los no hospitalizados
+- En nuestro ejemplo, el **sesgo de selección** es la diferencia en salud entre los hospitalizados y los no hospitalizados
 
 - Específicamente, si quienes van al hospital tienen una peor salud, podemos esperar que $E(y_{0i}|D_i=1)-E(y_{oi}|D_i=0)<0$
 
