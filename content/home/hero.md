@@ -29,4 +29,4 @@ Horario de clases: martes y jueves (8:00 a 9:30) en Zoom.
 
 Plataforma del curso: Microsoft Teams.
 
-Horario de oficina: martes de 14:00 a 15:00 y viernes de 12:00 a 13:00.
+Horario de oficina: martes (14:00 a 15:00) y viernes (12:00 a 13:00).
