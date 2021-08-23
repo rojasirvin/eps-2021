@@ -24,7 +24,7 @@ El curso se basa en los siguientes textos:
 
 * (MM) Angrist, J.D. y Pischke, J.S. (2014). *Mastering 'Metrics: The Path from Cause to Effect*. Princeton University Press.
 
-* Cameron, A.C. y P.K. Trivedi. (2005). *Microeconometrics: Methods and applications*. Oxford University Press.
+* (CT) Cameron, A.C. y P.K. Trivedi. (2005). *Microeconometrics: Methods and applications*. Oxford University Press.
 
 * (MT) Cunningham, S. (2021). Causal inference: The mixtape. Yale University Press. Disponible en: https://mixtape.scunning.com/index.html.
 
