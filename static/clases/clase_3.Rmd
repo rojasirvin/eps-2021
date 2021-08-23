@@ -32,6 +32,7 @@ library(tidyverse)
 library(magick)
 library(reticulate)
 library(knitr)
+library(kableExtra)
 xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
 
@@ -39,7 +40,7 @@ xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 # Clase 3. Regresión y efectos causales
 ]
 .subtitle[
-## Evaluación de Programas Sociales
+## Evaluación de Programas
 ]
 .author[
 ### Irvin Rojas <br> [rojasirvin.com](https://www.rojasirvin.com/) <br> [<i class="fab fa-github"></i>](https://github.com/rojasirvin) [<i class="fab fa-twitter"></i>](https://twitter.com/RojasIrvin) [<i class="ai ai-google-scholar"></i>](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&hl=en)
@@ -122,27 +123,41 @@ $$
 
 La Tabla 2.2.2 en MHE muestra los efectos de tratamiento estimados con regresión: 
 
-```{r table_efecto, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+```{r table.star, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 
-tabl <- "
+variable <- c("`T_1`: Clase pequeña", " ", "`T_2`: Clase pequeña y asistente", " ", "Efectos fijos de escuela", "Controles")
+r1 <- c("4.82", "(2.19)", "0.12", "(2.23)","No","No")
+r2 <- c("5.37","(1.26)","0.29","(1.13)","Sí","No")
+r3 <- c("5.36","(1.21)","0.53","(1.09)","Sí","`X_1`")
+r4 <- c("5.37","(1.19)","0.31","(1.07)","Sí","`X_1+X_2`")
 
-|Variable explicativa | (1) | (2) | (3) | (4) |
-|--|:-:|:-:|:-:|:-: |
-| $T_1$ | 4.82 | 5.37 | 5.36 | 5.37 |
-| | (2.19)| (1.26) | (1.21) | (1.19)
-| $T_2$ | 0.12 | 0.29 | 0.53 | 0.31 |
-| | (2.23) | (1.13) | (1.09) | (1.07) |
-| Efectos fijos de escuela | No | Sí  | Sí | Sí |
-|Controles| No | No | $X_1$ | $X_1+X_2$ |
+table.star <- data.frame(cbind(variable, r1, r2, r3, r4))
 
-"
-cat(tabl)
+colnames(table.star) = c("Variable explicativa","(1)","(2)","(3)","(4)")
 
+table.star %>%
+  kbl(align = "lcccc",
+      escape = FALSE,
+      full_width = FALSE) %>%  kable_paper(c("hover", "condensed", "responsive")) %>%
+  add_header_above(c("Efectos experimentales del tamaño del grupo en las calificaciones" = 5 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+  footnote(general = "Tabla 2.2.2 en Angrist y Pischke (2009)",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
 ```
+
+---
+
+# El impacto de STAR con regresión
 
 - ¿Cómo se obtienen los resultados de esta tabla?
 
 - ¿Qué se deduce sobre los distintos tratamientos?
+
+- ¿Cuál es la variable dependiente?
+
+- ¿Cuál es la variable independiente clave?
 
 ---
 
@@ -451,14 +466,14 @@ $Y_i=\alpha+\rho s_i+ X_i'\gamma+u_i$, $u_i$ no está correlacionado con los reg
 
 class: inverse, middle, center
 
-# Efectivo o condicionales
+# Aplicación: efectivo o condicionales
 
 
 ---
 
-# Efectivo o condicionales (Baird, McIntosh & Özler, 2011)
+# ¿Qué tipo de programa funciona mejor?
 
-
+- Baird, S., McIntosh, C., & Özler, B. (2011). Cash or condition? Evidence from a cash transfer experiment
 
 - ¿Cuál es la diferencia entre un CCT y un UCT?
 
@@ -549,12 +564,44 @@ class: inverse, middle, center
 
 - ¿Qué es atrición?
 
---
 
 - ¿Qué observamos?
 
-```{r, out.width="70%",fig.cap='Fuente: Baird, McIntosh & Özler (2011)',fig.align='center'}
-knitr::include_graphics("figures/cash_condition_table1.png")
+
+- ¿Cómo se obtienen los resultados de la Tabla 1
+
+
+---
+
+# Atrición
+
+```{r table.atricion, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+variable <- c("", "Condicional", " ", "Incondicional", " ", "Media en grupo de control", "`P>F(Cond.=Incond.)`")
+r1 <- c("Entrevistado en ronda 3","0.020","(0.015)","0.021","(0.019)","0.946","0.965")
+r2 <- c("Entrevistado en las tres rondas","0.021","(0.030)","0.030","(0.024)","0.893","0.797")
+r3 <- c("Tomó prueba de educación", "0.029 *","(0.016)","0.035 *","(0.020)","0.929","0.801")
+
+table.atricion <- data.frame(cbind(variable, r1, r2, r3))
+
+colnames(table.atricion) = c("","(1)","(2)","(3)")
+
+t <- table.atricion %>%
+  kbl(align = "lccc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>%
+    add_header_above(c(" "=1, "Variable dependiente:" = 3 ),
+                   background = "white") %>% 
+    add_header_above(c("Análisis de atrición" = 4 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+  footnote(general = "Adaptado de la tabla 1 de Baird, McIntosh & Ozler (2011). Errores agrupados a nivel EA. La muestra se restringe a individuos que estuvieron en la escuela en la línea base y que fueron seleccionados para estar en uno de los dos grupos de tratamiento o en el grupo de control. Parámetros estimados son distintos de 0 al 99`\\%` (***), 95`\\%` (**) y 90`\\%` (*) de confianza.",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
+
+scroll_box(t, height="80%")
+
 ```
 
 
@@ -562,7 +609,7 @@ knitr::include_graphics("figures/cash_condition_table1.png")
 
 # Atrición
 
-- ¿Cómo se obtienen los resultados de la Tabla 1
+- Estimamos la siguiente ecuación por MCO:
 
 $$y_i=\alpha+\beta_C C_i+\beta_U U_i + e_i$$
 
@@ -572,7 +619,7 @@ donde $y_i$ toma el valor de 1 si la observación estaba en la línea base y tam
 
 - ¿Cómo determinamos que hay diferencias significativas?
 
-- Por ejemplo, ¿qué significa el 0.29* (error estándar de 0.016) en la primera fila de la columna (3)?
+- Por ejemplo, ¿qué significa el $0.29^*$ (error estándar de 0.016) en la primera fila de la columna (3)?
 
 
 
@@ -580,14 +627,55 @@ donde $y_i$ toma el valor de 1 si la observación estaba en la línea base y tam
 
 # Pruebas de balance
 
+
 - Un aspecto que siempre revisamos cuando leemos resultados experimentales
 
+- Verificamos que las características observables antes de la implementación de la intervención sean iguales (en un sentido estadístico) entre los indiviudos asignados a los distintos grupos
 
-- ¿Qué observamos?
+- ¿Qué observamos en la tabla 2?
 
-```{r, out.width="70%",fig.cap='Fuente: Baird, McIntosh & Özler (2011)',fig.align='center'}
-knitr::include_graphics("figures/cash_condition_table2b.png")
+
+
+---
+
+# Pruebas de balance
+
+
+```{r table.balance, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+
+
+
+variable <- c("", "Edad", " ","Grado máximo"," ", "Madre vive"," ", "Padre vive"," ", "Nunca tuvo sexo", " ","Embarazada alguna vez"," ", "Transferencia", " ", "N")
+control <- c("Control","15.252","(1.903)","7.478","(1.634)","0.842","(0.365)","0.705","(0.456)","0.797","(0.402)","0.023","(0.149)","N/A"," ","1,356")
+condicional <- c("Condicional","14.952*","(1.827)","7.246","(1.598)","0.802","(0.399)","0.714","(0.453)","0.797","(0.403)","0.030","(0.171)","3.090","(1.431)", "470")
+incondicional <- c("Incondicional","15.424","(1.923)","7.896**","(1.604)","0.836","(0.371)","0.759","(0.428)","0.775","(0.419)","0.031","(0.173)","3.033","(1.451)", "261")
+pvalue <- c("Valor `p` (Cond. - Incond.)","0.007***", "", "0.004***","","0.360","","0.288","","0.582","","0.973","","0.606","","")
+
+
+
+table.balance <- data.frame(cbind(variable, control, condicional, incondicional, pvalue))
+
+colnames(table.balance) = c("","(1)","(2)","(3)","(4)")
+
+t <- table.balance %>%
+  kbl(align = "lcccc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>%
+  add_header_above(c(" " = 1,"Medias"=3, " "=1),
+                   background = "white") %>% 
+  add_header_above(c("Balance de características individuales" = 5 ),
+                   bold = TRUE,
+                   background = "white") %>%
+  footnote(general = "Adaptado de la tabla 2, panel B, de Baird, McIntosh & Ozler (2011). Errores agrupados a nivel EA. Diferencias de medias distintas de 0 al 99`\\%` (***), 95`\\%` (**) y 90`\\%` (*) de confianza. Los asteriscos en las columnas (2) y (3) indican diferencias significativas con respecto a grupo de control. Los asteriscos en la columna (4) indican diferencias entre los grupos con tratamiento condicional e incondicional.",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
+
+scroll_box(t, height="80%")
+
 ```
+
 
 ---
 
@@ -611,10 +699,39 @@ $$x_i=\alpha+\beta_C C_i+\beta_U U_i+u_i$$
 
 # Efectos de tratamiento
 
-- Veamos los efectos en la asistencia usando las listas
+- Efectos en la asistencia usando las listas
 
-```{r, out.width="58%",fig.cap='Fuente: Baird, McIntosh & Özler (2011)',fig.align='center'}
-knitr::include_graphics("figures/cash_condition_table5.png")
+```{r table.efecto, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+variable <- c("", "Condicional", " ", "Incondicional"," ", "Media en control", "N", "`P>F(Cond.=Incond.)`")
+t109 <- c("Primer periodo 2009", "0.139***","(0.045)","0.063", "(0.056)","0.778","284","0.129")
+t209 <- c("Segundo periodo 2009", "0.014","(0.033)","0.038","(0.033)","0.849","285","0.334")
+t309 <- c("Tercer periodo 2009", "0.169**","(0.085)","0.118","(0.102)","0.688","192","0.358")
+all09 <- c("Todo 2009","0.080**","(0.035)","0.058","(0.037)","0.810","319","0.436")
+t110 <- c("Primer periodo 2010", "0.092**","(0.041)","-0.038","(0.053)","0.801","211","0.010")
+
+
+table.efecto <- data.frame(cbind(variable, t109, t209, t309, all09, t110))
+
+colnames(table.efecto) = c("","(1)","(2)","(3)","(4)", "(5)")
+
+t <- table.efecto %>%
+  kbl(align = "lccccc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>%
+  add_header_above(c(" "=1, "Variable dependiente: fracción de los días que el entrevistado asistió a la escuela"=5),
+                   bold = TRUE,
+                   background = "white") %>% 
+  add_header_above(c("Impactos del programa en la asistencia" = 6 ),
+                   bold = TRUE,
+                   background = "white") %>%
+  footnote(general = "Adaptado de la tabla 5 de Baird, McIntosh & Ozler (2011). Errores agrupados a nivel EA. Se incluyen como controles indicadoras de edad, indicadoras de estrato, el índice de activos del hogar, el grado máximo de estudios y una indicadora de nunca haber tenido sexo. Parámetros estimados estadísticamente distintos de 0 al 99`\\%` (***), 95`\\%` (**) y 90`\\%` (*) de confianza. ",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
+
+scroll_box(t, height="70%")
+
 ```
 
 ---
@@ -650,8 +767,6 @@ $$y_i=\alpha+\beta_C C_i+\beta_U U_i +X_i'\gamma+u_i$$
 - Parece en contra de lo que hubiéramos esperado
 
 - Interpretación basada en *cumplidores* y *no cumplidores*, lo cual veremos más adelante en el curso
-
-
 
 
 ---

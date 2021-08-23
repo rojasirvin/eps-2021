@@ -7,6 +7,8 @@
     <script src="libs/header-attrs-2.9/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="libs/cide.css" type="text/css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css" type="text/css" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" type="text/css" />
@@ -23,7 +25,7 @@ class: title-slide
 # Clase 3. Regresión y efectos causales
 ]
 .subtitle[
-## Evaluación de Programas Sociales
+## Evaluación de Programas
 ]
 .author[
 ### Irvin Rojas &lt;br&gt; [rojasirvin.com](https://www.rojasirvin.com/) &lt;br&gt; [&lt;i class="fab fa-github"&gt;&lt;/i&gt;](https://github.com/rojasirvin) [&lt;i class="fab fa-twitter"&gt;&lt;/i&gt;](https://twitter.com/RojasIrvin) [&lt;i class="ai ai-google-scholar"&gt;&lt;/i&gt;](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&amp;hl=en)
@@ -106,19 +108,76 @@ $$
 
 La Tabla 2.2.2 en MHE muestra los efectos de tratamiento estimados con regresión: 
 
+&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;" colspan="5"&gt;&lt;div style="TRUE"&gt;Efectos experimentales del tamaño del grupo en las calificaciones&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Variable explicativa &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; (1) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; (2) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; (3) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; (4) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; `T_1`: Clase pequeña &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 4.82 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5.37 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5.36 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5.37 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (2.19) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.26) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.21) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.19) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; `T_2`: Clase pequeña y asistente &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.12 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.29 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.53 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.31 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (2.23) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.13) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.09) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.07) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Efectos fijos de escuela &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Sí &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Sí &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Sí &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Controles &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `X_1` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `X_1+X_2` &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Nota:&lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Tabla 2.2.2 en Angrist y Pischke (2009)&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
 
-|Variable explicativa | (1) | (2) | (3) | (4) |
-|--|:-:|:-:|:-:|:-: |
-| `\(T_1\)` | 4.82 | 5.37 | 5.36 | 5.37 |
-| | (2.19)| (1.26) | (1.21) | (1.19)
-| `\(T_2\)` | 0.12 | 0.29 | 0.53 | 0.31 |
-| | (2.23) | (1.13) | (1.09) | (1.07) |
-| Efectos fijos de escuela | No | Sí  | Sí | Sí |
-|Controles| No | No | `\(X_1\)` | `\(X_1+X_2\)` |
+---
+
+# El impacto de STAR con regresión
 
 - ¿Cómo se obtienen los resultados de esta tabla?
 
 - ¿Qué se deduce sobre los distintos tratamientos?
+
+- ¿Cuál es la variable dependiente?
+
+- ¿Cuál es la variable independiente clave?
 
 ---
 
@@ -428,14 +487,14 @@ $$
 
 class: inverse, middle, center
 
-# Efectivo o condicionales
+# Aplicación: efectivo o condicionales
 
 
 ---
 
-# Efectivo o condicionales (Baird, McIntosh &amp; Özler, 2011)
+# ¿Qué tipo de programa funciona mejor?
 
-
+- Baird, S., McIntosh, C., &amp; Özler, B. (2011). Cash or condition? Evidence from a cash transfer experiment
 
 - ¿Cuál es la diferencia entre un CCT y un UCT?
 
@@ -526,21 +585,85 @@ class: inverse, middle, center
 
 - ¿Qué es atrición?
 
---
 
 - ¿Qué observamos?
 
-&lt;div class="figure" style="text-align: center"&gt;
-&lt;img src="figures/cash_condition_table1.png" alt="Fuente: Baird, McIntosh &amp;amp; Özler (2011)" width="70%" /&gt;
-&lt;p class="caption"&gt;Fuente: Baird, McIntosh &amp; Özler (2011)&lt;/p&gt;
-&lt;/div&gt;
+
+- ¿Cómo se obtienen los resultados de la Tabla 1
 
 
 ---
 
 # Atrición
 
-- ¿Cómo se obtienen los resultados de la Tabla 1
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:80%; "&gt;&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="4"&gt;&lt;div style="TRUE"&gt;Análisis de atrición&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th style="empty-cells: hide;position: sticky; top:0; background-color: #FFFFFF;" colspan="1"&gt;&lt;/th&gt;
+&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="3"&gt;&lt;div style="TRUE"&gt;Variable dependiente:&lt;/div&gt;&lt;/th&gt;
+&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (1) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (2) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (3) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Entrevistado en ronda 3 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Entrevistado en las tres rondas &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Tomó prueba de educación &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Condicional &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.020 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.021 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.029 * &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.015) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.030) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.016) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Incondicional &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.021 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.030 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.035 * &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.019) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.024) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.020) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Media en grupo de control &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.946 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.893 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.929 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; `P&amp;gt;F(Cond.=Incond.)` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.965 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.797 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.801 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Nota:&lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Adaptado de la tabla 1 de Baird, McIntosh &amp;amp; Ozler (2011). Errores agrupados a nivel EA. La muestra se restringe a individuos que estuvieron en la escuela en la línea base y que fueron seleccionados para estar en uno de los dos grupos de tratamiento o en el grupo de control. Parámetros estimados son distintos de 0 al 99`\%` (***), 95`\%` (**) y 90`\%` (*) de confianza.&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+
+---
+
+# Atrición
+
+- Estimamos la siguiente ecuación por MCO:
 
 `$$y_i=\alpha+\beta_C C_i+\beta_U U_i + e_i$$`
 
@@ -550,7 +673,7 @@ donde `\(y_i\)` toma el valor de 1 si la observación estaba en la línea base y
 
 - ¿Cómo determinamos que hay diferencias significativas?
 
-- Por ejemplo, ¿qué significa el 0.29* (error estándar de 0.016) en la primera fila de la columna (3)?
+- Por ejemplo, ¿qué significa el `\(0.29^*\)` (error estándar de 0.016) en la primera fila de la columna (3)?
 
 
 
@@ -558,15 +681,154 @@ donde `\(y_i\)` toma el valor de 1 si la observación estaba en la línea base y
 
 # Pruebas de balance
 
+
 - Un aspecto que siempre revisamos cuando leemos resultados experimentales
 
+- Verificamos que las características observables antes de la implementación de la intervención sean iguales (en un sentido estadístico) entre los indiviudos asignados a los distintos grupos
 
-- ¿Qué observamos?
+- ¿Qué observamos en la tabla 2?
 
-&lt;div class="figure" style="text-align: center"&gt;
-&lt;img src="figures/cash_condition_table2b.png" alt="Fuente: Baird, McIntosh &amp;amp; Özler (2011)" width="70%" /&gt;
-&lt;p class="caption"&gt;Fuente: Baird, McIntosh &amp; Özler (2011)&lt;/p&gt;
-&lt;/div&gt;
+
+
+---
+
+# Pruebas de balance
+
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:80%; "&gt;&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="5"&gt;&lt;div style="TRUE"&gt;Balance de características individuales&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th style="empty-cells: hide;position: sticky; top:0; background-color: #FFFFFF;" colspan="1"&gt;&lt;/th&gt;
+&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="3"&gt;&lt;div style="TRUE"&gt;Medias&lt;/div&gt;&lt;/th&gt;
+&lt;th style="empty-cells: hide;position: sticky; top:0; background-color: #FFFFFF;" colspan="1"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (1) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (2) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (3) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (4) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Control &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Condicional &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Incondicional &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Valor `p` (Cond. - Incond.) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Edad &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 15.252 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 14.952* &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 15.424 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.007*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.903) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.827) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.923) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Grado máximo &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.478 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.246 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.896** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.004*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.634) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.598) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.604) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Madre vive &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.842 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.802 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.836 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.360 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.365) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.399) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.371) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Padre vive &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.705 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.714 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.759 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.288 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.456) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.453) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.428) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Nunca tuvo sexo &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.797 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.797 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.775 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.582 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.402) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.403) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.419) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Embarazada alguna vez &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.023 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.030 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.031 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.973 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.149) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.171) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.173) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Transferencia &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; N/A &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3.090 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3.033 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.606 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.431) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.451) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; N &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1,356 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 470 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 261 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Nota:&lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Adaptado de la tabla 2, panel B, de Baird, McIntosh &amp;amp; Ozler (2011). Errores agrupados a nivel EA. Diferencias de medias distintas de 0 al 99`\%` (***), 95`\%` (**) y 90`\%` (*) de confianza. Los asteriscos en las columnas (2) y (3) indican diferencias significativas con respecto a grupo de control. Los asteriscos en la columna (4) indican diferencias entre los grupos con tratamiento condicional e incondicional.&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;&lt;/div&gt;
+
 
 ---
 
@@ -590,12 +852,93 @@ donde `\(y_i\)` toma el valor de 1 si la observación estaba en la línea base y
 
 # Efectos de tratamiento
 
-- Veamos los efectos en la asistencia usando las listas
+- Efectos en la asistencia usando las listas
 
-&lt;div class="figure" style="text-align: center"&gt;
-&lt;img src="figures/cash_condition_table5.png" alt="Fuente: Baird, McIntosh &amp;amp; Özler (2011)" width="58%" /&gt;
-&lt;p class="caption"&gt;Fuente: Baird, McIntosh &amp; Özler (2011)&lt;/p&gt;
-&lt;/div&gt;
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:70%; "&gt;&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="6"&gt;&lt;div style="TRUE"&gt;Impactos del programa en la asistencia&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th style="empty-cells: hide;position: sticky; top:0; background-color: #FFFFFF;" colspan="1"&gt;&lt;/th&gt;
+&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="5"&gt;&lt;div style="TRUE"&gt;Variable dependiente: fracción de los días que el entrevistado asistió a la escuela&lt;/div&gt;&lt;/th&gt;
+&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (1) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (2) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (3) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (4) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (5) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Primer periodo 2009 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Segundo periodo 2009 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Tercer periodo 2009 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Todo 2009 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Primer periodo 2010 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Condicional &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.139*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.014 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.169** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.080** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.092** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.045) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.033) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.085) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.035) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.041) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Incondicional &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.063 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.038 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.118 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.058 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -0.038 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.056) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.033) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.102) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.037) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.053) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Media en control &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.778 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.849 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.688 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.810 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.801 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; N &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 284 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 285 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 192 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 319 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 211 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; `P&amp;gt;F(Cond.=Incond.)` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.129 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.334 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.358 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.436 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.010 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Nota:&lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Adaptado de la tabla 5 de Baird, McIntosh &amp;amp; Ozler (2011). Errores agrupados a nivel EA. Se incluyen como controles indicadoras de edad, indicadoras de estrato, el índice de activos del hogar, el grado máximo de estudios y una indicadora de nunca haber tenido sexo. Parámetros estimados estadísticamente distintos de 0 al 99`\%` (***), 95`\%` (**) y 90`\%` (*) de confianza. &lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;&lt;/div&gt;
 
 ---
 
@@ -630,8 +973,6 @@ donde `\(y_i\)` toma el valor de 1 si la observación estaba en la línea base y
 - Parece en contra de lo que hubiéramos esperado
 
 - Interpretación basada en *cumplidores* y *no cumplidores*, lo cual veremos más adelante en el curso
-
-
 
 
 ---
