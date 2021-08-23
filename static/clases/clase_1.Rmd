@@ -33,7 +33,7 @@ xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
 
 .title[
-# Sesión 1. Evaluación: diseño y econometría
+# Clase 1. Evaluación: diseño y econometría
 ]
 .subtitle[
 ## Evaluación de Programas

@@ -11,4 +11,4 @@ weight: 70
 
 [Clase 2](https://eps-2021.netlify.app/clases/clase_2.html#1). Inferencia causal
 
-
+[Clase 3](https://eps-2021.netlify.app/clases/clase_3.html#1). Regresión y efectos causales

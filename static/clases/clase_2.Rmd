@@ -37,7 +37,7 @@ xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
 
 .title[
-# Sesión 2. Inferencia causal
+# Clase 2. Inferencia causal
 ]
 .subtitle[
 ## Evaluación de Programas
