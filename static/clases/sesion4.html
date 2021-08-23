@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Inferencia estadística y evaluación</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Irvin Rojas" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="libs/cide.css" type="text/css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: title-slide
+
+
+
+.title[
+# Sesión 4. Inferencia estadística y evaluación
+]
+.subtitle[
+## Evaluación de Programas Sociales
+]
+.author[
+### Irvin Rojas &lt;br&gt; [rojasirvin.com](https://www.rojasirvin.com/) &lt;br&gt; [&lt;i class="fab fa-github"&gt;&lt;/i&gt;](https://github.com/rojasirvin) [&lt;i class="fab fa-twitter"&gt;&lt;/i&gt;](https://twitter.com/RojasIrvin) [&lt;i class="ai ai-google-scholar"&gt;&lt;/i&gt;](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&amp;hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas &lt;br&gt; División de Economía
+]
+
+---
+# Agenda
+
+1. Estudiaremos medidas de variabilidad de estimadores
+
+1. Definiremos parámetros clave en la literatura de efectos de tratamiento
+
+1. Estudiaremos una intervención en seis países para enfatizar las características de un experimento aleatorio y el análisis del mismo
+
+---
+
+class: inverse, middle, center
+
+# Medidas de variabilidad
+
+---
+# Medidas de variabilidad
+
+- Haremos un breve recordatorio sobre la precisión de los estimadores que usamos para evaluar el efecto de un tratamiento
+
+- Comenzamos con medias pues, como vimos antes, bajo un buen diseño, basta con una diferencia de medias para estimar el efecto del tratamiento
+
+- Sin embargo, las ideas que veremos son fácilmente trasladables a los estimadores de MCO que resultan cuando usamos regresión
+
+---
+
+# Algunas definiciones
+
+- **Insesgadez de la media muestral**: `\(E(\bar{y})=E(y_i)\)`
+
+- La insesgadez implica que, si obtuviéramos muestras repetidas de tamaño fijo, no habría desviaciones sistemáticas con respecto a `\(E(y_i)\)`
+
+- No confundir con LGN, que implican consistencia cuando `\(N\to\infty\)`
+
+- **Varianza poblacional**: `\(V(y_i)=E((y_i-E(y_i))^2)=\sigma_t^2\)`
+
+- **Desviación estándar**: `\(\sigma_y\)`
+
+- **Varianza muestral**: `\(S(y_i)^2\frac{1}{n}\sum_i(y_i-\bar{y})^2\)`
+
+---
+
+# ¿Cómo medimos la variabilidad de `\(\bar{y}\)`
+
+
+- Por otro lado, reemplazando la definición:
+
+$$
+`\begin{aligned}
+V(\bar{y})&amp;=V\left(\frac{1}{n}\sum_i y_i\right) \\
+&amp;=\frac{1}{n^2}V\left(\sum_i y_i\right) \\
+&amp;=\frac{1}{n}\sigma^2_y 
+\end{aligned}`
+$$
+donde la última igualdad resulta de la independencia entre las `\(i\)` y de que dado que las `\(y_i\)` vienen de la misma población, entonces tienen la misma varianza
+
+---
+
+# ¿Cómo medimos la variabilidad de `\(\bar{y}\)`
+
+- Notemos que la varianza de la media muestral depende de la varianza de `\(y_i=\sigma^2_y\)`, pero también de `\(n\)`
+
+- Es aquí donde una LGN tiene un papel, pues cuando `\(n\to\infty\)`, la varianza de la media muestral tiende a cero
+
+--
+
+- El **error estándar** queda definido como: `\(SE(\bar{y})=\sigma_y/\sqrt{n}\)`
+
+- Todos los estimadores que usamos tienen un error estándar, algunos con una forma más complicada que otra, pero todos ellos tienen la misma interpretación: *resumen la variabilidad que surge por el muestreo aleatorio*
+
+--
+
+- La contraparte muestral del error estándar, formalmente llamado **error estándar estimado de la media muestral** es:
+
+`$$\hat{SE}(\bar{y})=\frac{S(y_i)}{\sqrt{n}}$$`
+
+---
+
+# El estadístico `\(t\)`
+
+- Supongamos que queremos probar la hipótesis de que `\(E(y_i)=\mu\)`
+
+- El estadístico `\(t\)` se define como:
+`$$t(\mu)=\frac{\bar{y}-\mu}{\hat{SE}(\bar{y})}$$`
+- A la hipótesis que queremos probar se le conoce como la hipótesis nula, `\(H0\)`
+
+- Bajo `\(H0\)`, `\(\mu=0\)`, el estadístico es `\(t(\mu)=\frac{\bar{y}}{\hat{SE}(\bar{y})}\)`
+
+- Por un TLC sabemos que `\(t(\mu)\)` se distribuye normal en una muestra lo suficientemente grande, sin importar la distribución de `\(y_i\)`
+
+- Por tanto, podemos tomar decisiones sobre si la `\(H0\)` es consistente con lo que esperaríamos ver con una distribución normal
+
+---
+
+# Distribución normal
+
+- La conveniencia de la distribución normal es que conocemos muchas propiedades teóricas de esta
+
+- Por ejemplo, grafiquemos una normal arbitraria con media 0 y desviación estándar 1:
+
+
+```r
+normal_curve &lt;- ggplot(data.frame(x = c(-3, 3)),aes(x = x)) +
+  stat_function(fun = dnorm, args= list(0, 1))
+
+funcShaded &lt;- function(x) {y &lt;- dnorm(x, mean = 0, sd = 1)
+    y[x &lt; (0 - 1.96 * 1) | x &gt; (0 + 1.96 * 1)] &lt;- NA
+    return(y)
+}
+
+normal_curve &lt;-normal_curve+stat_function(fun=funcShaded, geom="area", fill="black", alpha=0.2)
+```
+
+
+---
+
+# Distribución normal
+
+
+.pull-left[
+![](figures/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+]
+
+
+.pull-right[
+
+- Por ejemplo, sabemos que el 95% de las realizaciones se encuentran en el intervalo `\([\mu-1.96\sigma, \mu+1.96\sigma]\)`
+
+- De aquí surge que, cuando trabajamos al 95% de confianza (típico en economía), se usa una *regla de dedo* de 2 para juzgar el valor de un estadístico `\(t\)`
+
+- Un estadístico `\(t\)` mayor que `\(|2|\)` indica que la `\(H0\)` de que `\(\mu=0\)` es altamente improbable
+]
+
+---
+
+# Intervalos de confianza
+
+- En vez de probar si en una muestra la `\(H0\)` se rechaza o no, para muchos posibles valores de `\(\mu\)`, podemos construir el conjunto de todos los valores de `\(\mu\)` que son consistentes con los datos
+
+- A esto le llamamos **intervalo de confianza** de `\(E(y_i)\)`
+
+--
+
+- Un intervalo de confianza es el conjunto de valores consistente con los datos:
+
+`$$IC_{0.95}=\{\bar{y}-1.96\times\hat{SE}(\bar{y}),\bar{y}+1.96\times\hat{SE}(\bar{y})\}$$`
+--
+
+- Si tuviéramos acceso a muestras repetidas y en cada una calculáramos `\(\bar{y}\)`, esperamos que en el 95% de los casos `\(E(y_i)\)` está en el intervalo de confianza
+
+---
+
+# Errores estándar del estimador de MCO
+
+- Como vimos anteriormente, el estimador de la matriz de varianzas del estimador de MCO propuesto por White (1980) es:
+
+`$$\hat{V}(\hat{\beta}_{MCO})=(X'X)^{-1}\left(\sum_i\hat{u}_i^2x_ix_i'\right)(X'X)^{-1}$$`
+
+- El error estándar es `\(\hat{\beta}_k\)` será la raíz cuadrada de la `\(k\)`ésima entrada sobre la diagonal principal de `\(\hat{V}(\hat{\beta}_{MCO})\)` y lo denominamos `\(\hat{EER}(\hat{\beta}_k)\)` por venir de una matriz de varianzas robusta
+
+- Con los mismos principios, una estadístico `\(t\)` se define como:
+
+`$$t(\beta_k)=\frac{\hat{\beta}_k-\beta_k}{\hat{EER}(\hat{\beta}_k)}$$`
+
+
+---
+
+# Prueba de hipótess
+
+- En la sesión anterior motivamos el uso de regresión para estimar efectos de tratamiento:
+
+`$$y_i=\alpha+\beta T_i +\gamma_1 x_1 + \gamma_2 x_2 + \ldots + \gamma_{K-2} x_{K-2}  + u_i$$`
+
+- Supongamos que el tratamiento fue asignado aleatoriamente y el diseño permaneció íntegro
+
+- Nos interesa entonces probar la hipótesis nula de que `\(\beta=0\)`
+
+--
+
+- Un estadístico `\(t\)` para probar esta hipótesis tiene la forma:
+
+`$$t(\beta)=\frac{\hat{\beta}}{\hat{EER}(\hat{\beta})}$$`
+- Bajo la `\(H0\)`, el estadístico `\(t\)` se distribuye asintóticamente normal
+
+- Entonces, podemos calcular el valor p, es decir, la probabilidad de observar `\(t\)` bajo la `\(H0\)`
+
+- En economía usamos frecuentemente los valores de p de 0.10, 0.05 y 0.01 para juzgar la significancia de los estimadores
+
+
+
+---
+
+class: inverse, middle, center
+
+# Parámetros de interés de efectos de tratamiento
+
+
+---
+
+# Supuesto de independencia condicional
+
+- En la sesión anterior vimos que el SIC nos dice que, condicional en `\(X_i\)`, los resultados potenciales son independientes del tratamiento
+
+- Cuando el tratamiento se asigna de manera aleatoria y el diseño experimental se, el supuesto es válido
+
+- Más aún, bajo asignación aleatoria, podemos hacer un supuesto aún más fuerte:
+
+`$$\{y_{0i},y_{1i}\perp D_i \}$$`
+
+---
+
+# Efectos de tratamiento
+
+- Vamos a definir dos medidas de efecto de tratamiento ampliamente usadas en la literatura
+
+- Definamos el cambio en la variable de resultados de un individuo:
+
+`$$\Delta_i=y_{1i}-y_{0i}$$`
+
+**Efecto promedio del tratamiento** (ATE): se interpreta como la ganancia hipotética debido al tratamiento para un individuo seleccionado al azar en una población
+
+- Este parámetro es de relevancia cuando pensamos en tratamientos de aplicación universal
+
+- Matemáticamente:
+
+`$$ATE=E(\Delta)$$`
+
+- Con su correspondiente análogo muestral:
+`$$\hat{ATE}=\frac{1}{N}\sum_i^N\Delta_i$$`
+
+---
+
+# Efectos de tratamiento
+
+**Efecto promedio del tratamiento en los tratados** (ATET, TT, TOT)
+
+- Como su nombre lo dice, este parámetro solo considera a los individuos que son efectivamente tratados
+
+- Matemáticamente:
+`$$ATET=\frac{1}{N_T}\sum_i^{N_T}(\Delta_i|D_i=1)$$`
+
+- Y su análogo muestral es:
+
+`$$\hat{ATET}=\sum_i^{N_T}(\Delta_i|D_i=1)$$`
+
+---
+
+# Efectos de tratamiento
+
+- Heckman (1997) critica el uso del ATE pues pudiera ser irrelevante
+
+- ¿Cuál es el ATE de PROGRESA, por ejemplo?
+
+- La contracrítica es que siempre podemos restringir lo que es la *población* de interés
+
+--
+
+- Noten que el ATET también abre la puerta a casos en los que, aún cuando el tratamiento se asignó aleatoriamente en un grupo, no todos a los que se les asigna el tratamiento efectivamente lo reciben
+
+--
+
+- En ambos casos, no podemos estimar directamente los parámetros pues no observamos `\(\Delta_i\)`
+
+- Sin embargo, ya vimos cómo, con una muestra de tratados y no tratados, podemos inferir el efecto del tratamiento, bajo algunos supuestos
+
+---
+
+class: inverse, middle, center
+
+# Experimentos a escala masiva
+
+---
+
+# Un programa multifacético causa progresos duraderos para los pobres
+
+- Banerjee y una larga lista de coautores (2015)
+
+- Hasta ahora habíamos analizado intervenciones con tratamientos aleatorizados que se restringían a una región o país
+
+--
+
+- Un fenómeno en el corazón del estudio de la economía del desarrollo es identificar las condiciones que provocan que las personas vivan en pobreza y, por tanto, identificar intervenciones que permitan mejorar el nivel de vida de la gente
+
+- ¿Qué piensan? ¿Debemos hacer cosas para combatir la pobreza?
+
+---
+
+# El programa
+
+- Intervención de gran escala en seis países: Etiopía, Ghana, Honduras, India, Pakistán y Perú
+
+- ¿En qué consistió la intervención?
+
+--
+
+- Programa *holístico*
+
+  - Activos
+  - Transferencias para comida
+  - Entrenamiento para negocios
+  - Acompañamiento (*coaching*)
+  - Productos de ahorro
+  - Educación para la salud
+  
+---
+  
+# Diseño
+
+- ¿Cómo se decidió quién recibiría el programa?
+
+--
+
+- En tres países hubo una aleatorización individual
+
+--
+
+  - En cada una de las localidades participantes se eligieron aleatoriamente a los hogares participantes
+  
+- En otros tres, hubo una aletorización agrupada (*clustered*)
+
+--
+
+  - De las localidades participantes, primero se asignaron localidades a tratamiento y localidades a control
+  
+  - En las localidades de tratamiento, se aleatorizaron los hogares que recibieron el tratamiento
+  
+  - Permite identificar la presencia de efectos de derramamiento o *spillovers*
+  
+---
+
+# Integridad del diseño
+
+
+.pull-left[
+
+- Aquí tenemos dos columnas del apéndice del artículo
+
+- ¿Qué nos dice el panel A? ¿Cuál es la `\(H0\)`
+
+- ¿Qué nos dice el panel B? ¿A qué le ponemos atención aquí?
+
+- ¿Qué se concluye?
+
+]
+
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/sixcountries_balance.png" alt="Fuente: Banerjee et al. (2015)" width="100%" /&gt;
+&lt;p class="caption"&gt;Fuente: Banerjee et al. (2015)&lt;/p&gt;
+&lt;/div&gt;
+]
+
+
+---
+
+# Integridad del diseño
+
+.pull-left[
+- ¿Qué sabemos de la atrición?
+
+- ¿Cómo interpretamos los resultados sobre atrición presentados?
+
+]
+
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/sixcountries_attrition.png" alt="Fuente: Banerjee et al. (2015)" width="88%" /&gt;
+&lt;p class="caption"&gt;Fuente: Banerjee et al. (2015)&lt;/p&gt;
+&lt;/div&gt;
+]
+
+---
+
+# Integridad del diseño
+
+- ¿A se refiere el término cumplimiento o *complience*?
+
+- ¿Qué significa que la tasa de cumplimiento en India sea de 52%?
+
+--
+
+- ¿Por qué se dice que el análisis presentado es uno de intención de tratamiento (*intention to treat*, ITT)
+
+--
+
+- Se comparan hogares **asignados** al tratamiento con hogares **asignados** al control, sin importar si efectivamente lo recibieron o no
+
+--
+
+---
+
+# Efectos de tratamiento
+
+- Se estima una sola ecuación con todas las observaciones para cada variable de interés
+
+`$$Y^k_i=\alpha + \beta_1 T_i + \beta Z_i^k + P_i + S_i + E_i + \varepsilon_i$$`
+
+- `\(T_i\)` es el indicador de asignación al tratamiento
+
+- `\(Z_i\)` es el valor de la variable de interés en la línea base
+
+- `\(P_i\)` son variables indicadoras por país
+
+- `\(S_i\)` son variables indicadoras de si la encuesta fue una encuesta *corta*
+
+- `\(E_i\)` son variables indicadores de estratificación 
+
+---
+
+# Variable dependiente
+
+- ¿Cómo se construye `\(Y^k_i\)`?
+
+--
+
+- Consideremos primero una sola variable, digamos el consumo per capita de comida
+
+- Esto es `\(Y^{k}_{ijl}\)` del hogar `\(i\)` en el país `\(l\)` y donde `\(k=\text{consumo de alimentos}\)`
+
+- La variable consumo de comida es parte de la familia de consumo `\(j=consumo\)`
+
+- Se construye un `\(z\)`-*score* para cada variable restándole la media del grupo de control en la ronda en donde se evalúa el impacto en el país `\(l\)` y se le divide por la desviación estándar
+
+--
+
+- En seguida, para cada familia `\(j\)`, tomamos los `\(z\)`-*score* de las variables que pertenecen a dicha familia y obtenemos la media y la desviación estándar para cada país `\(l\)` y ronda
+
+- Finalmente `\(Y^k_i\)` resulta de estandarizar cada `\(Y^{k}_{ijl}\)`
+
+
+---
+
+# Efectos de tratamiento
+
+
+.pull-left[
+- ¿Cuál es la tabla más importante que resume los efectos del programa?
+
+- ¿Qué se encuentra?
+]
+
+--
+
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/sixcountries_treatmenteffect.png" alt="Fuente: Banerjee et al. (2015)" width="85%" /&gt;
+&lt;p class="caption"&gt;Fuente: Banerjee et al. (2015)&lt;/p&gt;
+&lt;/div&gt;
+]
+
+---
+
+# Efectos de derramamiento
+
+- ¿Cómo podemos identificar los efectos de derramamiento en los países en donde hubo localidades enteras sin ningún hogar tratado?
+
+- En los casos de Ghana, Honduras y Perú hay tres tipos de hogares:
+
+  - Tratados en localidades tratadas
+  
+  - No tratados en localidades tratadas
+  
+  - No tratado en localidades no tratadas (control)
+
+--
+
+- Podemos comparar a los no tratados en las localidades de tratamiento con los no tratados en las localidades de control
+
+
+---
+# Próxima sesión
+
+
+- Habrá una primera presentación:
+
+  - De La O, A. L. (2013). Do conditional cash transfers affect electoral behavior? Evidence from a randomized experiment in Mexico. *American Journal of Political Science*, 57(1), 1-14.
+
+- Estudiaremos con detalle lo que sucede cuando no hay cumplimiento perfecto
+
+  - MM Capítulo 3
+  
+  - Angrist, J. D. (2006). Instrumental variables methods in experimental criminological research: what, why and how. *Journal of Experimental Criminology*, 2(1), 23-44.
+  
+- Pueden ir avanzando con las lecturas que se presentarán el jueves
+
+
+
+
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script src="libs/cols_macro.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
