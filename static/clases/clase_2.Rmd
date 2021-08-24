@@ -262,6 +262,25 @@ $$tasa=f(sexo,raza,estado\,civil, educación, ingreso, ocupación)$$
 
 - ¿Puede una serie de variables *dummy* capturar la diferencia de culturas?
 
+---
+
+# Nota sobre la *falacia ecológica*
+
+- Término atribuido a [Robinson (1950)](https://academic.oup.com/ije/article/38/2/337/658252?login=true)
+
+  - Robinson, W. S. (1950). Ecological correlations and the behavior of individuals. *American Sociological Review*.
+  
+- Es asumir algo sobre un individuo a partir de los datos agregados
+
+- Cuando las conclusiones cambian cuando el análisis se realiza a nivel individual que cuando se realiza a nivel agrupado, hablamos de una *falacia ecológica*
+
+- En el caso de Kanarek y coautores, dedujeron causalidad usando datos agregados sobre el contenido de asbesto en el agua
+
+- [Greenland & Morgenstern (1989)](https://academic.oup.com/ije/article-abstract/18/1/269/616865) argumentan que una de las dos causas de la falacia ecológica son los **confundidores omitidos** 
+  
+  - El hábito de fumar es un confundidor omitido que sesga los resultados atribuidos a otros factores de riesgo
+  
+- Pueden ver más [en este artículo](https://www.nature.com/articles/7500533)
 
 ---
 
