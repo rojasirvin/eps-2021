@@ -23,7 +23,7 @@ Por favor, seleccione una de las lecturas marcadas con una "+" de la lista de le
 | Del Valle et al. (2020)| Regresión discontinua | Anna Pérez | Martes 26 de octubre de 2021 |
 | Dell (2015) | Regresión discontinua   | Alejandro Parada | Martes 26 de octubre de 2021 |
 | Aguilar et al. (2021) | Regresión discontinua | Diego Tome | Martes 26 de octubre de 2021 |
-| Campos y Esquivel (2020) | Control sintético | Luis ALvarado | Jueves 11 de noviembre de 2021 |
+| Campos y Esquivel (2020) | Control sintético | Luis Alvarado | Jueves 11 de noviembre de 2021 |
 | Mitze et al. (2020)| Control sintético | Maria Fernanda Patiño | Jueves 11 de nociembre de 2021 |
 | Attanasio et al. (2011) | Estructurales | Xavier Anastasio | Martes 23 de noviembre de 2021|
 | Oshri et al. (2018) | Machine learning | Karen Carrillo | Martes 30 de noviembre de 2021 |
