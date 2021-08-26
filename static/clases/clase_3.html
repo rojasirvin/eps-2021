@@ -40,8 +40,6 @@ class: title-slide
 
 1. Motivar el uso de regresión para el análisis de efectos de tratamiento
 
-1. Recordatorio de las propiedades de la función de regresión
-
 1. Estudiaremos el supuesto de independencia condicional
 
 1. Veremos un ejemplo de experimento aleatorio para relacionarlo con lo que ya sabemos y para identificar elementos que iremos descubriendo con el tiempo
@@ -91,7 +89,7 @@ $$
 $$
 `\begin{aligned}
 E(y|D_i=1)-E(y|D_i=0)&amp;=\rho+\overbrace{E(\nu_i|D_i=1)-E(\nu_i|D_i=0)}^{\text{Sesgo de selección}} \\
-&amp;=\rho+E(y_{1i}|D_i=1)-E(y_{0i}|D_i=0)
+&amp;=\rho+E(y_{0i}|D_i=1)-E(y_{0i}|D_i=0)
 \end{aligned}`
 $$
 - Es decir, el sesgo de selección es igual a la correlación entre el término de error y `\(D_i\)`
@@ -104,9 +102,26 @@ $$
 
 ---
 
+# Regresión como herramienta
+
+- Usaremos muy frecuentemente la regresión para la estimación de efectos causales
+
+- La interpretación causal de los estimadores no surge de la herramienta, sino del diseño
+
+- Debemos tener en mente siempre si los estimadores están o no libres del sesgo de selección
+
+- Antes vimos que en el experimento STAR las medias de las calificaciones entre grupos eran distintas
+
+- La regresión nos servirá para hacer esencialmente lo mismo: comparación de `\(y_i\)` entre grupos
+
+
+---
+
 # El impacto de STAR con regresión
 
 La Tabla 2.2.2 en MHE muestra los efectos de tratamiento estimados con regresión: 
+
+`$$calificacion_i=\alpha+\beta_1 T_{1i} + \beta_2 T_{2i} + B'X_i + u_i$$`
 
 &lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
  &lt;thead&gt;
@@ -201,7 +216,7 @@ La Tabla 2.2.2 en MHE muestra los efectos de tratamiento estimados con regresió
 
 class: inverse, middle, center
 
-# Conceptos básicos de regresión
+# Motivación del uso de regresión en evaluación
 
 ---
 
@@ -245,119 +260,97 @@ class: inverse, middle, center
 
 ---
 
-# Algunas propiedades de la FEC
+# Teorema de la regresión de la FEC
 
-- Las siguientes dos propiedades nos serán útiles para motivar el uso de regresión:
+- MHE provee varias motivaciones de usar regresión al relacionar la función de regresión con la FEC
 
-- **Propiedad de descomposición**: cualquier variable aleatoria `\(y_i\)` puede ser descompuesta en una parte explicada por `\(X_i\)` (la FEC) y una parte ortogonal con cualquier función de `\(X_i\)`:
+- Aquí vamos a rescatar el que considero más intuitivo
 
-`$$y_i=E(y_i|X_i)+\varepsilon_i$$`
---
+- **Teorema de la regresión de la FEC**: la función `\(X_i'\beta\)` es la aproximación lineal de mínimos errores cuadrados promedio de `\(E(y_i|X_i)\)`: `$$\beta=\arg\min_b E((E(y_i|X_i)-X_i'b) ^2)$$`
 
-- **Propiedad predictiva**: la FEC es el mejor predictor de `\(y_i\)` dado `\(X_i\)` en el sentido de minimizar los errores cuadrados promedio de un problema de predicción:
+- Lo que nos dice este teorema es que si yo quiero **aproximar** la FEC y mi criterio para obtener la mejor aproximación es un problema de mínimos cuadrados promedio, entonces lo mejor que puedo hacer es que mi aproximación sea `\(X'\beta\)`
 
-`$$E(y_i|X_i)=\arg\min_{m(X_i)} E((y_i-m(X_i)^2)$$`
-- Pueden ver una prueba muy sencilla en MHE de la propiedad predictiva
+---
+
+# Teorema de la regresión de la FEC
+
+- Este teorema nos dice que si pensamos en en aproximar `\(E(y_i|X_i)\)`, incluso aunque la FEC no sea lineal, la función de regresión nos da la mejor aproximación lineal
+
+- Este teorema es lo más cercano a como interpretamos la regresión en evaluación pues más que querer predicciones de `\(y\)` para un individuo `\(i\)`, nos interesa la relación promedio entre las variables
+
+- Vale la pena notar que aquí hablamos de la función de regresión **poblacional**, es decir, aún tenemos que hablar sobre cómo estimarla
 
 
 ---
 
-# Tres razones por las cuales usar regresión
+# Teorema de la regresión de la FEC
 
-1. **Teorema de la FEC lineal**: si la FEC es lineal, entonces la función de regresión poblacional también lo es. Pueden ver una prueba muy sencilla en MHE
+.pull-left[
+- La figura 3.1.2 en MHE ilustra este teorema
 
---
+- La línea sólida es la FEC de la relación años de educación - salario
 
-1. **Teorema del mejor predictor lineal**: la función `\(X_i'\beta\)` es el mejor predictor lineal de `\(y_i\)` dado `\(X_i\)` en el sentido de mínimos cuadrados. Es decir `$$\beta=\arg\min_b E((y_i-X_i'b) ^2)$$`
+- La línea sólida muestra los promedios del salario para cada año de educación
 
---
+- La línea quebrada muestra la línea de regresión usando microdatos
 
-1. **Teorema de la regresión de la FEC**: la función `\(X_i'\beta\)` es la aproximación lineal de mínimos errores cuadrados promedio de `\(E(y_i|X_i)\)`: `$$\beta=\arg\min_b E((E(y_i|X_i)-X_i'b) ^2)$$`
+  - Graficar el coeficiente `\(\beta\)` que resulta al correr `\(y_i=\alpha+\beta s_i+u_i\)`
+
+- El teorema de la regresion de la FEC dice que obtenemos la misma recta si hacemos una regresión de $E(y_i|s_i)=\alpha+\beta s +u $
 
 
----
+]
 
-# Interpretación de estos teoremas
 
-- El teorema 1 es muy restrictivo, solo aplica cuando la FEC es en sí misma lineal
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/regresion_fec_mhe.png" alt="Fuente: Angrist &amp;amp; Pischke (2009)" width="80%" /&gt;
+&lt;p class="caption"&gt;Fuente: Angrist &amp; Pischke (2009)&lt;/p&gt;
+&lt;/div&gt;
 
---
+- Es decir, calculamos las medias del salario para cada nivel de educación y luego se hacemos una regresión de las medias en función de los niveles de educación (dándole más peso a las observaciones que aportaron más datos a la media de cada nivel)
+]
 
-- Los teoremas 2 y 3 son mucho menos restrictivos
-
-- El teorema 2 nos dice que, así como la FEC es el mejor predictor no restringido (de entre las funciones `\(m\)` en la propiedad predictiva de la FEC), la regresión es el **mejor predictor lineal**
-
-- El teorema 3 nos dice que si pensamos en cambio en aproximar `\(E(y_i|X_i)\)`, incluso aunque la FEC no sea lineal, la regresión nos da la mejor aproximación lineal
-
---
-
-- El teorema 3 es lo más cercano a como interpretamos la regresión en evaluación pues más que querer predicciones de `\(y\)` para un individuo `\(i\)`, nos interesa la relación promedio entre las variables
-
-- El teorema 2 nos hace pensar menos en la relación económica entre variables y más en una relación mecánica
 
 ---
 
-# Propiedades del estimador de MCO
+# Modelos saturados
 
-- En la práctica, no conocemos la FEC
+- Son modelos de regresión donde incluimos una variable categórica para cada uno de los posibles valores que tomen las `\(X_i\)`
 
-- Los teoremas antes vistos nos dicen que una forma de aproximarla es usando regresión, es decir, quisiéramos conocer `\(\beta=E(X_iX_i')^{-1}E(X_iy_i)\)`, un objeto poblacional
+- Del ejemplo con los datos de EUA, hay 21 posibles años de educación, entonces un modelo saturado es:
 
-- En la práctica aproximamos `\(\beta\)` con su análogo muestral: `\(\hat{\beta}_{MCO}=(X'X)^{-1}(X'Y)\)`
-
---
-
-- Con algo de álbebra, escribimos el estimador de MCO como `$$\hat{\beta}_{MCO}=\beta +\left(\sum x_ix_i'\right)^{-1}\left(\sum x_i u_i\right)$$`
-
-- Multiplicando por 1 el segundo término:
-`$$\hat{\beta}_{MCO}=\beta +\left(\frac{1}{N}\sum x_ix_i'\right)^{-1}\left(\frac{1}{N}\sum x_i u_i\right)$$`
-- Esta representación con **promedios** es útil para usar leyes de grandes números (LGN) y teoremas de límite central (TLC)
-
----
-
-# Consitencia
-
-- Queremos conocer la probabilidad límite del estimador de MCO:
-
-`$$p\lim\hat{\beta}_{MCO}=\beta +\left(p\lim\left(\frac{1}{N}\sum x_ix_i'\right)^{-1}\right)\left(p\lim\left(\frac{1}{N}\sum x_i u_i\right)\right)$$`
-- Si se puede aplica una LGN a `\(x_ix_i'\)`, entonces sabemos que el promedio `\(\frac{1}{N}\sum x_ix_i'\)` converge a una matriz finita no nula
-
-- Entonces, el estimador de MCO es consistente si `\(p\lim(\frac{1}{N}\sum x_i u_i)=0\)`
-
-- Escribimos `\(\hat{\beta}_{MCO}\xrightarrow{p}\beta\)`
-
----
-
-# Disitribución límite
-
-- Reescribimos el estimador de MCO como:
-`$$\sqrt{N}(\hat{\beta}-\beta)=(N^-{1}X'X)^{-1}N^{-1/2}X'u$$`
-- Para mostrar consistencia ya dijimos que `\(N^{-1}X'X\)` converge a una matriz finita y no nula
-
-- Si podemos aplicar un TLC a `\(X'u\)`, el segundo término tiene una distribución asintótica normal con media cero y varianza `\(p\lim\frac{1}{N}X'uu'X\)`
+`$$y_i=\alpha+\beta_1 c_{1i} + \beta_2 c_{2i} + \ldots + \beta_{21} c_{21i} + u_i$$`
+donde `\(c_{ji}=1\)` si el individuo `\(i\)` tiene una educación `\(s_{i}=j\)`
 
 --
 
-- Por lo tanto, la distribución asintótica del estimador de MCO es
+- El `\(j\)`-ésimo coeficiente `\(\beta_j\)` es el efecto de tener el nivel de educación `\(j\)`
 
-`$$\hat{\beta}_{MCO}\stackrel{a}{\sim}\mathcal{N}\left(\beta,(X'X)^{-1}X'uu'X(X'X)^{-1}\right)$$`
+- Además, `\(\alpha=E(y_i|s_i=0)\)`, se conoce como la categoría omitida
+
+- Podemos escoger la categoría omitida que tenga más sentido
+
 ---
 
-# Breve recordatorio de inferencia
+# Modelos saturados
 
-- Tenemos que estimar también la varianza del estimador de MCO
+- Si tuviéramos dos características, sexo y urbano-rural, un modelo saturado incluye un *término interacción*:
 
-- En un famoso artículo, White (1980) muestra que podemos estimar consistentemente `\(\hat{V}(\hat{\beta})\)` usando:
 
- `$$\hat{V}(\hat{\beta})=(X'X)^{-1}\left(\sum_i \hat{u}_i^2x_ix_i'\right)(X'X)^{-1}$$`
-- Esto es a lo que conocemos como la matriz de varianzas robusta a heterocedasticidad
+`$$y_i=\alpha+\beta_H x_{Hi} + \beta_R x_{Ri}+ \beta_{HR} x_{Hi}x_{Ri}+u_i$$`
 
-- Son robutos porque no hacemos supuestos sobre la distribución de los errores
 
-- En muy raras ocasiones, si asumimos errores independientes e identicamente distribuidos:
+- A los coeficientes `\(\beta_H\)` y `\(\beta_U\)` se les conoce como *efectos principales*
 
- `$$\hat{V}^H(\hat{\beta})=\hat{s}^2(X'X)^{-1}$$`
-donde `\(\hat{s}\)` es la varianza muestral
+- El término de interacción `\(\beta_{HR}\)` nos dice cómo cambia el ingreso entre individuos por tipo de localidad y por sexo 
+
+--
+
+- Un modelo saturado, si usamos sexo y `\(\tau\)` categorías de educación, sería:
+
+`$$y_i=\alpha+\beta_H x_{Hi}+\sum_{j=1}^{\tau} \beta_j c_{ji} + \sum_{j=1}^{\tau}\beta_{Hj}(x_{Hi}c_{ji})  + u_i$$`
+
 
 
 ---
@@ -383,6 +376,9 @@ class: inverse, middle, center
 
 - En la relación entre educación y salarios, una FEC causal describiría lo que un individuo ganaría con distintos niveles de educación
 
+--
+
+- Hay otro caso en el que la regresión puede tener interpretación causal, cuando existe **selección basada en observables**
 
 ---
 
@@ -394,7 +390,7 @@ class: inverse, middle, center
 
 --
 
-- Supongamos que `\(T_i\)` es ir a la universidad y la variable de interés es el ingreso
+- Supongamos que `\(D_i\)` es ir o  no a la universidad y la variable de interés es el ingreso
 
 - Sabemos que la comparación observacional nos da:
 
@@ -403,12 +399,14 @@ $$
 E(y_i|D_i=1)-E(y_i|D_i=0)=&amp;\overbrace{ E(y_{1i}-y_{0i}|D_i=1)}^{\text{Efecto promedio en los tratados}}+\\&amp; \underbrace{E(y_{0i}|D_i=1)-E(y_{oi}|D_i=0)}_{\text{Sesgo de selección}}
 \end{aligned}`
 $$
+
 - Es posible que aquellos que no fueron a la universidad de todos modos hubieran tenido un mayor salario, por lo que el sesgo de selección es positivo
 
 
 ---
 
 # Supuesto de independencia condicional
+
 - El SIC implica que si hacemos la comparación condicional en `\(X_i\)`, el sesgo desaparece
 
 
@@ -418,11 +416,19 @@ E(y_i|X_i,D_i=1)-E(y_i|X_i,D_i=0)=E(y_{1i}-y_{0i}|X_i)
 \end{aligned}`
 $$
 
+- Es decir, que si comparamos a personas con y sin tratamiento, con los `\(X_i\)` *fijos*, el sesgo de selección desaparece
+
+- *Mantener fijas* las `\(X\)` es el análogo a obtener el promedio del salario en cada nivel de escolaridad en la gráfica de la FEC descrita anteriormente
+
+---
+
+# Supuesto de independencia condicional
+
 - Para generalizar el concepto cuando la variable tiene más de dos valores (como con la educación `\(s_i\)`), escribamos `\(Y_{si}\equiv f_i(s)\)`
 
 - Esta función nos dice cuál sería el ingreso de `\(i\)` bajo todos los posibles niveles de `\(s\)`
 
-- En este caso, el SIC se convierte en:
+- En este caso, asumimos el SIC, que se traduce en:
 
 
 `$$Y_{si}\perp s_i | X_i$$`
@@ -439,17 +445,21 @@ $$
 
 - Dado el SIC, podemos hacer comparaciones de ingreso promedio para distintos niveles de educación:
 `$$E(Y_i|X_i,s_i=s)-E(Y_i|X_i,s_i=s-1)=E(f_i(s)-f_i(s-1)|X_i)$$`
+--
+
+- Notemos que lo impráctico de esto es que tendríamos que hacer comparaciones en pares y luego tratar de hacer un promedio ponderado por el número de individuos en cada nivel de educación
+
 ---
 
 # Regresión para hacer las comparasiones
 
-- Notemos que lo impráctico de esto es que tendríamos que hacer comparaciones en pares y luego tratar de hacer un promedio ponderado por el número de individuos en cada nivel de educación
+- Supongamos una función causal para el ingreso
 
---
+`$$f_i(s)=\alpha+\rho s+\nu_i$$`
 
-- Supongamos una función causal para el ingreso, `\(f_i(s)=\alpha+\rho s+\nu_i\)`, que indica lo que un individuo ganaría para todo valor de `\(s\)` (y no solo el valor realizado `\(s_i\)`)
+que indica lo que un individuo ganaría para todo valor de `\(s\)` (y no solo el valor realizado `\(s_i\)`)
 
-- La única parte aleatoria es el error con media cero `\(\nu_i\)`, que captura los factores no observados que afentan los ingresos
+- La única parte aleatoria es el error con media cero `\(\nu_i\)`, que captura los factores no observados que afectan los ingresos
 
 - Sustituyendo el valor observado:
 `$$Y_i=\alpha+\rho s_i+\nu_i$$`
@@ -475,12 +485,32 @@ E(f_i(s)|X_i,s_i)=E(f_i(s)|X_i)&amp;=\alpha+\rho s+E(\nu_i|X_i) \\
 &amp;=\alpha+\rho s + X_i'\gamma
 \end{aligned}`
 $$
+
 - Es decir, en el modelo de regresión causal
 `\(Y_i=\alpha+\rho s_i+ X_i'\gamma+u_i\)`, `\(u_i\)` no está correlacionado con los regresores `\(X_i\)` y `\(s_i\)`
 
 - `\(\rho\)` es el efecto causal de interés
 
 - El supuesto clave es que la única razón por la cual `\(\nu_i\)` y `\(s_i\)` están correlacionados es `\(X_i\)`
+
+
+---
+
+# En resumen
+
+- Las comparaciones observacionales están contaminadas por el sesgo de selección
+
+- La aleatorización resuelve el problema de selección, es decir, al comparar la variable de resultados de interés entre individuos tratados y no tratados, obtenemos el efecto causal
+
+- La FEC nos ayuda a describir la relación entre dos variables, por ejemplo, entre el estado de tratamiento y la variable de resultados
+
+- La regresión es una aproximación lineal a la FEC, aún cuando la FEC no sea lineal
+
+- Usaremos regresión como una herramienta para **comparar** la variable de resultados entre grupos
+
+- La regresión tiene una interpretación causal si la FEC que trata de aproximar es cauusal
+
+- El SIC le da una interpretación causal a la regresión, pero el SIC es un supuesto fuerte
 
 
 ---
@@ -978,6 +1008,8 @@ donde `\(y_i\)` toma el valor de 1 si la observación estaba en la línea base y
 ---
 # Próxima sesión
 
+- Haré un recordatorio de MCO y sus propiedades asintóticas
+
 - Hablaré sobre las medidas de variabilidad para realizar inferencia
 
   - MM, Capítulo 1, Apéndice
@@ -990,7 +1022,6 @@ donde `\(y_i\)` toma el valor de 1 si la observación estaba en la línea base y
 
   - Banerjee, A., Duflo, E., Goldberg, N., Karlan, D., Osei, R., Parienté, W., Shapiro, J., Thuysbaert, B. &amp; Udry, C. (2015). A multifaceted program causes lasting progress for the very poor: Evidence from six countries. *Science*, 348(6236), 1260799.
   
-
 ---
 
 class: center, middle

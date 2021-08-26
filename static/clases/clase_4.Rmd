@@ -39,7 +39,7 @@ xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 # Clase 4. Inferencia estadística y evaluación
 ]
 .subtitle[
-## Evaluación de Programas Sociales
+## Evaluación de Programas
 ]
 .author[
 ### Irvin Rojas <br> [rojasirvin.com](https://www.rojasirvin.com/) <br> [<i class="fab fa-github"></i>](https://github.com/rojasirvin) [<i class="fab fa-twitter"></i>](https://twitter.com/RojasIrvin) [<i class="ai ai-google-scholar"></i>](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&hl=en)
@@ -52,11 +52,146 @@ xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ---
 # Agenda
 
+1. Haremos un breve recordatorio de la *anatomía* y las propiedades del estimador de MCO
+
 1. Estudiaremos medidas de variabilidad de estimadores
 
 1. Definiremos parámetros clave en la literatura de efectos de tratamiento
 
 1. Estudiaremos una intervención en seis países para enfatizar las características de un experimento aleatorio y el análisis del mismo
+
+---
+
+
+class: inverse, middle, center
+
+# Breve nota sobre teoría asintótica de MCO
+
+
+---
+
+# Propiedades del estimador de MCO
+
+- En la práctica, no conocemos la FEC ni la función de regresión poblacional
+
+- En la clase anterior aprendimos que una forma de aproximar la FEC es usando regresión, es decir, quisiéramos conocer $\beta=E(X_iX_i')^{-1}E(X_iy_i)$, un objeto poblacional
+
+- En la práctica aproximamos $\beta$ con su análogo muestral: $\hat{\beta}_{MCO}=(X'X)^{-1}(X'Y)$
+
+--
+
+- Con algo de álgebra, escribimos el estimador de MCO como $$\hat{\beta}_{MCO}=\beta +\left(\sum x_ix_i'\right)^{-1}\left(\sum x_i u_i\right)$$
+
+- Multiplicando por $(1/N)^{-1}(1/N)=1$ el segundo término:
+$$\hat{\beta}_{MCO}=\beta +\left(\frac{1}{N}\sum x_ix_i'\right)^{-1}\left(\frac{1}{N}\sum x_i u_i\right)$$
+- Esta representación con **promedios** es útil para usar leyes de grandes números (LGN) y teoremas de límite central (TLC)
+
+---
+
+# Consistencia
+
+- Primero mostraremos el resultado de consistencia, es decir, mostraremos que cuando $N\to \infty$, el estimador de MCO $\hat{\beta}_{MCO}$ converge en probabilidad al parámetro poblacional $\beta$
+
+- Esta *prueba* informal de la consistencia nos permitirá ver dónde toma relevancia nuestro supuesto de independencia introducido cuando hablamos de resultados contrafactuales
+
+- Lo que acabaremos mostrando es que una condición necesaria para que $\hat{\beta}_{MCO}$ sea consistente es $E(u_i|x_i)=0$
+
+- En nuestro lenguaje de resultados pontenciales, esto significa que no hay sesgo de selección
+
+
+---
+
+# Consistencia
+
+- Queremos conocer la probabilidad límite del estimador de MCO:
+
+$$p\lim\hat{\beta}_{MCO}=\beta +\left(p\lim\left(\frac{1}{N}\sum x_ix_i'\right)^{-1}\right)\left(p\lim\left(\frac{1}{N}\sum x_i u_i\right)\right)$$
+
+- Si se puede aplica una LGN a $x_ix_i'$, entonces sabemos que el promedio $\frac{1}{N}\sum x_ix_i'$ converge a una matriz finita no nula
+
+- Entonces, el estimador de MCO es consistente si $p\lim(\frac{1}{N}\sum x_i u_i)=0$
+
+---
+
+# Consistencia
+
+- ¿Qué se requiere para que $p\lim(\frac{1}{N}\sum x_i u_i)=0$?
+
+- Una LGN nos dice que $p\lim(\frac{1}{N}\sum x_i u_i)= E(x_iu_i)$ (asumiendo independencia de las $i$)
+
+- Entonces, necesitamos $E(u_i|x_i)=0$
+
+- Escribimos $\hat{\beta}_{MCO}\xrightarrow{p}\beta$
+
+---
+
+# Distribución límite
+
+- Dada la consistencia, queremos saber la distribución del estimador de MCO para poder hacer inferencia
+
+- ¿Tiene una distribución de la que conocemos sus propiedades?
+
+- ¿Cuál es su media y su varianza cuando $N\to \infty$?
+
+- Para hacer esto, usamos una versión reescalada de $\hat{\beta}$ porque cuando $N\to \infty$?, $\hat{\beta}$ no tiene varianza
+
+
+---
+
+# Disitribución límite
+
+- Reescribimos el estimador de MCO como:
+$$
+\begin{aligned}
+\sqrt{N}(\hat{\beta}-\beta)&=(N^{-1}X'X)^{-1}(N^{1/2}N^{-1}X'u) \\
+&=(N^{-1}X'X)^{-1}(N^{-1/2}X'u)
+\end{aligned}
+$$
+
+- Para mostrar consistencia ya dijimos que $N^{-1}X'X$ converge a una matriz finita y no nula
+
+- Asumimos que podemos aplicar un TLC a $N^{-1/2}X'u$, el segundo término tiene una distribución asintótica normal con media cero y varianza $p\lim\frac{1}{N}X'uu'X$
+
+--
+
+- El *teorema del límite normal del producto* nos garantiza que también el producto $(N^{-1}X'X)^{-1}(N^{-1/2}X'u)$ será normal y nos dice la forma de la varianza
+
+- Por lo tanto, la distribución asintótica del estimador de MCO es
+
+$$\hat{\beta}_{MCO}\stackrel{a}{\sim}\mathcal{N}\left(\beta,(X'X)^{-1}X'uu'X(X'X)^{-1}\right)$$
+
+
+---
+
+# Disitribución límite
+
+- Estos son resultados asintóticos, válidos cuando $N\to \infty$
+
+- Son convenientes porque no asumimos forma distribucional sobre los errores
+
+  - En los cursos introductorios de econometría asumiamos, entre otras cosas, errores normales y homocedásticos
+  
+  - Aquí tenemmos menos supuestos
+
+- La distribución asintótica nos dice que el estimador de MCO tiene una distribución normal y que su varianza depende de los errores
+
+---
+
+# Estimación de la varianza
+
+- Tenemos que estimar también la varianza del estimador de MCO
+
+- En un famoso artículo, White (1980) muestra que podemos estimar consistentemente $\hat{V}(\hat{\beta})$ usando:
+
+ $$\hat{V}(\hat{\beta})=(X'X)^{-1}\left(\sum_i \hat{u}_i^2x_ix_i'\right)(X'X)^{-1}$$
+- Esto es a lo que conocemos como la matriz de varianzas robusta a heterocedasticidad
+
+- Son robutos porque no hacemos supuestos sobre la distribución de los errores
+
+- En muy raras ocasiones, si asumimos errores independientes e identicamente distribuidos:
+
+ $$\hat{V}^H(\hat{\beta})=\hat{s}^2(X'X)^{-1}$$
+donde $\hat{s}$ es la varianza muestral
 
 ---
 
@@ -83,16 +218,17 @@ class: inverse, middle, center
 
 - No confundir con LGN, que implican consistencia cuando $N\to\infty$
 
-- **Varianza poblacional**: $V(y_i)=E((y_i-E(y_i))^2)=\sigma_t^2$
+- **Varianza poblacional**: $V(y_i)=E((y_i-E(y_i))^2)=\sigma_y^2$
 
 - **Desviación estándar**: $\sigma_y$
 
-- **Varianza muestral**: $S(y_i)^2\frac{1}{n}\sum_i(y_i-\bar{y})^2$
+- **Varianza muestral**: $S(y_i)^2=\frac{1}{n}\sum_i(y_i-\bar{y})^2$
 
 ---
 
 # ¿Cómo medimos la variabilidad de $\bar{y}$
 
+- Asumamos que las $y_i$ son iid
 
 - Por otro lado, reemplazando la definición:
 
@@ -100,6 +236,7 @@ $$
 \begin{aligned}
 V(\bar{y})&=V\left(\frac{1}{n}\sum_i y_i\right) \\
 &=\frac{1}{n^2}V\left(\sum_i y_i\right) \\
+&=\frac{1}{n^2}n \sigma^2_y  \\
 &=\frac{1}{n}\sigma^2_y 
 \end{aligned}
 $$
@@ -109,7 +246,7 @@ donde la última igualdad resulta de la independencia entre las $i$ y de que dad
 
 # ¿Cómo medimos la variabilidad de $\bar{y}$
 
-- Notemos que la varianza de la media muestral depende de la varianza de $y_i=\sigma^2_y$, pero también de $n$
+- Notemos que la varianza de la media muestral depende de la varianza de $y_i$, $\sigma^2_y$, pero también de $n$
 
 - Es aquí donde una LGN tiene un papel, pues cuando $n\to\infty$, la varianza de la media muestral tiende a cero
 
@@ -133,13 +270,13 @@ $$\hat{SE}(\bar{y})=\frac{S(y_i)}{\sqrt{n}}$$
 
 - El estadístico $t$ se define como:
 $$t(\mu)=\frac{\bar{y}-\mu}{\hat{SE}(\bar{y})}$$
-- A la hipótesis que queremos probar se le conoce como la hipótesis nula, $H0$
+- A la hipótesis que queremos probar se le conoce como la hipótesis nula, $H_0$
 
-- Bajo $H0$, $\mu=0$, el estadístico es $t(\mu)=\frac{\bar{y}}{\hat{SE}(\bar{y})}$
+- Bajo $H_0$: $\mu=0$, el estadístico es $t(\mu)=\frac{\bar{y}}{\hat{SE}(\bar{y})}$
 
-- Por un TLC sabemos que $t(\mu)$ se distribuye normal en una muestra lo suficientemente grande, sin importar la distribución de $y_i$
+- Un TLC nos garantiza que $t(\mu)$ se distribuye normal en una muestra lo suficientemente grande, sin importar la distribución de $y_i$
 
-- Por tanto, podemos tomar decisiones sobre si la $H0$ es consistente con lo que esperaríamos ver con una distribución normal
+- Por tanto, podemos tomar decisiones sobre la $H_0$, basados en si $t(\mu)$ es consistente con lo que esperaríamos ver con una distribución normal
 
 ---
 
@@ -181,14 +318,14 @@ normal_curve
 
 - De aquí surge que, cuando trabajamos al 95% de confianza (típico en economía), se usa una *regla de dedo* de 2 para juzgar el valor de un estadístico $t$
 
-- Un estadístico $t$ mayor que $|2|$ indica que la $H0$ de que $\mu=0$ es altamente improbable
+- Un estadístico $t$ mayor que $|2|$ indica que la $H_0$ de que $\mu=0$ es altamente improbable
 ]
 
 ---
 
 # Intervalos de confianza
 
-- En vez de probar si en una muestra la $H0$ se rechaza o no, para muchos posibles valores de $\mu$, podemos construir el conjunto de todos los valores de $\mu$ que son consistentes con los datos
+- En vez de probar si en una muestra la $H_0$ se rechaza o no, para muchos posibles valores de $\mu$, podemos construir el conjunto de todos los valores de $\mu$ que son consistentes con los datos
 
 - A esto le llamamos **intervalo de confianza** de $E(y_i)$
 
@@ -200,6 +337,12 @@ $$IC_{0.95}=\{\bar{y}-1.96\times\hat{SE}(\bar{y}),\bar{y}+1.96\times\hat{SE}(\ba
 --
 
 - Si tuviéramos acceso a muestras repetidas y en cada una calculáramos $\bar{y}$, esperamos que en el 95% de los casos $E(y_i)$ está en el intervalo de confianza
+
+- Noten que el IC **no** se interpreta como la probabilidad de que el parámetro se encuentre en cierto rango
+
+- La interpretación es más sutil, lo que sucedería si tuviéramos distintas muestras de la misma población
+
+- Regularmente trabajamos con una muestra
 
 ---
 
@@ -233,13 +376,92 @@ $$y_i=\alpha+\beta T_i +\gamma_1 x_1 + \gamma_2 x_2 + \ldots + \gamma_{K-2} x_{K
 - Un estadístico $t$ para probar esta hipótesis tiene la forma:
 
 $$t(\beta)=\frac{\hat{\beta}}{\hat{EER}(\hat{\beta})}$$
-- Bajo la $H0$, el estadístico $t$ se distribuye asintóticamente normal
+- Bajo la $H_0$, el estadístico $t$ se distribuye asintóticamente normal
 
-- Entonces, podemos calcular el valor p, es decir, la probabilidad de observar $t$ bajo la $H0$
+- Podemos comparar el valor $t(\beta)$ con la distribución normal teórica para decir qué tan probable es observar dicho valor del estadístico
 
-- En economía usamos frecuentemente los valores de p de 0.10, 0.05 y 0.01 para juzgar la significancia de los estimadores
+---
+
+# El valor $p$
+
+- La otra cara de la moneda de los estadísticos de prueba es el valor $p$
+
+- El valor $p$ es la probabilidad de observar un valor mayor que el estadístico cuando la $H_0$ es verdadera
+
+- Un valor $p$ muy pequeño indica que es muy poco probable observar el estadístico de prueba bajo la $H_0$, por lo que hay evidencia para rechazar la $H_0$
+
+- Otra forma de intepretar el valor $p$ es la probabilidad de que se observen efectos iguales o más grandes a los observados debido al error muestral (*por suerte*)
+
+---
+
+# Valores $p$
+
+- Supongamos que un programa incrementa los ingresos en 100 pesos mensuales en promedio, con un valor $p$ de 0.07
+
+- Entonces, si el programa **no** tuviera efecto, todavía sería posible ver incrementos en los ingresos de 100 pesos mensuales o más en el 7% de los estudios debido al error muestral
+
+- En este breve texto de [Krzywinski & Altman (2013)](https://www.nature.com/articles/nmeth.2698) pueden leer algunos otros detalles sobre el valor $p$
+
+```{r, out.width="80%",fig.cap='Fuente: Krzywinski & Altman (2013)',fig.align='center'}
+knitr::include_graphics("figures/pvalue.jpg")
+```
 
 
+
+
+
+---
+
+# Valores $p$
+
+- ¿Qué tanto toleramos que nuestros resultados puedan ser *por suerte*?
+
+- Fijamos un nivel de significancia $\alpha$, definido como la probabilidad de rechazar la $H_0$ dado que esta es verdadera
+
+- Es decir, la probabilidad de cometer el **error tipo 1** o **falso positivo**
+
+- En economía usamos frecuentemente los valores $\alpha$ de 0.10, 0.05 y 0.01 para juzgar la significancia de los estimadores
+
+- En evaluación, si el valor $p$ es menor que $\alpha$ decimos que el efecto es *estadísticamente significativo*
+
+---
+
+# Prueba de hipótesis en evaluación
+
+- Un camino típico:
+
+  - Formulamos una pregunta causal $D_i \to y_i$
+
+  - Tengo razones para asumir que $D_i$ es independiente de $y_i$ (por ejemplo, hice un experimento)
+  
+  - De la clase anterior, sé que una regresión me ayudará a hacer comparaciones:
+  
+  $$y_i=\alpha+\beta D_i + B'X_i + u_i$$
+  - Formulamos la $H_0$: $\beta=0$, es decir, no hay efecto del tratamiento
+  
+  - Estimo la regresión, obtengo $\hat{\beta}$, y construyo $t=\frac{\hat{\beta}}{\hat{se}(\hat{\beta})}$
+  
+---
+
+# Prueba de hipótesis en evaluación
+
+- ... un camino típico
+
+  - El software me arroja: $\hat{\beta}$, $t(\hat{\beta})$ y $p$
+
+  - $t(\hat{\beta})$ y $p$ son dos caras de la misma moneda
+  
+  - Si $p>\alpha$, hay una probabilidad de observar $\hat{\beta}$ debido al error muestral mayor que $\alpha$
+  
+  - O, en términos de $t$, es altamente probable observar el estadístico bajo la $H_0$, por lo que no se rechaza la $H_0$
+  
+--
+
+- Las hipótesis no son exclusivamente de efectos de tratamiento
+
+- Otras hipótesis:
+  - Las características observables están *balanceadas*
+  - La atrcición ocurrió al azar
 
 ---
 
@@ -388,7 +610,7 @@ class: inverse, middle, center
 
 - Aquí tenemos dos columnas del apéndice del artículo
 
-- ¿Qué nos dice el panel A? ¿Cuál es la $H0$
+- ¿Qué nos dice el panel A? ¿Cuál es la $H_0$
 
 - ¿Qué nos dice el panel B? ¿A qué le ponemos atención aquí?
 
