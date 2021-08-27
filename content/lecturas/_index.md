@@ -103,6 +103,7 @@ Las lecturas obligatorias (marcadas con “*”) permiten una discusión informa
   + \* Card, D. (1990). The impact of the Mariel boatlift on the Miami labor market. *ILR Review*, 43(2), 245-257.  
   + \* Card, D., & Krueger, A. B. (2000). Minimum wages and employment: a case study of the fast-food industry in New Jersey and Pennsylvania: reply. *American Economic Review*,  0(5), 1397-1420.
   + Chen, H., Qian, W., & Wen, Q. (2021). The impact of the COVID-19 pandemic on consumption: Learning from high-frequency transaction data. *AEA Papers and Proceedings*, 111, 307-11.
+  + \+ Clarke, D., & Mühlrad, H. (2021). Abortion laws and women’s health. *Journal of Health Economics*, 76, 102413.
   + \+ Gutiérrez Vázquez, E. Y., & Parrado, E. A. (2016). Abortion legalization and childbearing in Mexico. *Studies in family planning*, 47(2), 113-128.  
   + \+ Levasseur, P. (2019). Can social programs break the vicious cycle between poverty and obesity? Evidence from urban Mexico. *World Development*, 113, 143-156.  
   + Qian, N. (2008). Missing women and the price of tea in China: The effect of sex-specific earnings on sex imbalance. *The Quarterly Journal of Economics*, 123(3), 1251-1285.
@@ -214,7 +215,6 @@ Las lecturas obligatorias (marcadas con “*”) permiten una discusión informa
   + Botosaru, I., & Ferman, B. (2019). On the role of covariates in the synthetic control method. *The Econometrics Journal*, 22(2), 117-130.  
   + \+ Calderón, G., Robles, G., Díaz-Cayeros, A., & Magaloni, B. (2015). The beheading of criminal organizations and the dynamics of violence in Mexico. *Journal of Conflict Resolution*, 59(8), 1455-1485.  
   + \+ Campos-Vazquez, R. M., & Esquivel, G. (2020). The effect of doubling the minimum wage and decreasing taxes on inflation in Mexico. Economics Letters, 109051.  
-  + \+ Clarke, D., & Mühlrad, H. (2021). Abortion laws and women’s health. *Journal of Health Economics*, 76, 102413.
   + Geloso, V., & Pavlik, J. B. (2021). The Cuban revolution and infant mortality: A synthetic control approach. *Explorations in Economic History*, 80, 101376.
   + Grier, K., & Maynard, N. (2016). The economic consequences of Hugo Chavez: A synthetic control analysis. *Journal of Economic Behavior & Organization*, 125, 1-21.
   + Mitze, T., Kosfeld, R., Rode, J., & Wälde, K. (2020). Face masks considerably reduce COVID-19 cases in Germany. *Proceedings of the National Academy of Sciences*, 117(51), 32293-32301.

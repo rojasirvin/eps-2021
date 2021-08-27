@@ -742,19 +742,12 @@ knitr::include_graphics("figures/sixcountries_treatmenteffect.png")
 ---
 # Próxima sesión
 
-
-- Habrá una primera presentación:
-
-  - De La O, A. L. (2013). Do conditional cash transfers affect electoral behavior? Evidence from a randomized experiment in Mexico. *American Journal of Political Science*, 57(1), 1-14.
-
 - Estudiaremos con detalle lo que sucede cuando no hay cumplimiento perfecto
 
   - MM Capítulo 3
   
   - Angrist, J. D. (2006). Instrumental variables methods in experimental criminological research: what, why and how. *Journal of Experimental Criminology*, 2(1), 23-44.
   
-- Pueden ir avanzando con las lecturas que se presentarán el jueves
-
 
 
 
