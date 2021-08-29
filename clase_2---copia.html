@@ -42,7 +42,10 @@ class: title-slide
 
 1. Sobre la importancia del diseño
 
-1. Definición de causalidad
+1. Causalidad
+
+1. El experimento ideal
+
 
 ---
 
@@ -531,18 +534,306 @@ y_{0,Hena}=0
 
 - Pero al trabajar con muestras, puede haber diferencias que surjan solo por el muestreo
 
-- Nuestra tarea es distinguir estas diferencias de los verdaderos efectos causales
+- Nuestra tarea es tratar de distinguir estas diferencias de los verdaderos efectos causales
+
+---
+
+class: inverse, middle, center
+
+# El experimento ideal
+
+---
+
+# El efecto de los hospitales
+
+- ¿Los hospitales hacen que la gente sea más sana?
+
+- Podemos conseguir datos de encuestas sobre cuántas veces las personas han ido al hospital en el último año
+
+
+&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;" colspan="4"&gt;&lt;div style="TRUE"&gt;El efecto de los hospitales&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Grupo &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; N &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Salud (0-5) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Error estándar &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Hospitalizados &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7,774 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3.21 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.014 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; No hospitalizados &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 90,049 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3.93 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.003 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Diferencia &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.72 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (t) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (58.9) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+--
+
+
+- ¿Tiene sentido? ¿Los hospitales enferman?
+
+- ¿Qué sucede?
+
+
+
+---
+
+# Comparaciones observacionales
+
+- Pensemos de nuevo en términos del *Modelo de Rubin* de resultados potenciales
+
+`$$y_{i}=\begin{cases}
+y_{1i}=1\quad\text{si }D_i=1\\
+y_{0i}=0 \quad \text{si } D_i=0
+\end{cases}$$`
+
+
+- Solo vemos al individuo en una situación, `\(y_i\)`:
+
+`$$y_i=y_{0i}+(y_{1i}-y_{0i})D_i$$`
+--
+
+- ¿Qué nos dicen las comparaciones observacionales?
+
+- Supongamos que tenemos acceso a datos sobre tratados y no tratados
+
+- Podemos calcular `\(E(y_i|D_i=1)-E(y_i|D_i=0)\)`:
+
+$$
+`\begin{aligned}
+E(y_i|D_i=1)-E(y_i|D_i=0)=&amp;E(y_{1i}|D_i=1)-E(y_{oi}|D_i=0)+\\&amp; \underbrace{E(y_{0i}|D_i=1)-E(y_{0i}|D_i=1)}_0 
+\end{aligned}`
+$$
+---
+
+# Sesgo de selección
+
+
+- Reordenando:
+
+$$
+`\begin{aligned}
+E(y_i|D_i=1)-E(y_i|D_i=0)=&amp;\overbrace{ E(y_{1i}|D_i=1)-E(y_{0i}|D_i=1)}^{\text{Efecto promedio en los tratados}}+\\&amp; \underbrace{E(y_{0i}|D_i=1)-E(y_{oi}|D_i=0)}_{\text{Sesgo de selección}}
+\end{aligned}`
+$$
+
+- El primer término nos da la diferencia promedio en la variable de salud entre los hospitalizados y lo que les hubiera pasado si no hubieran sido hospitalizados
+
+- En nuestro ejemplo, el **sesgo de selección** es la diferencia en salud entre los hospitalizados y los no hospitalizados
+
+- Específicamente, si quienes van al hospital tienen una peor salud, podemos esperar que `\(E(y_{0i}|D_i=1)-E(y_{oi}|D_i=0)&lt;0\)`
+
+---
+
+# Sesgo de selección
+
+- Al hacer aseveraciones basadas en comparaciones observacionales se incluye el efecto causal del tratamiento, pero también el sesgo de selección
+
+- El sesgo de selección puede ser positivo o negativo
+
+- El objetivo de las estrategias de evaluación es eliminar el sesgo de selección
+
+---
+
+# Tratamiento aleatorio
+
+- Supongamos que tenemos la posibilidad de aleatorizar el tratamiento, es decir, hacer que `\(Y_i\)` y `\(D_i\)` sean independientes
+
+- En ese caso, por independencia: `\(E(Y_{0i}|D_i=0)=E(Y_{0i}|D_i=1)\)`
+
+- De la definición de comparación observacional:
+
+$$
+`\begin{aligned}
+E(y_i|D_i=1)-E(y_i|D_i=0)=&amp;E(y_{1i}|D_i=1)-E(y_{0i}|D_i=0)
+\end{aligned}`
+$$
+
+- Sustituyendo el resultado de independencia:
+
+$$
+`\begin{aligned}
+E(y_i|D_i=1)-E(y_i|D_i=0)&amp;=E(y_{1i}|D_i=1)-E(y_{0i}|D_i=1) \\
+&amp; =E(y_{1i}-y_{0i}|D_i=1) \\
+&amp; =\underbrace{E(y_{1i}-y_{0i})}_{\text{Efecto causal}}
+\end{aligned}`
+$$
+
+---
+
+# No siempre es factible
+
+- La aleatorización resuelve muchas cosas, pero muchas veces no es factible
+
+- ¿Qué tendríamos que hacer en el caso de estudio, "¿Los hospitales matan?"
+
+--
+
+- Pensemos en un programa de empleo para ex convictos
+
+- Seguramente una comparación observacional indicaría que estos ganan menos que el resto de la población
+
+- Pero esto no significa que el programa cause un efecto negativo en el ingreso
+
+- Siempre tenemos que pensar en el contrafactual
+
+---
+
+# El experimento STAR
+
+- ¿En qué consistió?
+
+--
+
+- Dos tipos de tratamiento:
+
+  - `\(T_1\)`: clase pequeña (13-17) con maestro de tiempo completo
+  - `\(T_2\)`: tamaño normal pero con asistente para el maestro
+  
+- Un grupo `\(C\)` al que no se le hizo cambio alguno (22.3 alumnos en promedio)
+
+--
+
+- ¿Cuál es el efecto de tener clases más pequeñas?
+
+- ¿Por qué esto sería relevante? ¿Qué implicaciones de política tendría?
+
+---
+
+# El balance
+
+.pull-left[
+
+- ¿Qué vemos en la Tabla 2.2.1 de MHE
+
+- ¿Qué nos indican los valores `\(p\)`?
+
+- ¿Cuál es la hipótesis nula?
+
+- ¿Qué significa *atrición*?
+
+- ¿Se logró el objetivo del experimento?
+
+]
+
+.pull-right[
+
+&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;" colspan="5"&gt;&lt;div style="TRUE"&gt;Balance de observables&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Variable &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; `T_1` &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; `C` &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; `T_2` &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; `p` &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Lunch gratis &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.47 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.48 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.5 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.09 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Blanco / asiático &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.68 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.67 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.66 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.26 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Edad (1985) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5.44 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5.43 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5.42 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.32 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Atrición &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.49 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.52 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.53 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tamaño de clase &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 15.1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 22.4 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 22.8 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Calificación &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 54.7 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 48.9 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 50 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Nota:&lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Tomada de Angrist y Pischke (2009), Tabla 2.2.1.&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+]
+
+
+---
+
+# Desventajas
+
+- Tiempo
+
+- Costo: 12 millones de USD del proyecto STAR
+
+- Preocupaciones legales y éticas
+
+--
+
+- A veces es posible hacer experimentos, a veces es muy difícil y a veces es imposible
+
+- Usando métodos no experimentales, Angrist y Lavy (1999) encuentran resultados parecidos (pero con otros métodos)
+
 
 ---
 # Próxima sesión
 
 - Pregunta: ¿están libres el lunes por la mañana?
 
-- Introduciremos el concepto de sesgo de selección
+- Analizaremos el papel de la regresión en el análisis de efectos de tratamiento
 
-- Veremos un ejemplo de un experimento para identificar efectos causales
+  - MM, Capítulo 1, Apéndice
+  
+  - CT, Capítulo 25, Secciones 1 y 2
+  
+- Avancemos con dos ejemplos:
 
-  - MHE, Capítulo 2
+  - Baird, S., McIntosh, C., &amp; Özler, B. (2011). Cash or condition? Evidence from a cash transfer experiment. The *Quarterly journal of economics*, 126(4), 1709-1753.
+  
+  - Banerjee, A., Duflo, E., Goldberg, N., Karlan, D., Osei, R., Parienté, W., Shapiro, J., Thuysbaert, B. &amp; Udry, C. (2015). A multifaceted program causes lasting progress for the very poor: Evidence from six countries. *Science*, 348(6236), 1260799. 
 
 ---
 
