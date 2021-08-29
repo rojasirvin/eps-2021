@@ -7,6 +7,8 @@
     <script src="libs/header-attrs-2.9/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="libs/cide.css" type="text/css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css" type="text/css" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" type="text/css" />
@@ -588,44 +590,235 @@ class: inverse, middle, center
 
 # Integridad del diseño
 
+- Aquí tenemos dos tablas del [apéndice](https://dspace.mit.edu/bitstream/handle/1721.1/97047/Duflo_A%20multi-faceted%20paper%20and%20SI.pdf?sequence=1&amp;isAllowed=y) del artículo
 
-.pull-left[
+- ¿A qué equivale la tabla de *ortogonalidad* en el lenguaje que hemos usado hasta ahora?
 
-- Aquí tenemos dos columnas del apéndice del artículo
-
-- ¿Qué nos dice el panel A? ¿Cuál es la `\(H_0\)`
+- ¿Qué nos dice el panel A? ¿Cuál es la `\(H_0\)`?
 
 - ¿Qué nos dice el panel B? ¿A qué le ponemos atención aquí?
 
 - ¿Qué se concluye?
 
-]
+---
 
-.pull-right[
-&lt;div class="figure" style="text-align: center"&gt;
-&lt;img src="figures/sixcountries_balance.png" alt="Fuente: Banerjee et al. (2015)" width="100%" /&gt;
-&lt;p class="caption"&gt;Fuente: Banerjee et al. (2015)&lt;/p&gt;
-&lt;/div&gt;
-]
+# Integridad del diseño
+
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:80%; "&gt;&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="4"&gt;&lt;div style="TRUE"&gt;Ortogonalidad&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (1) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (2) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (3) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Consumo per cápita &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Índice seguridad alimentaria &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Índice activos &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Panel A: Prueba de diferencia de medias &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Control &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0124) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0124) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0124) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tratamiento &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -0.0323 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -0.0033 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0277 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0140) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0165) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0188) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Valor `p` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0979 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.8735 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.2019 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Panel B: Regresión &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tratamiento &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -0.0310 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0050 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0180 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.020) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0210) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0220) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; `R` cuadrada &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0010 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Nota:&lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Apéndice en Banerjee et al. (2015).&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;&lt;/div&gt;
 
 
 ---
 
 # Integridad del diseño
 
-.pull-left[
-- ¿Qué sabemos de la atrición?
-
 - ¿Cómo interpretamos los resultados sobre atrición presentados?
 
-]
+- ¿Cuál es la `\(H_0\)` en cada panel?
 
-.pull-right[
-&lt;div class="figure" style="text-align: center"&gt;
-&lt;img src="figures/sixcountries_attrition.png" alt="Fuente: Banerjee et al. (2015)" width="88%" /&gt;
-&lt;p class="caption"&gt;Fuente: Banerjee et al. (2015)&lt;/p&gt;
-&lt;/div&gt;
-]
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:60%; "&gt;&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="3"&gt;&lt;div style="TRUE"&gt;Atrición&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th style="empty-cells: hide;position: sticky; top:0; background-color: #FFFFFF;" colspan="1"&gt;&lt;/th&gt;
+&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="2"&gt;&lt;div style="TRUE"&gt;Variable dependiente: encuesta completada&lt;/div&gt;&lt;/th&gt;
+&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (1) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (2) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Ronda 1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Ronda 2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Panel A &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tratamiento &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0079 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0095 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0054) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0060) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Media &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.940 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.91 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Panel B &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tratamiento &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0073 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0090 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0054) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0060) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Consumo per cápita &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0030) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0030) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Índice activos &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0068*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0080*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0023) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0025) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Índice salud mental &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -0.0065** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0028) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0032) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Panel C &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tratamiento &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0087 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.0091 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0069) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.0078) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Características línea base &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Sí &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Sí &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Características línea base x Tratamiento &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Sí &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Sí &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Media atrición &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.94 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.91 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Valor `p` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.75 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.17 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Nota:&lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Apéndice en Banerjee et al. (2015).&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;&lt;/div&gt;
 
 ---
 
@@ -641,9 +834,8 @@ class: inverse, middle, center
 
 --
 
-- Se comparan hogares **asignados** al tratamiento con hogares **asignados** al control, sin importar si efectivamente lo recibieron o no
+- Se comparan hogares **asignados** al tratamiento con hogares asignados al control, sin importar si efectivamente lo recibieron o no
 
---
 
 ---
 
@@ -692,7 +884,7 @@ class: inverse, middle, center
 
 
 .pull-left[
-- ¿Cuál es la tabla más importante que resume los efectos del programa?
+- ¿Cuál es la evidencia (tabla o gráfica) más importante que resume los efectos del programa?
 
 - ¿Qué se encuentra?
 ]

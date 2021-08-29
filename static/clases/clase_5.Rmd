@@ -32,6 +32,8 @@ library(tidyverse)
 library(magick)
 library(reticulate)
 library(knitr)
+library(kableExtra)
+
 xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
 
@@ -605,42 +607,91 @@ class: inverse, middle, center
 
 # Integridad del diseño
 
+- Aquí tenemos dos tablas del [apéndice](https://dspace.mit.edu/bitstream/handle/1721.1/97047/Duflo_A%20multi-faceted%20paper%20and%20SI.pdf?sequence=1&isAllowed=y) del artículo
 
-.pull-left[
+- ¿A qué equivale la tabla de *ortogonalidad* en el lenguaje que hemos usado hasta ahora?
 
-- Aquí tenemos dos columnas del apéndice del artículo
-
-- ¿Qué nos dice el panel A? ¿Cuál es la $H_0$
+- ¿Qué nos dice el panel A? ¿Cuál es la $H_0$?
 
 - ¿Qué nos dice el panel B? ¿A qué le ponemos atención aquí?
 
 - ¿Qué se concluye?
 
-]
+---
 
-.pull-right[
-```{r, out.width="100%",fig.cap='Fuente: Banerjee et al. (2015)',fig.align='center'}
-knitr::include_graphics("figures/sixcountries_balance.png")
+# Integridad del diseño
+
+
+```{r table.ortogonal, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+variable <- c("", "Panel A: Prueba de diferencia de medias ", "Control", "","Tratamiento","", "Valor `p`", "Panel B: Regresión", "Tratamiento","" ,"`R` cuadrada")
+
+consumo <- c("Consumo per cápita", "", "0.0000", "(0.0124)","-0.0323","(0.0140)","0.0979", "", "-0.0310","(0.020)","0.0000")
+
+seguridad <- c("Índice seguridad alimentaria","","0.0000","(0.0124)","-0.0033","(0.0165)","0.8735","","0.0050","(0.0210)","0.0000")
+
+activos <- c("Índice activos","","0.0000","(0.0124)","0.0277","(0.0188)","0.2019","","0.0180","(0.0220)","0.0010")
+
+table.ortogonal <- data.frame(cbind(variable, consumo, seguridad, activos))
+
+colnames(table.ortogonal) = c("","(1)","(2)","(3)")
+
+t <- table.ortogonal %>%
+  kbl(align = "lccc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>%
+    add_header_above(c("Ortogonalidad" = 4 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+  footnote(general = "Apéndice en Banerjee et al. (2015).",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
+
+scroll_box(t, height="80%")
+
 ```
-]
 
 
 ---
 
 # Integridad del diseño
 
-.pull-left[
-- ¿Qué sabemos de la atrición?
-
 - ¿Cómo interpretamos los resultados sobre atrición presentados?
 
-]
+- ¿Cuál es la $H_0$ en cada panel?
 
-.pull-right[
-```{r, out.width="88%",fig.cap='Fuente: Banerjee et al. (2015)',fig.align='center'}
-knitr::include_graphics("figures/sixcountries_attrition.png")
+```{r table.atricion, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+variable <- c("", "Panel A", "Tratamiento","","Media","Panel B","Tratamiento","","Consumo per cápita","","Índice activos","","Índice salud mental","","Panel C","Tratamiento","","Características línea base", "Características línea base x Tratamiento","Media atrición","Valor `p`")
+
+e1 <- c("Ronda 1","","0.0079","(0.0054)","0.940","","0.0073","(0.0054)","0.0000","(0.0030)","0.0068***","(0.0023)","0.0000","(0.0028)","","0.0087","(0.0069)","Sí","Sí","0.94","0.75")
+e2 <- c("Ronda 2","","0.0095","(0.0060)","0.91","","0.0090","(0.0060)","0.0000","(0.0030)","0.0080***","(0.0025)","-0.0065**","(0.0032)","","0.0091","(0.0078)","Sí","Sí","0.91","0.17")
+
+
+
+table.atricion <- data.frame(cbind(variable, e1, e2))
+
+colnames(table.atricion) = c("","(1)","(2)")
+
+t <- table.atricion %>%
+  kbl(align = "lccc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>%
+    add_header_above(c(" " = 1,"Variable dependiente: encuesta completada" = 2 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+    add_header_above(c("Atrición" = 3 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+  footnote(general = "Apéndice en Banerjee et al. (2015).",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
+
+scroll_box(t, height="60%")
+
 ```
-]
 
 ---
 
@@ -656,9 +707,8 @@ knitr::include_graphics("figures/sixcountries_attrition.png")
 
 --
 
-- Se comparan hogares **asignados** al tratamiento con hogares **asignados** al control, sin importar si efectivamente lo recibieron o no
+- Se comparan hogares **asignados** al tratamiento con hogares asignados al control, sin importar si efectivamente lo recibieron o no
 
---
 
 ---
 
@@ -707,7 +757,7 @@ $$Y^k_i=\alpha + \beta_1 T_i + \beta Z_i^k + P_i + S_i + E_i + \varepsilon_i$$
 
 
 .pull-left[
-- ¿Cuál es la tabla más importante que resume los efectos del programa?
+- ¿Cuál es la evidencia (tabla o gráfica) más importante que resume los efectos del programa?
 
 - ¿Qué se encuentra?
 ]
