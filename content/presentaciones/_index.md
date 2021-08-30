@@ -19,6 +19,7 @@ Por favor, seleccione una de las lecturas marcadas con una "+" de la lista de le
 | Becerril & Abdulai (2010) | PSM | Gandhi Martínez | Martes 12 de septiembre de 2021 |
 |García-Díaz et al. (2018) | PSM |Carlos Martínez | Jueves 14 de octubre de 2021 |
 | Espinosa & Rubin (2015) | PSM | José Luis Mendoza | Jueves 14 de octubre de 2021 |
+| Chang et al. (2017) | PSM | Carolina Smith | Jueves 14 de octubre de 2021 |
 | Del Valle et al. (2020)| Regresión discontinua | Anna Pérez | Jueves 21 de octubre de 2021 |
 | Dell (2015) | Regresión discontinua   | Alejandro Parada | Martes 26 de octubre de 2021 |
 | Aguilar et al. (2021) | Regresión discontinua | Diego Tome | Martes 26 de octubre de 2021 |
