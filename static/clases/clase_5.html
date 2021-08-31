@@ -273,17 +273,80 @@ normal_curve &lt;-normal_curve+stat_function(fun=funcShaded, geom="area", fill="
 
 - Regularmente trabajamos con una muestra
 
+
+---
+
+class: inverse, middle, center
+
+# Breve nota sobre teoría asintótica de MCO
+---
+
+# Propiedades del estimador de MCO
+
+- En la práctica, no conocemos la FEC ni la función de regresión poblacional
+
+- En la clase anterior aprendimos que una forma de aproximar la FEC es usando regresión, es decir, quisiéramos conocer `\(\beta=E(X_iX_i')^{-1}E(X_iy_i)\)`, un objeto poblacional
+
+- En la práctica aproximamos `\(\beta\)` con su análogo muestral: `\(\hat{\beta}_{MCO}=(X'X)^{-1}(X'Y)\)`
+
+--
+
+- Con algo de álgebra, escribimos el estimador de MCO como `$$\hat{\beta}_{MCO}=\beta +\left(\sum x_ix_i'\right)^{-1}\left(\sum x_i u_i\right)$$`
+
+- Multiplicando por `\((1/N)^{-1}(1/N)=1\)` el segundo término:
+`$$\hat{\beta}_{MCO}=\beta +\left(\frac{1}{N}\sum x_ix_i'\right)^{-1}\left(\frac{1}{N}\sum x_i u_i\right)$$`
+
+- Esta representación con **promedios** es útil para usar leyes de grandes números (LGN) y teoremas de límite central (TLC)
+
+---
+
+# Distribución asintótica
+
+- La teoría asintótica nos garantiza que, si `\(E(u_i|x_i)=0\)` la distribución asintótica del estimador de MCO es
+
+`$$\hat{\beta}_{MCO}\stackrel{a}{\sim}\mathcal{N}\left(\beta,(X'X)^{-1}X'uu'X(X'X)^{-1}\right)$$`
+
+--
+
+- Estos son resultados asintóticos, válidos cuando `\(N\to \infty\)`
+
+- Son convenientes porque no asumimos forma distribucional sobre los errores
+
+  - En los cursos introductorios de econometría asumiamos, entre otras cosas, errores normales y homocedásticos
+  
+  - Aquí tenemos menos supuestos
+
+- La distribución asintótica nos dice que el estimador de MCO tiene una distribución normal y que su varianza depende dela varianza de los errores
+
+---
+
+# Estimación de la varianza
+
+- Tenemos que estimar también la varianza del estimador de MCO
+
+- En un influyente artículo, White (1980) muestra que podemos estimar consistentemente `\(\hat{V}(\hat{\beta}_{MCO})\)` usando:
+
+ `$$\hat{V}(\hat{\beta}_{MCO})=(X'X)^{-1}\left(\sum_i \hat{u}_i^2x_ix_i'\right)(X'X)^{-1}$$`
+- Esto es a lo que conocemos como la matriz de varianzas robusta a heterocedasticidad
+
+- Son robutos porque no hacemos supuestos sobre la distribución de los errores
+
+- En muy raras ocasiones, si asumimos errores independientes e identicamente distribuidos:
+
+ `$$\hat{V}^H(\hat{\beta}_{MCO})=\hat{s}^2(X'X)^{-1}$$`
+donde `\(\hat{s}\)` es la varianza muestral
+
 ---
 
 # Errores estándar del estimador de MCO
 
-- Como vimos anteriormente, el estimador de la matriz de varianzas del estimador de MCO propuesto por White (1980) es:
+- Partiendo del estimador de la matriz de varianzas del estimador de MCO propuesto por White (1980)
 
 `$$\hat{V}(\hat{\beta}_{MCO})=(X'X)^{-1}\left(\sum_i\hat{u}_i^2x_ix_i'\right)(X'X)^{-1}$$`
 
-- El error estándar es `\(\hat{\beta}_k\)` será la raíz cuadrada de la `\(k\)`ésima entrada sobre la diagonal principal de `\(\hat{V}(\hat{\beta}_{MCO})\)` y lo denominamos `\(\hat{EER}(\hat{\beta}_k)\)` por venir de una matriz de varianzas robusta
+el error estándar de `\(\hat{\beta}_k\)` será la raíz cuadrada de la `\(k\)`-ésima entrada sobre la diagonal principal de `\(\hat{V}(\hat{\beta}_{MCO})\)` y lo denominamos `\(\hat{EER}(\hat{\beta}_k)\)` por venir de una matriz de varianzas robusta
 
-- Con los mismos principios, una estadístico `\(t\)` se define como:
+- Con los mismos principios que para la media muestral, una estadístico `\(t\)` se define como:
 
 `$$t(\beta_k)=\frac{\hat{\beta}_k-\beta_k}{\hat{EER}(\hat{\beta}_k)}$$`
 
@@ -353,143 +416,6 @@ normal_curve &lt;-normal_curve+stat_function(fun=funcShaded, geom="area", fill="
 - En economía usamos frecuentemente los valores `\(\alpha\)` de 0.10, 0.05 y 0.01 para juzgar la significancia de los estimadores
 
 - En evaluación, si el valor `\(p\)` es menor que `\(\alpha\)` decimos que el efecto es *estadísticamente significativo*
-
-
-
----
-
-class: inverse, middle, center
-
-# Breve nota sobre teoría asintótica de MCO
-
-
----
-
-# Propiedades del estimador de MCO
-
-- En la práctica, no conocemos la FEC ni la función de regresión poblacional
-
-- En la clase anterior aprendimos que una forma de aproximar la FEC es usando regresión, es decir, quisiéramos conocer `\(\beta=E(X_iX_i')^{-1}E(X_iy_i)\)`, un objeto poblacional
-
-- En la práctica aproximamos `\(\beta\)` con su análogo muestral: `\(\hat{\beta}_{MCO}=(X'X)^{-1}(X'Y)\)`
-
---
-
-- Con algo de álgebra, escribimos el estimador de MCO como `$$\hat{\beta}_{MCO}=\beta +\left(\sum x_ix_i'\right)^{-1}\left(\sum x_i u_i\right)$$`
-
-- Multiplicando por `\((1/N)^{-1}(1/N)=1\)` el segundo término:
-`$$\hat{\beta}_{MCO}=\beta +\left(\frac{1}{N}\sum x_ix_i'\right)^{-1}\left(\frac{1}{N}\sum x_i u_i\right)$$`
-- Esta representación con **promedios** es útil para usar leyes de grandes números (LGN) y teoremas de límite central (TLC)
-
----
-
-# Consistencia
-
-- Primero mostraremos el resultado de consistencia, es decir, mostraremos que cuando `\(N\to \infty\)`, el estimador de MCO `\(\hat{\beta}_{MCO}\)` converge en probabilidad al parámetro poblacional `\(\beta\)`
-
-- Esta *prueba* informal de la consistencia nos permitirá ver dónde toma relevancia nuestro supuesto de independencia introducido cuando hablamos de resultados contrafactuales
-
-- Lo que acabaremos mostrando es que una condición necesaria para que `\(\hat{\beta}_{MCO}\)` sea consistente es `\(E(u_i|x_i)=0\)`
-
-- En nuestro lenguaje de resultados pontenciales, esto significa que no hay sesgo de selección
-
-
----
-
-# Consistencia
-
-- Queremos conocer la probabilidad límite del estimador de MCO:
-
-`$$p\lim\hat{\beta}_{MCO}=\beta +\left(p\lim\left(\frac{1}{N}\sum x_ix_i'\right)^{-1}\right)\left(p\lim\left(\frac{1}{N}\sum x_i u_i\right)\right)$$`
-
-- Si se puede aplica una LGN a `\(x_ix_i'\)`, entonces sabemos que el promedio `\(\frac{1}{N}\sum x_ix_i'\)` converge a una matriz finita no nula
-
-- Entonces, el estimador de MCO es consistente si `\(p\lim(\frac{1}{N}\sum x_i u_i)=0\)`
-
----
-
-# Consistencia
-
-- ¿Qué se requiere para que `\(p\lim(\frac{1}{N}\sum x_i u_i)=0\)`?
-
-- Una LGN nos dice que `\(p\lim(\frac{1}{N}\sum x_i u_i)= E(x_iu_i)\)` (asumiendo independencia de las `\(i\)`)
-
-- Entonces, necesitamos `\(E(u_i|x_i)=0\)`
-
-- Escribimos `\(\hat{\beta}_{MCO}\xrightarrow{p}\beta\)`
-
----
-
-# Distribución límite
-
-- Dada la consistencia, queremos saber la distribución del estimador de MCO para poder hacer inferencia
-
-- ¿Tiene una distribución de la que conocemos sus propiedades?
-
-- ¿Cuál es su media y su varianza cuando `\(N\to \infty\)`?
-
-- Para hacer esto, usamos una versión reescalada de `\(\hat{\beta}\)` porque cuando `\(N\to \infty\)`?, `\(\hat{\beta}\)` no tiene varianza
-
-
----
-
-# Disitribución límite
-
-- Reescribimos el estimador de MCO como:
-$$
-`\begin{aligned}
-\sqrt{N}(\hat{\beta}-\beta)&amp;=(N^{-1}X'X)^{-1}(N^{1/2}N^{-1}X'u) \\
-&amp;=(N^{-1}X'X)^{-1}(N^{-1/2}X'u)
-\end{aligned}`
-$$
-
-- Para mostrar consistencia ya dijimos que `\(N^{-1}X'X\)` converge a una matriz finita y no nula
-
-- Asumimos que podemos aplicar un TLC a `\(N^{-1/2}X'u\)`, el segundo término tiene una distribución asintótica normal con media cero y varianza `\(p\lim\frac{1}{N}X'uu'X\)`
-
---
-
-- El *teorema del límite normal del producto* nos garantiza que también el producto `\((N^{-1}X'X)^{-1}(N^{-1/2}X'u)\)` será normal y nos dice la forma de la varianza
-
-- Por lo tanto, la distribución asintótica del estimador de MCO es
-
-`$$\hat{\beta}_{MCO}\stackrel{a}{\sim}\mathcal{N}\left(\beta,(X'X)^{-1}X'uu'X(X'X)^{-1}\right)$$`
-
-
----
-
-# Disitribución límite
-
-- Estos son resultados asintóticos, válidos cuando `\(N\to \infty\)`
-
-- Son convenientes porque no asumimos forma distribucional sobre los errores
-
-  - En los cursos introductorios de econometría asumiamos, entre otras cosas, errores normales y homocedásticos
-  
-  - Aquí tenemmos menos supuestos
-
-- La distribución asintótica nos dice que el estimador de MCO tiene una distribución normal y que su varianza depende de los errores
-
----
-
-# Estimación de la varianza
-
-- Tenemos que estimar también la varianza del estimador de MCO
-
-- En un famoso artículo, White (1980) muestra que podemos estimar consistentemente `\(\hat{V}(\hat{\beta})\)` usando:
-
- `$$\hat{V}(\hat{\beta})=(X'X)^{-1}\left(\sum_i \hat{u}_i^2x_ix_i'\right)(X'X)^{-1}$$`
-- Esto es a lo que conocemos como la matriz de varianzas robusta a heterocedasticidad
-
-- Son robutos porque no hacemos supuestos sobre la distribución de los errores
-
-- En muy raras ocasiones, si asumimos errores independientes e identicamente distribuidos:
-
- `$$\hat{V}^H(\hat{\beta})=\hat{s}^2(X'X)^{-1}$$`
-donde `\(\hat{s}\)` es la varianza muestral
-
-
-
 
 ---
 

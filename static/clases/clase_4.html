@@ -699,18 +699,41 @@ donde `\(y_i\)` toma el valor de 1 si la observación estaba en la línea base y
 
 - ¿Cómo obtenemos estos resultados en la práctica?
 
---
+- En este artículo, se calculan las medias de cada característica en cada grupo (control, tratamiento condicional y tratamiento incondicional) y se hace una prueba de diferencia de medias
+
+- Juzgamos la significancia estadística de la diferencia de medias
+
+---
+
+# Pruebas de balance
+
+- Por ejemplo, para el grado máximo, la media en el grupo de control es 7.478 y en el tratamiento condicional es de 7.246, una diferencia de 0.232
+
+- ¿Es esta diferencia una diferencia que surge solo por cuestiones del muestreo (*by chance*)?
+
+- Abordaremos con detalle el asunto de la significancia estadística
+
+- Por ahora, podemos decir que indicamos con `\(^*\)` una diferencia que es distinta de 0 con un 90% de confianza
+
+- Es decir, si tuviéramos acceso a muestras repetidas, existe 10% de probabilidad de rechazar la hipótesis de que las medias son iguales cuando no deberíamos hacerlo
+
+- De manera similar, `\(^{***}\)` significa que dicha probabilidad es de 1% 
+
+---
+
+# Pruebas de balance
+
+- Otra forma de realizar las pruebas de balance sería como sigue:
 
 `$$x_i=\alpha+\beta_C C_i+\beta_U U_i+u_i$$`
---
 
-- Otros aspectos técnicos:
+- Aquí la interpretación es con respecto a `\(\beta_C\)` y `\(\beta_U\)`
 
-  - Errores estándar agrupados a nivel EA
-  
-  - Indicadores de estrato de aleatorización (ciudad, semiurbano, rural)
-  
-  
+- Nuestra hipótesis es que la variable `\(x_i\)` no es en promedio distinta entre los distintos grupos de tratamiento y control
+
+- En otras palabras, se juzga la significancia estadística de `\(\beta_C\)` y `\(\beta_U\)`
+
+
 ---
 
 # Efectos de tratamiento
@@ -813,6 +836,15 @@ donde `\(y_i\)` toma el valor de 1 si la observación estaba en la línea base y
 - `\(X_i\)` son las características en la línea base
 
 - Como el tratamiento se asignó de manera aleatoria, esperamos que `\(X_i\)` no esté correlacionado con el error, pero que sí mejore la precisión de los estimadores
+
+--
+
+- Otros aspectos técnicos que iremos cubriendo:
+
+  - Errores estándar agrupados a nivel EA
+  
+  - Indicadores de estrato de aleatorización (ciudad, semiurbano, rural)
+  
 
 ---
 
