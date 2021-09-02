@@ -38,91 +38,13 @@ class: title-slide
 ---
 # Agenda
 
-1. Definiremos parámetros clave en la literatura de efectos de tratamiento
-
 1. Estudiaremos medidas de variabilidad de estimadores
 
 1. Haremos un breve recordatorio de la *anatomía* y las propiedades del estimador de MCO
 
+1. Definiremos parámetros clave en la literatura de efectos de tratamiento
+
 1. Estudiaremos una intervención en seis países para enfatizar las características de un experimento aleatorio y el análisis del mismo
-
-
----
-
-class: inverse, middle, center
-
-# Parámetros de interés de efectos de tratamiento
-
-
----
-
-# Supuesto de independencia condicional
-
-- En la sesión anterior vimos que el SIC nos dice que, condicional en `\(X_i\)`, los resultados potenciales son independientes del tratamiento
-
-- Cuando el tratamiento se asigna de manera aleatoria y el diseño experimental se, el supuesto es válido
-
-- Más aún, bajo asignación aleatoria, podemos hacer un supuesto aún más fuerte:
-
-`$$\{y_{0i},y_{1i}\perp D_i \}$$`
-
----
-
-# Efectos de tratamiento
-
-- Vamos a definir dos medidas de efecto de tratamiento ampliamente usadas en la literatura
-
-- Definamos el cambio en la variable de resultados de un individuo:
-
-`$$\Delta_i=y_{1i}-y_{0i}$$`
-
-**Efecto promedio del tratamiento** (ATE): se interpreta como la ganancia hipotética debido al tratamiento para un individuo seleccionado al azar en una población
-
-- Este parámetro es de relevancia cuando pensamos en tratamientos de aplicación universal
-
-- Matemáticamente:
-
-`$$ATE=E(\Delta)$$`
-
-- Con su correspondiente análogo muestral:
-`$$\hat{ATE}=\frac{1}{N}\sum_i^N\Delta_i$$`
-
----
-
-# Efectos de tratamiento
-
-**Efecto promedio del tratamiento en los tratados** (ATET, TT, TOT)
-
-- Como su nombre lo dice, este parámetro solo considera a los individuos que son efectivamente tratados
-
-- Matemáticamente:
-`$$ATET=\frac{1}{N_T}\sum_i^{N_T}(\Delta_i|D_i=1)$$`
-
-- Y su análogo muestral es:
-
-`$$\hat{ATET}=\frac{1}{N_T}\sum_i^{N_T}(\Delta_i|D_i=1)$$`
-
----
-
-# Efectos de tratamiento
-
-- Heckman (1997) critica el uso del ATE pues pudiera ser irrelevante
-
-- ¿Cuál es el ATE de PROGRESA, por ejemplo?
-
-- La contracrítica es que siempre podemos restringir lo que es la *población* de interés
-
---
-
-- Noten que el ATET también abre la puerta a casos en los que, aún cuando el tratamiento se asignó aleatoriamente en un grupo, no todos a los que se les asigna el tratamiento efectivamente lo reciben
-
---
-
-- En ambos casos, no podemos estimar directamente los parámetros pues no observamos `\(\Delta_i\)`
-
-- Sin embargo, ya vimos cómo, con una muestra de tratados y no tratados, podemos inferir el efecto del tratamiento, bajo algunos supuestos
-
-- Nuestras afirmaciones siempre irán acompañadas de una *medida de incertidumbre* debido al error muestral
 
 ---
 
@@ -457,6 +379,83 @@ el error estándar de `\(\hat{\beta}_k\)` será la raíz cuadrada de la `\(k\)`-
   - La atrición ocurrió al azar
 
 
+
+---
+
+class: inverse, middle, center
+
+# Parámetros de interés de efectos de tratamiento
+
+
+---
+
+# Supuesto de independencia condicional
+
+- En la sesión anterior vimos que el SIC nos dice que, condicional en `\(X_i\)`, los resultados potenciales son independientes del tratamiento
+
+- Cuando el tratamiento se asigna de manera aleatoria y el diseño experimental se, el supuesto es válido
+
+- Más aún, bajo asignación aleatoria, podemos hacer un supuesto aún más fuerte:
+
+`$$\{y_{0i},y_{1i}\perp D_i \}$$`
+
+---
+
+# Efectos de tratamiento
+
+- Vamos a definir dos medidas de efecto de tratamiento ampliamente usadas en la literatura
+
+- Definamos el cambio en la variable de resultados de un individuo:
+
+`$$\Delta_i=y_{1i}-y_{0i}$$`
+
+**Efecto promedio del tratamiento** (ATE): se interpreta como la ganancia hipotética debido al tratamiento para un individuo seleccionado al azar en una población
+
+- Este parámetro es de relevancia cuando pensamos en tratamientos de aplicación universal
+
+- Matemáticamente:
+
+`$$ATE=E(\Delta)$$`
+
+- Con su correspondiente análogo muestral:
+`$$\hat{ATE}=\frac{1}{N}\sum_i^N\Delta_i$$`
+
+---
+
+# Efectos de tratamiento
+
+**Efecto promedio del tratamiento en los tratados** (ATET, TT, TOT)
+
+- Como su nombre lo dice, este parámetro solo considera a los individuos que son efectivamente tratados
+
+- Matemáticamente:
+`$$ATET=\frac{1}{N_T}\sum_i^{N_T}(\Delta_i|D_i=1)$$`
+
+- Y su análogo muestral es:
+
+`$$\hat{ATET}=\frac{1}{N_T}\sum_i^{N_T}(\Delta_i|D_i=1)$$`
+
+---
+
+# Efectos de tratamiento
+
+- Heckman (1997) critica el uso del ATE pues pudiera ser irrelevante
+
+- ¿Cuál es el ATE de PROGRESA, por ejemplo?
+
+- La contracrítica es que siempre podemos restringir lo que es la *población* de interés
+
+--
+
+- Noten que el ATET también abre la puerta a casos en los que, aún cuando el tratamiento se asignó aleatoriamente en un grupo, no todos a los que se les asigna el tratamiento efectivamente lo reciben
+
+--
+
+- En ambos casos, no podemos estimar directamente los parámetros pues no observamos `\(\Delta_i\)`
+
+- Sin embargo, ya vimos cómo, con una muestra de tratados y no tratados, podemos inferir el efecto del tratamiento, bajo algunos supuestos
+
+- Nuestras afirmaciones siempre irán acompañadas de una *medida de incertidumbre* debido al error muestral
 
 ---
 
