@@ -286,16 +286,16 @@ $$
 $$
 \begin{aligned}
 E(Y_i(1,D_i(1))-Y_i(0,D_i(0)))&=E(Y_i(1)-Y_i(0))(D_i(1)-D_i(0))\\
-&=(1)E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=1)P(D_i(1)-D_i(0)=1)\\
-&+(0)E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=0)P(D_i(1)-D_i(0)=0)\\
-&+(-1)E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=-1)P(D_i(1)-D_i(0)=-1)\\
+&=E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=1)P(D_i(1)-D_i(0)=1)\\
+&+E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=0)P(D_i(1)-D_i(0)=0)\\
+&+E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=-1)P(D_i(1)-D_i(0)=-1)\\
 \end{aligned}
 $$
 --
 
-- Noten que la intución de este valor esperado es obtener el efecto en la variable de interés bajo los distintos posibles efectos de $Z$ sobre $D$
+- La intuición de este valor esperado es obtener el efecto en la variable de interés bajo los distintos posibles efectos de $Z$ sobre $D$
 
-- El segundo término de la suma es cero y corresponde a aquellos para quienes la asignación no modificó el cumplimento
+- El segundo término de la suma es cero y corresponde a aquellos para quienes la asignación no modificó el cumplimento, por lo que la $E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=0)=0$)
 
 - Usando el supueto 5 de monotonicidad, sabemos $D_i(1)-D_i(0)$ es igual a uno o cero, es decir, $P(D_i(1)-D_i(0)=-1)=0$
 
