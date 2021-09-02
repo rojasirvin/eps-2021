@@ -701,20 +701,13 @@ $$y_i=\alpha+\beta_C C_i+\beta_U U_i +X_i'\gamma+u_i$$
 ---
 # Próxima sesión
 
-- Haré algunas definiciones de la literatura de efectos de tratamiento
-
-  - CT, Capítulo 25, Secciones 1 y 2
-
-- Haré un recordatorio de MCO y sus propiedades asintóticas
-
 - Hablaré sobre las medidas de variabilidad para realizar inferencia
 
   - MM, Capítulo 1, Apéndice
-  
-- Veremos un ejemplo un tanto distinto: un proyecto a escala masiva
 
-  - Banerjee, A., Duflo, E., Goldberg, N., Karlan, D., Osei, R., Parienté, W., Shapiro, J., Thuysbaert, B. & Udry, C. (2015). A multifaceted program causes lasting progress for the very poor: Evidence from six countries. *Science*, 348(6236), 1260799.
-  
+- Haré un recordatorio de MCO y sus propiedades asintóticas
+
+
 ---
 
 class: center, middle

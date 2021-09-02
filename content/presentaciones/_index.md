@@ -11,8 +11,8 @@ Por favor, seleccione una de las lecturas marcadas con una "+" de la lista de le
 
 | **Autores** | **Tema** | **Presentador** | **Fecha de exposición** |
 | --- | --- | --- | --- |
-| De la O (2013) | Experimental | Pablo Pérez | Jueves 9 de septiembre de 2021 |
-| McIntosh et al. (2018) | LATE | Sebastián Ocampo | Jueves 9 de septiembre de 2021 |
+| De la O (2013) | Experimental | Pablo Pérez | Martes 14 de septiembre de 2021 |
+| McIntosh et al. (2018) | LATE | Sebastián Ocampo | Martes 14 de septiembre de 2021 |
 | Campos et al. (2017) | DID | Melissa Santillán | Martes 28 de septiembre de 2021 |
 | Gutiérrez & Parrado (2016) | DID   | Sofía Huidobro | Jueves 30 de septiembre de 2021 |
 | Rojas et al. (2021) | ANCOVA | Fedra Pineda | Jueves 30 de septiembre de 2021 |
