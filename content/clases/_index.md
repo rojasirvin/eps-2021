@@ -16,3 +16,5 @@ weight: 70
 [Clase 4](https://eps-2021.netlify.app/clases/clase_4.html#1). Regresión y efectos causales
 
 [Clase 5](https://eps-2021.netlify.app/clases/clase_5.html#1). Inferencia estadística y evaluación
+
+[Clase 6](https://eps-2021.netlify.app/clases/clase_6.html#1). LATE y variables instrumentales

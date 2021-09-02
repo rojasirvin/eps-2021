@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>LATE y variables instrumentales</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Irvin Rojas" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="libs/cide.css" type="text/css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: title-slide
+
+
+
+.title[
+# Clase 6. LATE y variables instrumentales
+]
+.subtitle[
+## Evaluación de Programas
+]
+.author[
+### Irvin Rojas &lt;br&gt; [rojasirvin.com](https://www.rojasirvin.com/) &lt;br&gt; [&lt;i class="fab fa-github"&gt;&lt;/i&gt;](https://github.com/rojasirvin) [&lt;i class="fab fa-twitter"&gt;&lt;/i&gt;](https://twitter.com/RojasIrvin) [&lt;i class="ai ai-google-scholar"&gt;&lt;/i&gt;](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&amp;hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas &lt;br&gt; División de Economía
+]
+
+---
+# Agenda
+
+1. Introduciremos problemas de evaluación cuando hay cumplimiento imperfecto
+
+1. Derivaremos e interpretaremos el estimador de efecto local promedio de tratamiento (LATE)
+
+---
+
+class: inverse, middle, center
+
+# Cumplimiento no perfecto
+
+---
+
+# ¿Fracasó el experimento?
+
+- Frecuentemente nos encontraremos con intervenciones donde la aleatorización ocurre de manera íntegra, pero no todos aquellos asignados a cierto tratamiento efectivamente lo reciben
+
+- Nos tomaremos en serio la diferencia entre **ser asignado** al tratamiento y **recibir el tratamiento**
+
+  - Al evaluar un programa que asigna aleatoriamente a niños a escuelas de prestigio, nos interesa el efecto de efectivamente asistir a dichas escuelas y, quizás no tanto, el efecto de haber sido sorteado para asistir a dichas escuelas
+
+---
+
+# ¿Fracasó el experimento?
+
+- Usaremos un estimador de variables instrumentales (VI) para relacionar los efectos de la **asignación** con los efectos de la **adopción**
+
+- Llegaremos al siguiente resultado:
+
+`$$\text{Efecto de la asignación en } Y=(\text{Efecto de la asignación en la adopción})\times (\text{Efecto de la adopción en }Y)$$`
+
+- Por tanto:
+
+`$$\text{Efecto de la adopción en }Y=\frac{\text{Efecto de la asignación en }Y}{\text{Efecto de las asignación en la adopción}}$$`
+
+- Ahora derivaremos formalmente este resultado, pero la intución es importante: el efecto causal de la adopción es el efecto de la asignación, *escalado* por el efecto de la asignación en la adopción
+
+---
+
+class: inverse, middle, center
+
+# Efectos causales con cumplimiento imperfecto
+
+---
+
+# Identificación de efectos causales usando VI
+
+- Angrist, Imbens &amp; Rubin (1996)
+
+- Asignación: `\(Z_i=\begin{cases} 1 \\0 \\ \end{cases}\)`
+
+- Cumplimiento: `\(D_i=\begin{cases} 1 \\0 \\ \end{cases}\)`
+
+- `\(Y_i\)` variable de resultados
+
+- Nos importa el efecto de `\(D_i\)` sobre `\(Y_i\)`
+
+---
+
+# Efectos causales y VI
+
+- `\(D_i(Z)\)` es el indicador de cumplir, dada la asignación `\(Z\)`
+
+- Con cumplimiento perfecto tendríamos `\(D_i(Z)=Z_i\)`
+
+- En general, hay asignados que no cumplen y no asignados que cumplen
+
+- `\(Y_i(Z,D)\)` es la variable de interés de `\(i\)`
+
+- `\(Y_i(Z,D)\)` y `\(D_i(Z)\)` son resultados potenciales
+
+---
+
+# Supuestos
+
+**Supuesto 1**: *Stable Unit Treatment Value Assumption (SUTVA)*
+
+- Este supuesto indica que los resultados potenciales de `\(i\)` no están correlacionados con los de los otros individuos
+
+- Por tanto podemos escribir `\(Y_i(Z,D)=Y_i(Z_i,D_i)\)` y `\(D_i(Z)=D_i(Z_i)\)`
+
+**Supuesto 2**: asignación aleatoria
+
+- La asignación de `\(Z_i\)` es aleatoria, es decir, `\(P(Z=C)=P(Z=C')\)` para todo `\(C\)` y `\(C'\)`
+
+--
+
+- Los supuestos 1 y 2 nos permiten identificar los efectos causales de `\(Z\)` en `\(Y\)` y de `\(Z\)` en `\(D\)` calculando diferencias de medias por grupos de `\(Z\)`:
+
+  - `\(ITT_Y\)` comparar las medias de `\(y\)` entre quienes `\(Z=1\)` y quienes `\(Z=0\)`
+  
+  - `\(ITT_D\)` comparar las medias de `\(D\)` entre quienes `\(Z=1\)` y quienes `\(Z=0\)`
+  
+- `\(ITT\)` se conoce como **intención a tratar** o **intention to treat**
+
+---
+
+# Parada para reflexionar
+
+- Hasta ahora el supuesto crítico es la asignación aleatoria de `\(Z\)`
+
+- `\(D_i\)` puede no serlo y, en general, no lo es
+
+- Por tanto, una comparación de `\(y\)` entre grupos de `\(D\)` es inapropiada
+
+- Necesitamos algunos supuestos para decir algo del efecto causal de `\(D\)` sobre `\(Y\)`
+
+---
+
+# Más supuestos
+
+**Supuesto 3**: restricción de exclusión
+
+`$$Y(Z,D)=Y(Z',D)\quad \forall \quad Z,Z',D$$`
+
+- Este supuesto implica que podemos escribir:
+
+`$$Y_i(1,d)=Y_i(0,d) \quad d=\{0,1\}$$`
+- Es decir, resuleve el problema contrafactual
+
+--
+
+- Con el supuesto 3 podemos escribir:
+
+`$$Y(D)=Y(Z,D)=Y(Z',D)\quad \forall \quad Z,Z',D$$`
+--
+
+- Y por el supuesto 1:
+
+`$$Y_i(D_i)=Y_i(Z,D)$$`
+---
+
+# Más supuestos
+
+**Supuesto 4**: el efecto causal promedio de `\(Z\)` sobre `\(D\)` es distinto de cero
+
+- Esto es, `\(E(D_i(1)-D_i(0))\neq0\)`
+
+- En otras palabras, la asignación tiene efecto sobre el cumplimiento
+
+--
+
+**Supuesto 5**: monotonicidad
+
+`$$D_i(1)\geq D_i(0) \quad \forall\quad i=1,\ldots N$$`
+- Este supuesto simplemente dice que no hay un individuo que:
+
+  - Cuando se le asigna, no cumple
+  - Cuando no se le asigna, cumple
+  
+- Noten que este supuesto se debe pensar en términos contrafactuales
+
+- A un individuo que no cumple cuando se le asigna y cumple cuando no se le asigna se le conoce como **retador** o *defier*
+
+---
+
+# Variable instrumental
+
+- `\(Z\)` es una **variable instrumental** para el efecto causal de `\(D\)` sobre `\(Y\)` si se cumplen los supuestos 1 al 5
+
+---
+
+# Interpretación del estimador de VI
+
+- Comencemos escribiendo el efecto causal de `\(Z\)` en `\(Y\)`, que por el supuesto de exclusión de `\(Z\)` es:
+
+$$
+`\begin{aligned}
+Y_i(1,D_i(1))-Y_i(0,D_i(0))=\underbrace{Y_i(D_i(1))-Y_i(D_i(0))}_{A} \\
+\end{aligned}`
+$$
+
+--
+
+- Notemos que el lado derecho, `\(A\)`, puede calcularse siguiendo la notación de resultados potenciales:
+
+$$
+`\begin{aligned}
+Y(D)&amp;=Y(0)+D(Z)(Y(1)-Y(0)) \\
+D(Z)&amp;=D(0)+Z(D(1)-D(0))\\
+\end{aligned}`
+$$
+--
+
+- Sustituyendo `\(D\)` en `\(Y\)`:
+
+$$
+`\begin{aligned}
+Y(D(Z))&amp;=Y(0)+(D(0)+Z(D(1)-D(0)))(Y(1)-Y(0)) \\
+&amp;=Y(0)D(0)(Y(1)-Y(0))+Z(D(1)-D(0))(Y(1)-Y(0))
+\end{aligned}`
+$$
+
+---
+
+# Interpretación del estimador de VI
+
+- Podemos evaluar entonces los dos valores de `\(Z\)` y obtener:
+
+$$
+`\begin{aligned}
+Y(D(1))&amp;=Y(0)+D(1)(Y(1)-Y(0)) \\
+Y(D(0))&amp;=Y(0)+D(0)(Y(1))-Y(0) \\
+\end{aligned}`
+$$
+--
+
+- Y entonces:
+
+$$
+`\begin{aligned}
+A&amp;=Y_i(D_i(1))-Y_i(D_i(0)) \\
+&amp;=(Y_i(1)-Y_i(0))(D_i(1)-D_i(0))\\
+\end{aligned}`
+$$
+
+--
+
+- Es decir, el efecto causal de `\(Z\)` sobre `\(Y\)` para `\(i\)` es el producto del efecto causal de `\(D\)` sobre `\(Y\)` y del efecto causal de `\(Z\)` sobre `\(Y\)`:
+
+$$
+\underbrace{Y_i(1,D_i(1))-Y_i(0,D_i(0))}_B=(Y_i(1)-Y_i(0))(D_i(1)-D_i(0))
+$$
+
+---
+
+# Interpretación causal del estimador de VI
+
+- Consideremos ahora `\(B\)` y obtengamos el valor esperado:
+
+$$
+`\begin{aligned}
+E(Y_i(1,D_i(1))-Y_i(0,D_i(0)))&amp;=E(Y_i(1)-Y_i(0))(D_i(1)-D_i(0))\\
+&amp;=(1)E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=1)P(D_i(1)-D_i(0)=1)\\
+&amp;+(0)E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=0)P(D_i(1)-D_i(0)=0)\\
+&amp;+(-1)E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=-1)P(D_i(1)-D_i(0)=-1)\\
+\end{aligned}`
+$$
+--
+
+- Noten que la intución de este valor esperado es obtener el efecto en la variable de interés bajo los distintos posibles efectos de `\(Z\)` sobre `\(D\)`
+
+- El segundo término de la suma es cero y corresponde a aquellos para quienes la asignación no modificó el cumplimento
+
+- Usando el supueto 5 de monotonicidad, sabemos `\(D_i(1)-D_i(0)\)` es igual a uno o cero, es decir, `\(P(D_i(1)-D_i(0)=-1)=0\)`
+
+---
+
+# Interpretación causal del estimador de VI
+
+- Por tanto:
+
+$$
+`\begin{aligned}
+E(Y_i(1,D_i(1))-Y_i(0,D_i(0)))=E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=1)P(D_i(1)-D_i(0)=1)
+\end{aligned}`
+$$
+--
+
+- Es decir, el efecto causal promedio de `\(Z\)` sobre `\(Y\)` es igual al producto del efecto causal promedio de `\(D\)` sobre `\(Y\)` en aquellos individuos que cuando se les asigna cumplen y cuando no se les asigna no cumplen, `\(D_i(0)=0\)` y `\(D_i(1)=1\)`, y la proporción de estos individuos en la población
+
+---
+
+# Interpretación causal del estimador de VI
+
+**Proposición 1 en Angrist, Imbens &amp; Rubin (1996)**: interpretación causal del estimador de VI
+
+- Si los supuestos 1 a 5 se cumplen, el estimador de VI es:
+
+`$$E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=1)=\frac{E(Y_i(D_i(1),1))-Y_i(D_i(0),0)}{E(D_i(1)-D_i(0)}=\lambda_{LATE}$$`
+
+- Angrist y coautores llaman a este parámetro el **efecto local promedio del tratamiento** o *LATE*
+
+- El LATE es el efecto causal promedio del tratamiento en un conjunto de individuos cuyo estatus de tratamiento puede ser modificado por la asignación aleatoria
+
+- A estos individuos se les conoce como **cumplidores** o *compliers*
+
+
+---
+
+# Tipos de individuos
+
+- Hay cuatro tipos de individuos:
+
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:60%; "&gt;&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="3"&gt;&lt;div style="TRUE"&gt;Tipos de individuos&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `D_i(0)=0` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `D_i(0)=1` &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; `D_i(1)=0` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `Y_i(1,0)-Y_i(0,0)=0` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `Y_i(1,0)-Y_i(0,1)=-(Y_i(1)-Y_i(0))` &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Nunca cumplidor &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Retador &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; `D_i(1)=1` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `Y_i(1,1)-Y_i(0,0)=Y_i(1)-Y_i(0)` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `Y_i(1,1)-Y_i(0,1)=0` &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Cumplidor &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Siempre adoptador &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Nota:&lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Adaptado de la tabla 1 en Angrist, Imbens &amp;amp; Rubin (1996).&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+
+---
+
+# Tipos de individuos
+
+- Los cumplidores cumplen con el tratamiento si se les asigna y no lo cumplen si no se les asigna
+
+- `\(Z\)` es independiente de `\(D\)` para los nunca cumplidores y los siempre adoptadores y el efecto causal es 0 para ambos
+
+- Los retadores hacen lo contrario a lo que les es asignado
+
+  - El supuesto de monotonicidad descarta la existencia de retadores para la identificación del LATE
+  - En la práctica, esperamos que sean pocos tal que podamos ignorarlos
+  
+
+- A la suma de nunca cumplidores, siempre adoptadores y retadores se le conoce como **no cumplidores**
+
+---
+
+# LATE y TT
+
+- En general el LATE y el TT difieren
+
+- Pero recordemos que `\(TOT=E(y_{1i}-y_{0i}|D_i=1)\)`
+
+- Noten que en el conjunto con `\(D_i=1\)` se encuentran los cumplidores y los siempre adoptadores
+
+- Si podemos asegurar que no hay siempre adoptadores, el LATE y el TT son iguales
+
+---
+
+# Resumiendo
+
+- Hemos mostrado que el efecto promedio de `\(Z\)` sobre `\(Y\)` es proporcional al efecto de `\(D\)` sobre `\(Y\)` para los cumplidores
+
+- Por el supuesto 4, sabemos que la proporción de cumplidores es igual al efecto de `\(Z\)` sobre `\(D\)`
+
+- Dado que `\(Z\)` se asigna aleatoriamente, podemos estimar los dos ITT por separado para obtener `\(\lambda=\frac{ITT_Y}{ITT_D}\)`
+
+--
+
+- En la práctica de evaluación recurrimos a la econometría con variables instrumentales
+
+
+---
+
+class: inverse, middle, center
+
+# Variables instrumentales y LATE
+---
+
+# Terminología
+
+- **Primera etapa**: es el efecto causal de la asignación sobre el cumplimento
+
+`$$\phi=E(D_i|Z_i=1)-E(D_i|Z_i=0)$$`
+- **Forma reducida**: es la diferencia en `\(y\)` entre grupos de asignación
+
+`$$\rho=E(y_i|Z_i=1)-E(y_i|Z_i=0)$$`
+- **LATE**: es la diferencia en `\(y\)` entre a quienes se les asigna el tratamiento y quienes no, dividida por la diferencia en cumplimiento entre a quienes se les asigna el tratamiento y quienes no
+
+`$$\lambda_{LATE}=\frac{\rho}{\phi}$$`
+
+---
+
+# Variables instrumentales en investigación criminológica
+
+- Angrist (2006) estudia un experimento bastante particular: aleatorizar la respuesta policíaca
+
+- ¿En qué consistió la intervención?
+
+--
+
+- `\(y_i\)`: tasa de reincidencia en conductas de violencia doméstica
+
+- `\(T_i=\begin{cases} 1\quad \text{si apercibido} \\ 0\quad \text{otro caso}\ \end{cases}\)`
+
+--
+
+- Se muestra como el ITT puede no reflejar la efectividad de la intervención debido al efecto de *dilusión* provocado, en este caso, por desviaciones con respecto a la forma de enfrentar un episodio policíaco
+
+---
+
+# Diferencias en las respuestas efectivas
+
+
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:60%; "&gt;&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="4"&gt;&lt;div style="TRUE"&gt;Tratamiento asignado y recibido en casos de violencia doméstica&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th style="empty-cells: hide;position: sticky; top:0; background-color: #FFFFFF;" colspan="1"&gt;&lt;/th&gt;
+&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="2"&gt;&lt;div style="TRUE"&gt;Traamiento recibido:&lt;/div&gt;&lt;/th&gt;
+&lt;th style="empty-cells: hide;position: sticky; top:0; background-color: #FFFFFF;" colspan="1"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Arrestado &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Apercibido &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tratamiento asignado: &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Total &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Arrestar &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 98.91 (91) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.09 (1) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 29.3 (92) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Apercibir &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 20.27 (45) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 79.73 (177) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 70.7 (222) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 43.1 (136) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 56.69 (178) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 100 (314) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Nota:&lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Adaptado de la tabla 1 en Angrist (2006).&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+
+- En el estudio original, lo que llamamos *apercibir* tuvo en realidad dos componentes: *aconsejar* y *separar*, pero para facilitar el análisis usaremos solo *arrestar* por un lado y *apercibir* por el otro
+
+- ¿Qué observamos sobre a las desviaciones con respecto al tratamiento asignado?
+
+
+---
+
+# Diferencias en las respuestas efectivas
+
+- Noten que cuando el tratamiento asignado era arrestar, efectivamente se arrestó al 98.91% de los individuos
+
+- En cambio, noten que 20.27 % de los 222 asignados a ser apercibidos fueron en efecto arrestados
+
+- ¿Cómo ocurre el sesgo de selección en este caso?
+
+---
+
+# Sesgo de selección
+
+- Algunos individuos se comportaron violentos, por lo que fueron arrestados a pesar de ser asignados a apercibimiento
+
+- Por tanto, si comparamos `\(y\)` entre aquellos individuos apercibidos y no apercibidos, no tomamos en cuenta que aquellos no apercibidos (por tanto, arrestados) pudieran ser más violentos, sobrestimando el efecto de la política de apercibimiento
+
+---
+
+# LATE
+
+- La primera etapa es el efecto causal en la probabilidad de recibir el tratamiento de apercibimiento por el hecho de haber sido asignado a ese tratamiento: `\(E(D_i|Z_i=1)-E(D_i|Z_i=0)=0.797-0.011=0.786\)`
+  
+- La forma reducida es el efecto causal de la asignación al tratamiento sobre la tasa de reincidencia: `\(E(y_i|Z_i=1)-E(y_i|Z_i=0)=0.211-0.097=0.0.114\)`
+
+--
+
+- El ITT ignora el hecho de que algunos asignados a apercibimiento fueron arrestados
+
+- Sabemos que el LATE está dado por `\(\lambda_{LATE}=\frac{ITT_y}{ITT_D}=\frac{0.114}{0.786}=0.145\)`
+
+- Los datos de los autores reportan que si nos fijáramos solo en las diferencias por tipo de tratamiento obtendríamos, `\(E(y_i|D_i=1)-E(y_i|D_i=0)=0.216-0.129=0.087\)`, es decir, casi la mitad del LATE
+
+- Pero como `\(D\)` no es aleatoria, dicha comparación no es correcta
+
+---
+
+class: inverse, middle, center
+
+# La econometría del LATE
+
+---
+
+# Motivación con un estadístico de Wald
+
+- Pensemos en un modelo con efectos constantes de tratamiento: `\(y_{1i}-y_{0i}=\lambda\)`
+
+- La variable de resultados está determinada por `\(y_{0i}=\alpha+\varepsilon_i\)`, donde `\(\alpha=E(y_{0i})\)`
+
+- Entonces, el modelo de resultados potenciales es:
+
+`$$y_i=\alpha+\lambda D_i+\varepsilon_i$$`
+- Si `\(D_i\)` no es independiente de `\(y_{0i}\)`, es decir, `\(y_{0i}\)` no es independiente del error, entonces una diferencia de medias entre grupos de `\(D\)` no produce un estimador consistente de `\(\lambda\)`
+
+---
+
+# Motivación con un estadístico de Wald
+
+- Ahora supongamos que tenemos un **instrumento** `\(z_i\)` tal que `\(z_i\perp y_i\)`, es decir, `\(E(\varepsilon_i|z_i)=0\)`
+
+--
+
+- Evaluemos la esperanza de `\(y_i\)` cuando `\(z_i=1\)` y cuando `\(z_i=0\)`:
+
+$$
+`\begin{aligned}
+E(y_i|z_i=1)&amp;=\beta+\lambda E(D_i| z_i=1) \\
+E(y_i|z_i=0)&amp;=\beta+\lambda E(D_i| z_i=0) \\
+\end{aligned}`
+$$
+- Restando: 
+
+`$$E(y_i|z_i=1)-E(y_i|z_i=0)=\lambda(E(D_i| z_i=1)-E(D_i| z_i=0))$$`
+
+
+- Y despejando obtenemos
+
+`$$\lambda=\frac{E(y_i|z_i=1)-E(y_i|z_i=0)}{E(D_i| z_i=1)-E(D_i| z_i=0)}$$`
+
+que es conocido como un *estadístico de Wald*
+
+---
+
+# Mínimos cuadrados en dos etapas (MC2E)
+
+- En la práctica, podemos plantear un modelo econométrico en dos etapas:
+
+- **Modelo estructural**
+
+`$$y_i=X_i'\beta+\lambda D_i+\varepsilon_i$$`
+
+--
+
+- **Primera etapa**
+
+`$$D_i=X_i'\phi_0+\phi_1z_i+\eta_i$$`
+donde `\(\phi_i\)` es el efecto causal de la asignación sobre el cumplimiento
+
+- Cuado `\(D_i\)` y `\(z_i\)` son ambas dicotómicas, `\(\phi_1\)` da la proporción de la población que son cumplidores
+
+---
+
+# Mínimos cuadrados en dos etapas (MC2E)
+
+- Podemos concevir el problema como uno en el que primero se estima la primera etapa y se sustituyen los valores ajustados de `\(D_i\)` en el modelo estructural
+
+- Sustituyendo la primera etapa en el modelo estructural
+
+`$$y_i=X_i'\beta+\lambda \hat{D}_i+\varepsilon_i$$`
+--
+
+- Esta es la forma de pensar el procedimiento, pero en la práctica nunca hacemos esto manualmente
+
+  - Noten que `\(\hat{D}_i\)` es estimada, por lo cual se ignora la variabilidad muestral de la primera etapa y los errores estándar serían inconsistentes
+
+--
+
+- Nota: el estimador de Wald es igual al estimador de MC2E cuando no hay `\(X\)` y cuando `\(Z\)` y `\(D\)` son binarias
+
+---
+
+# Mínimos cuadrados en dos etapas (MC2E)
+
+
+- **Forma reducida**
+
+$$
+`\begin{aligned}
+y_i&amp;=X_i'\beta+\lambda(X_i'\phi_0+\phi_1z_1+\eta_i)+\varepsilon_i \\
+&amp;=X_i'\rho_0+\rho_1z_i+\nu_i
+\end{aligned}`
+$$
+donde `\(\rho_1=\lambda\phi_1\)` es el coeficiente de forma reducida sobre la variable de asignación
+
+--
+
+- Noten que esto implica que `\(\lambda=\rho_1/\phi_1\)`
+
+- Es decir, `\(\lambda_{MC2E}\)` puede interpretarse como la versión reescalada del coeficiente de forma reducida usando el efecto causal de la primera etapa para reescalar
+
+
+---
+
+# Efectos estimados
+
+- Regresando a los resultados del experimento, ahora con econometría
+
+
+**Primera etapa**
+
+
+- Versión corta:
+
+`$$apercibido_i=\phi_0+\phi_1T_i+\eta_i$$`
+
+- Con controles:
+`$$apercibido_i=\phi_0+\phi_1T_i+X_i'\Phi +\eta_i$$`
+- Noten que el 0.786 es exactamente lo que se encontraba al hacer las diferencias de medias
+
+
+**Forma reducida**
+
+- También conocido como ITT
+
+`$$reincidencia_i=\rho_0+\rho_1T_i+\nu_i$$`
+
+
+
+---
+
+# Efectos estimados
+
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:60%; "&gt;&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="5"&gt;&lt;div style="TRUE"&gt;Primera etapa y forma reducida&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th style="empty-cells: hide;position: sticky; top:0; background-color: #FFFFFF;" colspan="1"&gt;&lt;/th&gt;
+&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="2"&gt;&lt;div style="TRUE"&gt;Primera etapa&lt;/div&gt;&lt;/th&gt;
+&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="2"&gt;&lt;div style="TRUE"&gt;Forma reducida&lt;/div&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th style="empty-cells: hide;position: sticky; top:0; background-color: #FFFFFF;" colspan="1"&gt;&lt;/th&gt;
+&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="2"&gt;&lt;div style="TRUE"&gt;Variable dep.: fue apercibido&lt;/div&gt;&lt;/th&gt;
+&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="2"&gt;&lt;div style="TRUE"&gt;Variable dep.: reincidencia&lt;/div&gt;&lt;/th&gt;
+&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (1) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (2)* &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (3) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (4)* &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Asignado a ser apercibido (`T`) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.786 (0.043) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.733 (0.043) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.114 (0.047) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.108 (0.041) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Arma &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -0.064 (0.045) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -0.004 (0.042) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Influencia químicos &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -0.088 (0.040) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.052 (0.038) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Media variable dep. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.567 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.567 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.178 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.178 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Nota:&lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Tabla 2 en Angrist (2006). * Indica que se incluyen como variables de control indicadoras para año, trimestre, raza no blanca y raza mixta.&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+- Habíamos obtenido antes la columna (1), pero como una diferencia de medias: `\(E(D_i|Z_i=1)-E(D_i|Z_i=0)=0.797-0.011=0.786\)`
+
+- Mientras que también habíamos encontrado (3): `\(E(y_i|Z_i=1)-E(y_i|Z_i=0)=0.211-0.097=0.0.114\)`
+
+---
+
+#Efectos estimados
+
+**Efecto del tratamiento**
+
+- Noten que con nuestro estimador de MC2E obtenemos exactamente lo que antes habíamos calculado como `\(\lambda_{LATE}=\frac{ITT_y}{ITT_D}=\frac{E(y_i|Z_i=1)-E(y_i|Z_i=0)}{E(D_i|Z_i=1)-E(D_i|Z_i=0)}=0.145\)`
+
+
+
+- Vean que al estimar la ecuación estructural por MCO obtenemos un coeficiente cercano a 0.070
+
+- Más aún, sabemos que el coeficiente de MCO es inconsistente
+
+---
+
+#Efectos estimados
+
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:50%; "&gt;&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="5"&gt;&lt;div style="TRUE"&gt;Impactos de ser apercibido en la reincidencia (MCO y LATE)&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th style="empty-cells: hide;position: sticky; top:0; background-color: #FFFFFF;" colspan="1"&gt;&lt;/th&gt;
+&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="2"&gt;&lt;div style="TRUE"&gt;MCO&lt;/div&gt;&lt;/th&gt;
+&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="2"&gt;&lt;div style="TRUE"&gt;VI/MC2E&lt;/div&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th style="empty-cells: hide;position: sticky; top:0; background-color: #FFFFFF;" colspan="1"&gt;&lt;/th&gt;
+&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="4"&gt;&lt;div style="TRUE"&gt;Variable dep.: reincidencia&lt;/div&gt;&lt;/th&gt;
+&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (1) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (2)* &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (3) &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt; (4)* &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Apercibido &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.087 (0.044) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.070 (0.038) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.145 (0.060) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.140 (0.053) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Arma &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.010 (0.043) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.005 (0.043) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Influencia químicos &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.057 (0.039) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.064 (0.039) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Nota:&lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Tabla 3 en Angrist (2006). * Indica que se incluyen como variables de control indicadoras para año, trimestre, raza no blanca y raza mixta.&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+- Usando el estimador de MC2E obtenemos exactamente lo que antes habíamos calculado como `\(\lambda_{LATE}=\frac{ITT_y}{ITT_D}=\frac{E(y_i|Z_i=1)-E(y_i|Z_i=0)}{E(D_i|Z_i=1)-E(D_i|Z_i=0)}=0.145\)`
+
+- Al estimar la ecuación estructural por MCO obtenemos un coeficiente cercano a 0.070
+
+- Pero sabemos que el coeficiente de MCO es inconsistente
+
+
+---
+
+# LATE es igual ATET en este caso
+
+- Noten que este estudio tiene lo que se conoce como *no cumplidores de un solo lado*
+
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:50%; "&gt;&lt;table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;border-bottom: 0;'&gt;
+ &lt;thead&gt;
+&lt;tr&gt;&lt;th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; padding-right: 4px; padding-left: 4px; background-color: white !important;position: sticky; top:0; background-color: #FFFFFF;" colspan="3"&gt;&lt;div style="TRUE"&gt;Tipos de individuos&lt;/div&gt;&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"&gt;  &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `D_i(0)=0` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `D_i(0)=1` &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; `D_i(1)=0` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `Y_i(1,0)-Y_i(0,0)=0` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `Y_i(1,0)-Y_i(0,1)=-(Y_i(1)-Y_i(0))` &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Nunca cumplidor &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Retador &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; `D_i(1)=1` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `Y_i(1,1)-Y_i(0,0)=Y_i(1)-Y_i(0)` &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; `Y_i(1,1)-Y_i(0,1)=0` &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Cumplidor &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Siempre adoptador &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;span style="font-style: italic;"&gt;Nota:&lt;/span&gt; &lt;sup&gt;&lt;/sup&gt; Adaptado de la tabla 1 en Angrist, Imbens &amp;amp; Rubin (1996).&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+- Cuando la asignación es **apercibir**, en el 20.27% de los casos la acción fue arrestar y en el 79.73% efectivamente fue apercibir
+
+- En cambio, cuando se indica **no apercibir**, es decir, arrestar, la adopción es casi perfecto (salvo un caso)
+
+--
+
+- En otras palabras, en este caso no hay **siempre cumplidores**
+
+- No hay individuos que hayan sido *apercibidos* independientemente de la asignación
+
+
+---
+
+# LATE es igual ATET en este caso
+
+- Recordemos que el grupo de quienes reciben el tratamiento está compuesto de los cumplidores y los siempre adoptadores
+
+- En este caso en particular:
+
+`$$\lambda_{LATE}=E(y_{1i}-y_{0i}|C_i=1)=E(y_{1i}-y_{0i}|D_i=1)=ATET$$`
+--
+
+- Esto ocurre en los casos en que:
+
+  - Algunos de los asignados al tratmiento, `\(z_i=1\)` lo reciben mientras otros no
+  
+  - Nadie de los asignados al control, `\(z_i=0\)` tiene acceso al tratamiento
+
+---
+
+# Próxima sesión
+
+- Un laboratorio en R sobre regresión y métodos experimentales
+
+  - Será muy útil si le echan un ojo a la Tarea 1
+
+- El jueves habrá dos presentaciones que emplean la asignación experimental de dos programas
+
+  + \+ De La O, A. L. (2013). Do conditional cash transfers affect electoral behavior? Evidence from a randomized experiment in Mexico. *American Journal of Political Science*, 57(1), 1-14.
+  
+  + \+ McIntosh, C., Alegría, T., Ordóñez, G., &amp; Zenteno, R. (2018). The neighborhood impacts of local infrastructure investment: Evidence from urban Mexico. *American Economic Journal: Applied Economics*, 10(3), 263-86.
+
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script src="libs/cols_macro.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
