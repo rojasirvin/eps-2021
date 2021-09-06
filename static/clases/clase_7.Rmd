@@ -30,20 +30,10 @@ class: title-slide
 knitr::opts_chunk$set(echo = FALSE, fig.path = "figures/")
 
 library(tidyverse)
-library(pacman)
 library(janitor)
 library(sandwich)
-#library(nnet)
-#library(mlogit)
-library(readr)
 library(clubSandwich)
 library(modelsummary)
-library(estimatr)
-
-p_load(tidyverse, foreign, reshape2, psych, qwraps2, forcats, readxl, 
-       broom, lmtest, margins, plm, rdrobust, multiwayvcov,
-       wesanderson, sandwich, stargazer,
-       readstata13, pscore, optmatch, kdensity, MatchIt, bootstrap, matlib, dplyr)
 
 xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
@@ -61,7 +51,7 @@ xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 # Clase 7. Métodos experimentales en R
 ]
 .subtitle[
-## Evaluación de Programas Sociales
+## Evaluación de Programas
 ]
 .author[
 ### Irvin Rojas <br> [rojasirvin.com](https://www.rojasirvin.com/) <br> [<i class="fab fa-github"></i>](https://github.com/rojasirvin) [<i class="fab fa-twitter"></i>](https://twitter.com/RojasIrvin) [<i class="ai ai-google-scholar"></i>](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&hl=en)
@@ -80,7 +70,7 @@ xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 
 1. Cumplimiento imperfecto
 
-Encontrarán los archivos necesarios para realizar este laboratorio en el grupo de [Teams](https://teams.microsoft.com/_#/school/files/General?threadId=19%3Ac3a5700a3395418aa6263112f30fed7b%40thread.tacv2&ctx=channel&context=General&rootfolder=%252Fsites%252FEPS2020%252FDocumentos%2520compartidos%252FGeneral)
+Encontrarán los archivos necesarios para realizar este laboratorio en el grupo de [Teams](https://teams.microsoft.com/_#/school/files/General?threadId=19%3AQ1Ql67l7Hg4cIQhVrUjMP23JdiUzcnPlKHeLRkJ2GpQ1%40thread.tacv2&ctx=channel&context=Laboratorio%25201&rootfolder=%252Fsites%252FEPS2021%252FDocumentos%2520compartidos%252FGeneral%252FLaboratorio%25201)
 
 ---
 
@@ -90,23 +80,22 @@ class: inverse, middle, center
 
 ---
 
-# Usemos los datos de la ENOE 4T2019
+# Usemos los datos de la ENOE 1T2021
 
 
 .pull-left[
-```{r tidy=TRUE,echo=TRUE,collapse=TRUE,message=FALSE,warning=FALSE}
-# Llamar datos
-
-data_empleo1<-read_csv(
-  "./SDEMT419.csv",
+```{r tidy=TRUE,echo=TRUE,message=FALSE,warning=FALSE}
+# Llamar datoss
+data_empleo1<-read_csv("C:/Users/Irvin/Dropbox/Evaluación de Programas Sociales/2021/laboratorios/Laboratorio 1. Experimental/ENOEN_COE1T121.csv",
   locale = locale(encoding = "latin1")) %>% 
   clean_names()
 
-data_socdem<-read_csv(
-  "./COE1T419.csv",
+data_socdem<-read_csv("C:/Users/Irvin/Dropbox/Evaluación de Programas Sociales/2021/laboratorios/Laboratorio 1. Experimental/ENOEN_SDEMT121.csv",
   locale=locale(encoding="latin1")) %>% 
   clean_names()
 
+nrow(data_empleo1)
+ncol(data_empleo1)
 ```
 ]
 
@@ -115,62 +104,108 @@ data_socdem<-read_csv(
 
 - Cuando hablamos de datos, a las filas las llamamos *observaciones* y a las columnas *variables*
 
-- Por ejemplo, la base de datos de empleo, **data_empleo1** tiene 402,536 observaciones, es decir, registros de 402,536 entrevistas
+- Por ejemplo, la base de datos de empleo, **data_empleo1** tiene 402,536 observaciones, es decir, registros de 282,161 entrevistas
 
-- La misma base tiene 104 variables
+- La misma base tiene 190 variables
 
-```{r tidy=TRUE,echo=TRUE,collapse=TRUE,warning=FALSE}
-nrow(data_empleo1)
-ncol(data_empleo1)
-```
 ]
 
 
 ---
 
-# Usemos los datos de la ENOE 4T2019
+# Usemos los datos de la ENOE 1T2021
 
-```{r tidy=TRUE,echo=TRUE,collapse=TRUE,warning=FALSE}
+.pull-left[
+- Estos son los datos oficiales que usa INEGI para los cálculos de sus [indicadores laborales](https://www.inegi.org.mx/contenidos/programas/enoe/15ymas/doc/resultados_ciudades_enoe_2021_trim1.pdf)
+
+- Recomiendo ver la documentación de INEGI para entender la [estructura de la base de datos](
+https://www.inegi.org.mx/contenidos/programas/enoe/15ymas/doc/enoe_n_fd_c_bas_amp.pdf)
+
+- La ENOE es una encuestra trimestral que caracteriza al mercado laboral mexicano y las 39 ciudades más importantes del país
+]
+
+.pull-right[
+- La ENOE está contenida en cinco archivos, los cuales se relacionan entre sí de acuerdo al siguiente diagrama
+
+```{r, out.width="100%",fig.cap='Fuente: INEGI',fig.align='center'}
+knitr::include_graphics("figures/pegado_bases.png")
+```
+]
+
+---
+
+# Pegado de bases
+
+- Recomiendo que primero identifiquen qué variables necesitan para así pegar las bases necesarias (pegar todas las bases y crear una sola gran base es ineficiente en términos de cómputo)
+
+- En este ejemplo, usaremos la base con características sociodemográficas y la primer parte del cuestionario de empleo
+
+
+```{r echo=TRUE, warning=FALSE, highlight=TRUE}
 #A socdem le pegamos empleo1
 data_enoe <- data_socdem %>%
   left_join(data_empleo1,
-            by=c("cd_a", "ent", "con", "v_sel", "n_hog", "h_mud", "n_ren"))
+            by=c("cd_a", "ent", "con", "v_sel", "tipo", "mes_cal", "ca","n_hog", "h_mud", "n_ren"))
+
+#Pequeño arreglo para eliminar las variables con .x y .y
+data_enoe <- data_enoe %>% 
+  rename_at(vars(ends_with(".x")),
+            ~str_replace(., "\\..$","")) %>% 
+  select_at(vars(-ends_with(".y")))
+
 
 ```
---
-
-- Estos son los datos oficiales que usa INEGI para los cálculos de sus [indicadores laborales](https://www.inegi.org.mx/contenidos/programas/enoe/15ymas/doc/resultados_ciudades_enoe_2019_trim4.pdf)
-
-- La variable de clasificación de la PEA PNEA es **clase1**
-
-- Restringimos a los individuos de 15 años en adelante
-
-- La variable **fac** es el factor de expansión que nos permite hacer inferencia para la población de México
 
 ---
 
 # Calculamos el tamaño de la PEA y la PNEA
+
 .tiny[
 .pull-left[
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE}
+
+- La variable de clasificación de la PEA y PNEA es **clase1**
+
+- Eliminamos las observaciones de los individuos que no son residentes permanentes y los cuestionarios que no fueron completados
+
+- Restringimos a los individuos de 15 años en adelante
+
+- La variable **fac_tri** es el factor de expansión que nos permite hacer inferencia para la población de México de forma trimestral
+]
+]
+
+.pull-right[
+
+
+```{r echo=TRUE, warning=FALSE}
 #Verificamos la población total de mayores de 15 años
 data_enoe<-data_enoe %>% 
-  mutate(pob_cuenta15=ifelse(eda.x>=15,1,0)) %>% 
-  mutate(npob15=pob_cuenta15*fac.x)
+  filter(c_res!=2 & (r_def=="00" | r_def==0)) %>% 
+  mutate(pob_cuenta15=ifelse(eda>=15 & eda<99,1,0)) %>% 
+  mutate(npob15=pob_cuenta15*fac_tri)
 
-sum(data_enoe$npob15)
+sum(data_enoe$npob15, na.rm = T)
 
 #La variable clase1 nos da la clasificación de
 #acuerdo a INEGI (1=PEA, 2=PNEA)
 pea_pnea<-data_enoe %>% 
-  filter(eda.x>=15) %>% 
+  filter(eda>=15) %>% 
   group_by(clase1) %>% 
-  summarize(poblacion=sum(fac.x)) %>% 
+  summarize(poblacion=sum(fac_tri)) %>% 
   ungroup() %>% 
   mutate(clase1=factor(clase1, levels=c(1,2),labels=c("PEA","PNEA")))
-pea_pnea
+
 ```
 ]
+
+---
+
+# Calculamos el tamaño de la PEA y la PNEA
+
+.pull-left[
+
+```{r echo=TRUE, warning=FALSE}
+pea_pnea
+```
 ]
 
 .pull-right[
@@ -179,11 +214,10 @@ knitr::include_graphics("figures/inegi_poblaciones.png")
 ```
 ]
 
-
 ---
 
 # Regresión básica
-```{r tidy=TRUE,echo=TRUE,collapse=TRUE,warning=FALSE}
+```{r echo=TRUE, warning=FALSE}
 
 ##Regresión básica
 data_enoe <- data_enoe %>% 
@@ -200,7 +234,7 @@ summary(m2)$coef
 ---
 
 # Regresión ingenua
-```{r tidy=TRUE,echo=TRUE,collapse=TRUE,warning=FALSE}
+```{r echo=TRUE, warning=FALSE}
 
 ##¿Ser beneficiario del sistema de salud causa mayor ingreso?
 
@@ -227,7 +261,7 @@ class: inverse, middle, center
 
 - Los números que generemos no serán iguales a los reportados en el artículo
 
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
+```{r echo=TRUE, warning=FALSE, message=FALSE}
 
 data.angrist<-read_csv("./STAR_public_use.csv",
                        locale = locale(encoding = "latin1"))   %>% 
@@ -249,7 +283,7 @@ data.angrist.table1<-data.angrist %>%
 
 # Estadística descriptiva
 
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE}
+```{r echo=TRUE, warning=FALSE}
 #Pedimos estadísticas por grupo
 data.angrist.table1 %>% 
   filter(noshow==0) %>% 
@@ -263,26 +297,30 @@ data.angrist.table1 %>%
 
 # Diferencias de medias
 
-.pull-left[
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
+- Con *prueba t*
+
+```{r echo=TRUE, warning=FALSE, message=FALSE}
 t.test(data=filter(data.angrist.table1,noshow==0),
        age ~ ssp)
 ```
-]
 
-.pull-right[
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
+---
+
+# Diferencias de medias
+
+- Con una regresión
+```{r echo=TRUE, warning=FALSE, message=FALSE}
 dif_age <- lm(age ~ ssp,
               data=filter(data.angrist.table1,noshow==0))
 summary(dif_age)$coef
 ```
-]
+
 
 ---
 
 # ¿Los observables predicen el tratamiento?
 
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
+```{r echo=TRUE, warning=FALSE, message=FALSE}
 predict_t <- lm(as.numeric(ssp) ~ age + female + mtongue + gpa0,
                 data=filter(data.angrist.table1,noshow==0) )
 summary(predict_t)$coef
@@ -296,32 +334,46 @@ class: inverse, middle, center
 
 # Un paréntesis
 
-- Acabo de encontrar el paquete *modelsummary*
+.pull-left[
+- El paquete *modelsummary* puede serles útil para construir tablas
 
 - Para hacer estadística descriptiva:
 
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
-datasummary(noshow+age+female~ ssp*(mean + sd)*Arguments(na.rm=TRUE),
+```{r echo=TRUE, warning=FALSE, message=FALSE}
+tabla.descriptiva <- datasummary(noshow+age+female~ ssp*(mean + sd)*Arguments(na.rm=TRUE),
                     fmt = "%.2f",
                     data = data.angrist.table1,
                     title = "Pruebas de balance",
                     notes = "Fuente: Angrist, Lang & Oreopoulos (2009)")
 ```
+]
+.pull-right[
+```{r echo=TRUE, warning=FALSE, message=FALSE}
+tabla.descriptiva
+```
+]
 
 ---
 
 # Un paréntesis
 
+.pull-left[
 - Para hacer tablas de balance:
-
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
-datasummary_balance(~ssp,
+```{r echo=TRUE,warning=FALSE, message=FALSE}
+tabla.balance <- datasummary_balance(~ssp,
                     fmt = "%.2f",
                     data = data.angrist.table1,
                     title = "Pruebas de balance",
                     notes = "Fuente: Angrist, Lang & Oreopoulos (2009)")
 
 ```
+]
+
+.pull-right[
+```{r echo=TRUE,warning=FALSE, message=FALSE}
+tabla.balance
+```
+]
 
 ---
 
@@ -461,7 +513,7 @@ donde $F$ es el estadístico $F$ en una prueba de significancia conjunta de los 
 
 # Cumplimiento imperfecto
 
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
+```{r echo=TRUE,warning=FALSE, message=FALSE}
 data.morocco<-read_csv("./crepon_morocco.csv",
                        locale = locale(encoding = "latin1"))   %>% 
   clean_names() %>% 
@@ -470,7 +522,7 @@ data.morocco<-read_csv("./crepon_morocco.csv",
 
 - Veamos la estadística descriptiva básica de la variable de tamaño del hogar:
 
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
+```{r echo=TRUE,warning=FALSE, message=FALSE}
 data.morocco %>% 
   group_by(treatment) %>%
   summarize(mean=mean(members_resid_bl),
@@ -482,7 +534,7 @@ data.morocco %>%
 
 # Prueba de balance con regresión
 
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
+```{r echo=TRUE,warning=FALSE, message=FALSE}
 #Con una regresión:
 dif_members <- lm(members_resid_bl ~ treatment + factor(paire), data=data.morocco)
 summary(dif_members)$coef[1:7,]
@@ -492,7 +544,7 @@ summary(dif_members)$coef[1:7,]
 
 # Errores estándar *agrupados*
 
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
+```{r echo=TRUE,warning=FALSE, message=FALSE}
 #Usemos errores estándar agrupados
 #Esto es lo más cercano que he llegado de lo que producen los autores
 coef_test(dif_members, vcov = "CR1", 
@@ -504,7 +556,7 @@ coef_test(dif_members, vcov = "CR1",
 
 # Hay selección
 
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
+```{r echo=TRUE,warning=FALSE, message=FALSE}
 ##Pero hay selección, veamos un tabulado cruzado
 data.morocco %>%
   mutate(treatment=factor(treatment, levels=c(0,1),labels=c("Control", "Tratamiento"))) %>% 
@@ -516,7 +568,7 @@ data.morocco %>%
 
 # Ser cliente no es independiente
 
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
+```{r echo=TRUE,warning=FALSE, message=FALSE}
 #¿Ser cliente es independiente del tamaño del hogar?
 dif_members_client <- lm(members_resid_bl ~ client + factor(paire), data=data.morocco)
 coef_test(dif_members_client, vcov = "CR1", 
@@ -525,7 +577,7 @@ coef_test(dif_members_client, vcov = "CR1",
 
 --
 
-```{r tidy=TRUE, echo=TRUE,collapse=TRUE,warning=FALSE, message=FALSE}
+```{r echo=TRUE,warning=FALSE, message=FALSE}
 #¿El número de actividades es independiente de ser cliente?
 dif_activities_client <- lm(act_number_bl ~ client + factor(paire), data=data.morocco)
 coef_test(dif_activities_client, vcov = "CR1", 

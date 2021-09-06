@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Métodos experimentales en R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Irvin Rojas" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="libs/cide.css" type="text/css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: title-slide
+
+
+
+&lt;style type="text/css"&gt;
+.huge .remark-code { /*Change made here*/
+  font-size: 200% !important;
+}
+.tiny .remark-code { /*Change made here*/
+  font-size: 60% !important;
+}
+&lt;/style&gt;
+
+.title[
+# Clase 7. Métodos experimentales en R
+]
+.subtitle[
+## Evaluación de Programas
+]
+.author[
+### Irvin Rojas &lt;br&gt; [rojasirvin.com](https://www.rojasirvin.com/) &lt;br&gt; [&lt;i class="fab fa-github"&gt;&lt;/i&gt;](https://github.com/rojasirvin) [&lt;i class="fab fa-twitter"&gt;&lt;/i&gt;](https://twitter.com/RojasIrvin) [&lt;i class="ai ai-google-scholar"&gt;&lt;/i&gt;](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&amp;hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas &lt;br&gt; División de Economía
+]
+
+---
+# Agenda
+
+1. Breve recordatorio de estructura de bases
+
+1. Estadística descriptiva y pruebas de hipótesis
+
+1. Cumplimiento imperfecto
+
+Encontrarán los archivos necesarios para realizar este laboratorio en el grupo de [Teams](https://teams.microsoft.com/_#/school/files/General?threadId=19%3AQ1Ql67l7Hg4cIQhVrUjMP23JdiUzcnPlKHeLRkJ2GpQ1%40thread.tacv2&amp;ctx=channel&amp;context=Laboratorio%25201&amp;rootfolder=%252Fsites%252FEPS2021%252FDocumentos%2520compartidos%252FGeneral%252FLaboratorio%25201)
+
+---
+
+class: inverse, middle, center
+
+# Estructura de bases usando la ENOE
+
+---
+
+# Usemos los datos de la ENOE 1T2021
+
+
+.pull-left[
+
+```r
+# Llamar datoss
+data_empleo1 &lt;- read_csv("C:/Users/Irvin/Dropbox/Evaluación de Programas Sociales/2021/laboratorios/Laboratorio 1. Experimental/ENOEN_COE1T121.csv", 
+    locale = locale(encoding = "latin1")) %&gt;% clean_names()
+
+data_socdem &lt;- read_csv("C:/Users/Irvin/Dropbox/Evaluación de Programas Sociales/2021/laboratorios/Laboratorio 1. Experimental/ENOEN_SDEMT121.csv", 
+    locale = locale(encoding = "latin1")) %&gt;% clean_names()
+
+nrow(data_empleo1)
+```
+
+```
+## [1] 282161
+```
+
+```r
+ncol(data_empleo1)
+```
+
+```
+## [1] 190
+```
+]
+
+.pull-right[
+- Usaremos datos de la ENOE para mostrar algunas ideas respecto a la estructura de los datos
+
+- Cuando hablamos de datos, a las filas las llamamos *observaciones* y a las columnas *variables*
+
+- Por ejemplo, la base de datos de empleo, **data_empleo1** tiene 402,536 observaciones, es decir, registros de 282,161 entrevistas
+
+- La misma base tiene 190 variables
+
+]
+
+
+---
+
+# Usemos los datos de la ENOE 1T2021
+
+.pull-left[
+- Estos son los datos oficiales que usa INEGI para los cálculos de sus [indicadores laborales](https://www.inegi.org.mx/contenidos/programas/enoe/15ymas/doc/resultados_ciudades_enoe_2021_trim1.pdf)
+
+- Recomiendo ver la documentación de INEGI para entender la [estructura de la base de datos](
+https://www.inegi.org.mx/contenidos/programas/enoe/15ymas/doc/enoe_n_fd_c_bas_amp.pdf)
+
+- La ENOE es una encuestra trimestral que caracteriza al mercado laboral mexicano y las 39 ciudades más importantes del país
+]
+
+.pull-right[
+- La ENOE está contenida en cinco archivos, los cuales se relacionan entre sí de acuerdo al siguiente diagrama
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/pegado_bases.png" alt="Fuente: INEGI" width="100%" /&gt;
+&lt;p class="caption"&gt;Fuente: INEGI&lt;/p&gt;
+&lt;/div&gt;
+]
+
+---
+
+# Pegado de bases
+
+- Recomiendo que primero identifiquen qué variables necesitan para así pegar las bases necesarias (pegar todas las bases y crear una sola gran base es ineficiente en términos de cómputo)
+
+- En este ejemplo, usaremos la base con características sociodemográficas y la primer parte del cuestionario de empleo
+
+
+
+```r
+#A socdem le pegamos empleo1
+data_enoe &lt;- data_socdem %&gt;%
+  left_join(data_empleo1,
+            by=c("cd_a", "ent", "con", "v_sel", "tipo", "mes_cal", "ca","n_hog", "h_mud", "n_ren"))
+
+#Pequeño arreglo para eliminar las variables con .x y .y
+data_enoe &lt;- data_enoe %&gt;% 
+  rename_at(vars(ends_with(".x")),
+            ~str_replace(., "\\..$","")) %&gt;% 
+  select_at(vars(-ends_with(".y")))
+```
+
+---
+
+# Calculamos el tamaño de la PEA y la PNEA
+
+.tiny[
+.pull-left[
+
+- La variable de clasificación de la PEA y PNEA es **clase1**
+
+- Eliminamos las observaciones de los individuos que no son residentes permanentes y los cuestionarios que no fueron completados
+
+- Restringimos a los individuos de 15 años en adelante
+
+- La variable **fac_tri** es el factor de expansión que nos permite hacer inferencia para la población de México de forma trimestral
+]
+]
+
+.pull-right[
+
+
+
+```r
+#Verificamos la población total de mayores de 15 años
+data_enoe&lt;-data_enoe %&gt;% 
+  filter(c_res!=2 &amp; (r_def=="00" | r_def==0)) %&gt;% 
+  mutate(pob_cuenta15=ifelse(eda&gt;=15 &amp; eda&lt;99,1,0)) %&gt;% 
+  mutate(npob15=pob_cuenta15*fac_tri)
+
+sum(data_enoe$npob15, na.rm = T)
+```
+
+```
+## [1] 96940869
+```
+
+```r
+#La variable clase1 nos da la clasificación de
+#acuerdo a INEGI (1=PEA, 2=PNEA)
+pea_pnea&lt;-data_enoe %&gt;% 
+  filter(eda&gt;=15) %&gt;% 
+  group_by(clase1) %&gt;% 
+  summarize(poblacion=sum(fac_tri)) %&gt;% 
+  ungroup() %&gt;% 
+  mutate(clase1=factor(clase1, levels=c(1,2),labels=c("PEA","PNEA")))
+```
+]
+
+---
+
+# Calculamos el tamaño de la PEA y la PNEA
+
+.pull-left[
+
+
+```r
+pea_pnea
+```
+
+```
+## # A tibble: 3 x 2
+##   clase1 poblacion
+##   &lt;fct&gt;      &lt;dbl&gt;
+## 1 &lt;NA&gt;       12266
+## 2 PEA     55385133
+## 3 PNEA    41555736
+```
+]
+
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/inegi_poblaciones.png" alt="Fuente: INEGI" width="100%" /&gt;
+&lt;p class="caption"&gt;Fuente: INEGI&lt;/p&gt;
+&lt;/div&gt;
+]
+
+---
+
+# Regresión básica
+
+```r
+##Regresión básica
+data_enoe &lt;- data_enoe %&gt;% 
+  mutate(lingreso=ifelse(ingocup&gt;0,log(ingocup),NA))
+
+m1&lt;-lm(lingreso ~ anios_esc, data=data_enoe)
+summary(m1)$coef
+```
+
+```
+##               Estimate   Std. Error   t value Pr(&gt;|t|)
+## (Intercept) 8.18922050 0.0050731658 1614.2229        0
+## anios_esc   0.04338408 0.0004248752  102.1102        0
+```
+
+```r
+##Agregamos indicadora de mujer
+m2&lt;-lm(lingreso ~ anios_esc+factor(sex), data=data_enoe)
+summary(m2)$coef
+```
+
+```
+##                 Estimate   Std. Error    t value Pr(&gt;|t|)
+## (Intercept)   8.29583852 0.0051903541 1598.31841        0
+## anios_esc     0.04543314 0.0004165385  109.07310        0
+## factor(sex)2 -0.31748027 0.0045407406  -69.91817        0
+```
+
+---
+
+# Regresión ingenua
+
+```r
+##¿Ser beneficiario del sistema de salud causa mayor ingreso?
+
+data_enoe&lt;-data_enoe %&gt;% 
+  mutate(beneficiario=ifelse(imssissste==1 |imssissste==2,1,0))
+
+m3&lt;-lm(lingreso ~ anios_esc+factor(sex)+factor(beneficiario), data=data_enoe)
+summary(m3)$coef
+```
+
+```
+##                          Estimate   Std. Error    t value Pr(&gt;|t|)
+## (Intercept)            8.20483133 0.0049345578 1662.72880        0
+## anios_esc              0.03288278 0.0004051091   81.17020        0
+## factor(sex)2          -0.31677913 0.0042652794  -74.26926        0
+## factor(beneficiario)1  0.52213323 0.0043677066  119.54403        0
+```
+
+---
+
+class: inverse, middle, center
+
+# Pruebas de balance usando regresión
+
+---
+
+# Datos de Angrist
+
+- Noten que aquí solo analizaremos UN tratamiento
+
+
+- Los números que generemos no serán iguales a los reportados en el artículo
+
+
+```r
+data.angrist&lt;-read_csv("./STAR_public_use.csv",
+                       locale = locale(encoding = "latin1"))   %&gt;% 
+  clean_names()
+
+
+#Usemos por ahora un solo tratamiento, SSP
+data.angrist.table1&lt;-data.angrist %&gt;% 
+  select(noshow,age,female, mtongue, gpa0, ssp) %&gt;%
+  mutate(mtongue=ifelse(mtongue=="English",1,0)) %&gt;% 
+  mutate(ssp=factor(ssp,levels=c(0,1),
+             labels=c("Control","SSP")))
+```
+
+---
+
+# Estadística descriptiva
+
+
+```r
+#Pedimos estadísticas por grupo
+data.angrist.table1 %&gt;% 
+  filter(noshow==0) %&gt;% 
+  group_by(ssp) %&gt;% 
+  summarize(mean=mean(age),
+            std=sd(age), n=n()) %&gt;% 
+  ungroup()
+```
+
+```
+## # A tibble: 2 x 4
+##   ssp      mean   std     n
+##   &lt;fct&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+## 1 Control  18.3 0.613  1335
+## 2 SSP      18.2 0.607   236
+```
+
+---
+
+# Diferencias de medias
+
+- Con *prueba t*
+
+
+```r
+t.test(data=filter(data.angrist.table1,noshow==0),
+       age ~ ssp)
+```
+
+```
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  age by ssp
+## t = 1.1722, df = 325.42, p-value = 0.242
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.03415216  0.13485679
+## sample estimates:
+## mean in group Control     mean in group SSP 
+##              18.28764              18.23729
+```
+
+---
+
+# Diferencias de medias
+
+- Con una regresión
+
+```r
+dif_age &lt;- lm(age ~ ssp,
+              data=filter(data.angrist.table1,noshow==0))
+summary(dif_age)$coef
+```
+
+```
+##                Estimate Std. Error     t value Pr(&gt;|t|)
+## (Intercept) 18.28764045 0.01675837 1091.254087 0.000000
+## sspSSP      -0.05035231 0.04323783   -1.164543 0.244381
+```
+
+
+---
+
+# ¿Los observables predicen el tratamiento?
+
+
+```r
+predict_t &lt;- lm(as.numeric(ssp) ~ age + female + mtongue + gpa0,
+                data=filter(data.angrist.table1,noshow==0) )
+summary(predict_t)$coef
+```
+
+```
+##                  Estimate  Std. Error    t value     Pr(&gt;|t|)
+## (Intercept)  1.4025655392 0.338476098  4.1437654 3.599109e-05
+## age         -0.0168268559 0.014943752 -1.1260128 2.603326e-01
+## female      -0.0073619093 0.018341162 -0.4013873 6.881898e-01
+## mtongue      0.0038570717 0.019969401  0.1931491 8.468673e-01
+## gpa0         0.0007211719 0.002149339  0.3355319 7.372688e-01
+```
+---
+
+class: inverse, middle, center
+
+# Un paréntesis: *modelsummary*
+---
+
+# Un paréntesis
+
+.pull-left[
+- El paquete *modelsummary* puede serles útil para construir tablas
+
+- Para hacer estadística descriptiva:
+
+
+```r
+tabla.descriptiva &lt;- datasummary(noshow+age+female~ ssp*(mean + sd)*Arguments(na.rm=TRUE),
+                    fmt = "%.2f",
+                    data = data.angrist.table1,
+                    title = "Pruebas de balance",
+                    notes = "Fuente: Angrist, Lang &amp; Oreopoulos (2009)")
+```
+]
+.pull-right[
+
+```r
+tabla.descriptiva
+```
+
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Pruebas de balance&lt;/caption&gt;
+ &lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="empty-cells: hide;border-bottom:hidden;" colspan="1"&gt;&lt;/th&gt;
+&lt;th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"&gt;&lt;div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; "&gt;Control&lt;/div&gt;&lt;/th&gt;
+&lt;th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"&gt;&lt;div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; "&gt;SSP&lt;/div&gt;&lt;/th&gt;
+&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; mean &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; sd &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; mean  &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; sd  &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; noshow &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.23 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; age &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.62 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.66 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.50 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;
+&lt;tr&gt;
+&lt;td style="padding: 0; border:0;" colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Fuente: Angrist, Lang &amp;amp; Oreopoulos (2009)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tfoot&gt;
+&lt;/table&gt;
+]
+
+---
+
+# Un paréntesis
+
+.pull-left[
+- Para hacer tablas de balance:
+
+```r
+tabla.balance &lt;- datasummary_balance(~ssp,
+                    fmt = "%.2f",
+                    data = data.angrist.table1,
+                    title = "Pruebas de balance",
+                    notes = "Fuente: Angrist, Lang &amp; Oreopoulos (2009)")
+```
+]
+
+.pull-right[
+
+```r
+tabla.balance
+```
+
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Pruebas de balance&lt;/caption&gt;
+ &lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="empty-cells: hide;border-bottom:hidden;" colspan="1"&gt;&lt;/th&gt;
+&lt;th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"&gt;&lt;div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; "&gt;Control (N=1406)&lt;/div&gt;&lt;/th&gt;
+&lt;th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"&gt;&lt;div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; "&gt;SSP (N=250)&lt;/div&gt;&lt;/th&gt;
+&lt;th style="empty-cells: hide;border-bottom:hidden;" colspan="1"&gt;&lt;/th&gt;
+&lt;th style="empty-cells: hide;border-bottom:hidden;" colspan="1"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Mean &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Std. Dev. &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Mean  &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Std. Dev.  &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Diff. in Means &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Std. Error &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; noshow &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.22 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.06 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.23 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; age &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18.29 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.62 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18.28 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.66 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.01 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.04 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.57 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.49 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.57 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.50 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.01 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; mtongue &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.71 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.46 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.72 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.45 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; gpa0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 78.68 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4.23 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 78.85 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4.40 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.17 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.30 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;
+&lt;tr&gt;
+&lt;td style="padding: 0; border:0;" colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Fuente: Angrist, Lang &amp;amp; Oreopoulos (2009)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tfoot&gt;
+&lt;/table&gt;
+]
+
+---
+
+class: inverse, middle, center
+
+# Cumplimiento imperfecto
+
+---
+
+# Estimador de variables instrumentales
+
+- Consideremos el modelo
+`\(y=\beta_0+\beta_1 x_1+\beta_2 x_2+\ldots+\beta_k x_K+u\)`
+
+donde `\(x_k\)` está correlacionado con `\(u\)`
+
+--
+ 
+- Y consideremos la proyección lineal de `\(x_K\)` en las variables exógenas:
+
+`$$x_K=\delta_0+\delta_1 x_1+\delta_2 x_2+\ldots+\delta_{K-1}x_{K-1}+\theta_1 z_1+e_K$$`
+
+donde `\(E(e_K)=0\)` y `\(x_K\)` no está correlacionado con las `\(x_j\)` ni con `\(z_1\)`
+
+--
+
+- Supongamos que tenemos una variable instrumental `\(z_1\)` tal que:
+
+  - **Exclusión**: `\(z_1\)` no pertenece a la ecuación de `\(y\)`, es decir, `\(Cov(z_1,u)\)`
+  
+  - **Relevancia**: `\(\theta_1\neq 0\)`
+  
+entonces `\(z_1\)` es una variable instrumental para `\(x_k\)`
+
+
+---
+
+# Estimador de variables instrumentales
+
+
+- Escribamos el modelo como `\(y=x\beta+u\)`, donde `\(x=(1,x_2,\dots,x_K)\)` y definamos `\(z=(1,x_2,\ldots,x_{K-1},z_1)\)`
+
+- Premultiplicamos la ecuación de `\(y\)` por `\(z'\)` y tomamos el valor esperado:
+
+`$$E(z'y)=E(z'x)\beta+E(z'u)$$`
+
+--
+
+- Por la condición de eclusión sabemos que `\(E(z'u)=0\)`, por tanto, si `\(E(z'x)\)` es de rango completo:
+
+`$$\beta=E(z'x)^{-1}E(z'y)$$`
+
+
+
+
+
+
+- Y sustituyendo los análogos muestrales:
+
+`$$\hat{\beta}_{VI}=\left(\frac{1}{N}\sum_iz_i'x_i\right)^{-1}\left(\frac{1}{N}\sum_iz_i'y_i\right)=(Z'X)^{-1}Z'Y$$`
+---
+
+# Variables instrumentales y mínimos cuadrados en dos etapas
+
+- En nuestro problema del LATE, el instrumento será la asignación al tratamiento
+
+  - Si `\(Z\)` es asignado de manera aleatoria, se cumple la restricción de exclusión
+
+- La variable *endógena* es la adopción, por lo que la variable de asignación funciona como un instrumento de la adopción
+
+--
+  
+- En la práctica, puede haber más de un instrumento y más de una variable endógena y el método de estimación usado es **mínimimos cuadrados en dos etapas**
+
+- Reservaremos el término *estimador de variables instrumentales* al caso en que tenemos tantas variables endógenas como instrumentos, es decir, cuando el modelo esta *exactamente identificado*
+
+- En este curso solo usaremos modelos exactamente identificados
+
+---
+
+# Propiedades del estimador de VI
+
+- No vamos a ocuparnos de las pruebas formales
+
+- Noten que el estimador de nuevo puede escribirse como funciones de medias muestrales, por tanto, recurrimos a LGN y TLC para probar su consitencia y distribución asintótica
+
+---
+
+# Una nota sobre instrumentos débiles
+
+- Hay cosas que no abordaremos en el curso, como el hecho de que, a diferencia del estimador de MCO, el estimador de VI es **sesgado**
+
+- Es decir, en muestras grandes, el estimador de VI solo se acerca al parámetro poblacional
+
+--
+
+- Más aún, se puede mostrar que:
+
+`$$sesgo_{VI}=sesgo_{MCO}\frac{1}{F+1}$$`
+
+donde `\(F\)` es el estadístico `\(F\)` en una prueba de significancia conjunta de los regresores de la primera etapa
+
+- Es decir, el sesgo se aproxima al sesgo del estimador de MCO cuando no hay primera etapa
+
+- En la práctica, nos fijamos que la primera etapa sea válida al observar los coeficientes estimados sobre `\(Z_i\)`
+
+- Y la regla de dedo usada en econometría es que `\(F&gt;10\)` en la primera etapa
+
+---
+
+# Cumplimiento imperfecto
+
+- Crépon, Devoto, Duflo &amp; Parienté (2015), Estimating the Impact of Microcredit on Those Who Take It Up
+
+- Experimento en Marruecos
+
+--
+
+- Pareciera que las intervenciones de microfinanzas no tienen efectos en el hogar promedio
+
+- Los autores estudian con detalle el efecto de la adopción
+
+- En 81 de 162 localidades se **introdujo** aleatoriamente una empresa de microfinanzas
+
+- Para seleccionar las localidades de tratamiento, primer se emparejaron localidades de acuerdo a características observables y, para cada pareja se asignó a tratamiento y otra a control
+
+
+--
+
+- Tenemos entonces dos indicadores
+
+  - **treatment** es la variable de asignación aleatoria
+  
+  - **client** es la variable de adopción
+
+---
+
+# Cumplimiento imperfecto
+
+
+```r
+data.morocco&lt;-read_csv("./crepon_morocco.csv",
+                       locale = locale(encoding = "latin1"))   %&gt;% 
+  clean_names() %&gt;% 
+  filter(merge_indicator!=1)   # 2 y 3 incluyen la línea base
+```
+
+- Veamos la estadística descriptiva básica de la variable de tamaño del hogar:
+
+
+```r
+data.morocco %&gt;% 
+  group_by(treatment) %&gt;%
+  summarize(mean=mean(members_resid_bl),
+            std=sd(members_resid_bl), n=n()) %&gt;% 
+  ungroup()
+```
+
+```
+## # A tibble: 2 x 4
+##   treatment  mean   std     n
+##       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+## 1         0  5.14  2.69  2266
+## 2         1  5.19  2.76  2199
+```
+
+---
+
+# Prueba de balance con regresión
+
+
+```r
+#Con una regresión:
+dif_members &lt;- lm(members_resid_bl ~ treatment + factor(paire), data=data.morocco)
+summary(dif_members)$coef[1:7,]
+```
+
+```
+##                   Estimate Std. Error    t value     Pr(&gt;|t|)
+## (Intercept)     4.06166091  0.3047365 13.3284357 9.311212e-40
+## treatment       0.04334484  0.0707258  0.6128576 5.400023e-01
+## factor(paire)2  1.78431373  0.4152704  4.2967514 1.770771e-05
+## factor(paire)3  1.06107184  0.4356350  2.4356902 1.490300e-02
+## factor(paire)4 -3.08333333  0.4594672 -6.7106719 2.184193e-11
+## factor(paire)5  1.85814080  0.4442115  4.1830089 2.933028e-05
+## factor(paire)6  2.88352450  0.4262934  6.7641779 1.517259e-11
+```
+
+---
+
+# Errores estándar *agrupados*
+
+
+```r
+#Usemos errores estándar agrupados
+#Esto es lo más cercano que he llegado de lo que producen los autores
+coef_test(dif_members, vcov = "CR1", 
+          cluster = data.morocco$demi_paire, test = "naive-t")[1:2,]
+```
+
+```
+##         Coef. Estimate     SE t-stat p-val (naive-t) Sig.
+## 1 (Intercept)   4.0617 0.0641 63.381          &lt;0.001  ***
+## 2   treatment   0.0433 0.0780  0.556           0.579
+```
+
+---
+
+# Hay selección
+
+
+```r
+##Pero hay selección, veamos un tabulado cruzado
+data.morocco %&gt;%
+  mutate(treatment=factor(treatment, levels=c(0,1),labels=c("Control", "Tratamiento"))) %&gt;% 
+  mutate(client=factor(client, levels=c(0,1),labels=c("No cliente", "Cliente"))) %&gt;% 
+  tabyl(treatment, client)
+```
+
+```
+##    treatment No cliente Cliente NA_
+##      Control       2101       0 165
+##  Tratamiento       1753     251 195
+```
+---
+
+# Ser cliente no es independiente
+
+
+```r
+#¿Ser cliente es independiente del tamaño del hogar?
+dif_members_client &lt;- lm(members_resid_bl ~ client + factor(paire), data=data.morocco)
+coef_test(dif_members_client, vcov = "CR1", 
+          cluster = data.morocco$demi_paire, test = "naive-t")[1:2,]
+```
+
+```
+##         Coef. Estimate    SE t-stat p-val (naive-t) Sig.
+## 1 (Intercept)     4.18 0.127  33.03          &lt;0.001  ***
+## 2      client     0.43 0.179   2.41          0.0172    *
+```
+
+--
+
+
+```r
+#¿El número de actividades es independiente de ser cliente?
+dif_activities_client &lt;- lm(act_number_bl ~ client + factor(paire), data=data.morocco)
+coef_test(dif_activities_client, vcov = "CR1", 
+          cluster = data.morocco$demi_paire, test = "naive-t")[1:2,]
+```
+
+```
+##         Coef. Estimate     SE t-stat p-val (naive-t) Sig.
+## 1 (Intercept)    1.109 0.2307   4.81          &lt;0.001  ***
+## 2      client    0.191 0.0681   2.81          0.0056   **
+```
+
+
+---
+# Próxima sesión
+
+- Hablaré sobre cómo estimar el LATE usando variables instrumentales
+
+  - Angrist, J. D. (2006). Instrumental variables methods in experimental criminological research: what, why and how. *Journal of Experimental Criminology*, 2(1), 23-44.
+
+- Usaremos R para terminar el análisis con cumplimiento imperfecto
+
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script src="libs/cols_macro.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
