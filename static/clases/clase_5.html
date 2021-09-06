@@ -331,10 +331,53 @@ el error estándar de `\(\hat{\beta}_k\)` será la raíz cuadrada de la `\(k\)`-
 
 - En economía usamos frecuentemente los valores `\(\alpha\)` de 0.10, 0.05 y 0.01 para juzgar la significancia de los estimadores
 
-  - Los correspondientes valores del estadístico `\(t\)` en muestras grandes son 
-
 - En evaluación, si el valor `\(p\)` es menor que `\(\alpha\)` decimos que el efecto es *estadísticamente significativo*
 
+
+---
+
+
+# Nota sobre los valores `\(t\)` críticos
+
+.pull-left[
+- Los correspondientes valores del estadístico `\(t\)` en muestras grandes para `\(\alpha\)` de 0.10, 0.05 y 0.01 son 2.56, 1.96 y 1.64
+
+- ¿Cómo puedo encontrar el valor `\(p\)` exacto de un estadístico `\(t\)` dado?
+
+
+```r
+(1-pnorm(abs(1.644854)))
+```
+
+```
+## [1] 0.04999996
+```
+
+- O uno menos arbitrario
+
+
+```r
+(1-pnorm(abs(-1.3)))
+```
+
+```
+## [1] 0.09680048
+```
+]
+
+.pull-right[
+- Y al revés, puedo siempre encontrar el estadístico `\(t\)` asociado a cierto valor `\(p\)`
+
+
+```r
+qnorm(1-(.1/2))
+```
+
+```
+## [1] 1.644854
+```
+- El 2 en las expresiones anteriores viene de que estamos en pruebas de dos colas con una distribución simétrica
+]
 ---
 
 # Prueba de hipótesis en evaluación
