@@ -2,7 +2,7 @@
 title: "LATE y variables instrumentales"
 author: "Irvin Rojas"
 institute: "CIDE"
-date: "9 de septiembre de 2021"
+date: "21 de septiembre de 2021"
 header-includes:
   - \usepackage{tikz}
   - \usetikzlibrary{shapes, shadows,arrows}
@@ -38,7 +38,7 @@ xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
 
 .title[
-# Clase 8. LATE y variables instrumentales
+# Clase 9. LATE y variables instrumentales
 ]
 .subtitle[
 ## Evaluación de Programas

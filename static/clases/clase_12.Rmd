@@ -1,0 +1,391 @@
+---
+title: "Número de rondas e hipótesis múltiples"
+author: "Irvin Rojas"
+institute: "CIDE"
+date: "28 de septiembre de 2021"
+header-includes:
+  - \usepackage{tikz}
+  - \usetikzlibrary{shapes, shadows,arrows}
+output:
+  xaringan::moon_reader:
+    css: [default, "libs/cide.css", metropolis-fonts, "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css", "https://use.fontawesome.com/releases/v5.7.2/css/all.css", "https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css"]
+    seal: false
+    chakra: "https://remarkjs.com/downloads/remark-latest.min.js"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      titleSlideClass: ["middle", "center"]
+      ratio: "16:9"
+      beforeInit: ["https://platform.twitter.com/widgets.js", "libs/cols_macro.js"]
+      navigation:
+        scroll: false
+
+
+---
+class: title-slide
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.path = "figures/")
+
+library(tidyverse)
+library(pacman)
+library(janitor)
+library(sandwich)
+#library(nnet)
+#library(mlogit)
+library(readr)
+library(clubSandwich)
+library(modelsummary)
+library(estimatr)
+
+p_load(tidyverse, foreign, reshape2, psych, qwraps2, forcats, readxl, 
+       broom, lmtest, margins, plm, rdrobust, multiwayvcov,
+       wesanderson, sandwich, stargazer,
+       readstata13, pscore, optmatch, kdensity, MatchIt, bootstrap, matlib, dplyr)
+
+xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
+```
+
+```{css, echo = FALSE}
+.huge .remark-code { /*Change made here*/
+  font-size: 200% !important;
+}
+.tiny .remark-code { /*Change made here*/
+  font-size: 60% !important;
+}
+```
+
+.title[
+# Clase 11. Hipótesis múltiples
+]
+.subtitle[
+## Evaluación de Programas Sociales
+]
+.author[
+### Irvin Rojas <br> [rojasirvin.com](https://www.rojasirvin.com/) <br> [<i class="fab fa-github"></i>](https://github.com/rojasirvin) [<i class="fab fa-twitter"></i>](https://twitter.com/RojasIrvin) [<i class="ai ai-google-scholar"></i>](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas <br> División de Economía
+]
+
+---
+# Agenda
+
+1. Discutir sobre métodos para solucinar el problema de la prueba de múltiples hipótesis
+
+1. Discutir sobre la definición de las variables dependientes para evitar el problema de las múltiples hipótesis
+
+---
+
+class: inverse, middle, center
+
+# Hipótesis múltiples
+
+---
+
+# Hipótesis múltiples
+
+- **Error tipo I**: concluir que hay un efecto de tratamiento cuando la $H_0$ es verdader, es decir, cuando $H_0:\;\beta_i=0$
+
+- En una investigación fijamos $\alpha$, la probabilidad de rechazar $H_0$ cuando $H_0$ es cierto
+
+- En economía trabajamos con $\alpha=0.05$ o $\alpha=0.01$
+
+- El problema con probar múltiples hipótesis es que inflamos la tasa de error tipo I
+
+--
+
+- Por ejemplo, si tenemos 100 hipótesis y si usamos un valor estándar de $\alpha=0.05$, esperaríamos rechazar 5 hipótesis *por suerte*
+
+
+---
+
+# Hipótesis múltiples
+
+.pull-left[
+- Si realizamos una prueba, la probabilidad de cometer un error es $\alpha$ y la de no cometer un error es $1-\alpha$
+
+- Si realizamos $n$ pruebas, la probabilidad de no cometer un error es $(1-\alpha)^n$ y la probabilidad de cometer al menos un error es $1-(1-\alpha)^n$
+
+- Es decir, la probabilidad de cometer al menos un error se incrementa exponencialmente
+]
+
+.pull-right[
+```{r echo=T, eval=T, fig.height= 5}
+alpha=0.05
+n <- 1:1000
+p <- 1-(1-alpha)^n
+
+plot(p,n, xlab="n", ylab="1-(1-alpha)^n")
+
+```
+]
+
+
+---
+
+# Hipótesis múltiples
+
+
+- Dos estrategias que abordaremos son:
+
+  - Controlar o ajustar $\alpha$
+  
+  - Crear índices que agreguen varias variables
+  
+---
+
+class: inverse, middle, center
+
+# Control del error tipo I
+
+---
+
+# Control del error tipo I
+
+- Popper (1995), Multiple Hypothesis Testing
+
+- Definimos *familias* de variables
+
+- Haremos el ajuste *hacia adentro* de estas familias
+
+- Antes habíamos estudiado de Banerjee et al. (2015)
+
+  - Seguridad alimentaria
+  - Consumo
+  - Activos
+  - Salud mental
+  
+- Dentro de cada familia tenemos $n$ hipótesis $H_i$, con un valor $p$ asociado $p_i$
+
+- Recordemos que $p_i$ es la probabilidad de que el estadístico $T_i$ exceda el valor teórico $t_i$
+
+- Ordenamos las hipótesis de menor a mayor,con $p_1$ siendo el valor más pequeño: $p_1\leq p_2\ldots \leq p_n$
+
+
+---
+
+# Método de Bonferroni
+
+- El método propuesto por Bonferroni controla la **tasa de error por familia** (FEWR por *family-wise error rate*) definida como la probabilidad de cometer al menos un error tipo I
+
+--
+
+- Consiste en rechazar $H_i$ si $p_i\leq \alpha_i$, donde $\alpha_i$ se escoge de forma que $\sum_i\alpha_i=\alpha$
+
+- Usualmente se hace $\alpha_i=\frac{\alpha}{n}$
+
+--
+
+- Por ejemplo, con dos tests y $\alpha=0.05$, $\alpha_i^B=0.025$
+
+--
+
+- Noten que esta corrección es bastante conservadora
+
+- También podemos ver este test como crear unos valores $p^B$ ajustados: $p_i^B=p_i\times n$
+
+---
+
+# Método de Hochberg
+
+- Si $p_j\leq \frac{\alpha}{n-j+1}$ para todo $j=1,\ldots,n$, rechazar todas las hipótesis $H_i$ para $i<j$
+
+- Visto de otro modo
+
+  - Rechazar todas las $H_i$ si $p_n\leq \alpha$
+  
+  - Si no, pasar a la hipótesis $n-1$. Rechazar las hipótesis $H_1,\ldots,H_{n-1}$ si $p_{n-1}\leq \frac{\alpha}{2}$
+  
+  - Continuar hasta encontrar la hipótesis $j$ tal que se rechacen las hipótesis $H_1,\ldots,H_{j}$
+
+---
+
+# ¿Por qué preocuparnos por la FWER?
+
+- La idea de la FWER tiene sentido si nos preocupa tener incluso un solo falso positivo
+
+- En la práctica, podemos vivir con algunos falsos positivos
+
+---
+
+# Método de Benjamini y Hochberg
+
+- Este método controla la tasa de falso descubrimiento
+
+- Si $V$ es el número de falsos rechazos (cuando rechazamos la $H_0$ que es verdadera) y si $R$ es el número total de rechazos, entonces $Q=V/R$ es la proporción de falsos rechazos
+
+- Al valor esperado de $Q$ se le conoce como **tasa de falsos rechazos** (FDR por *false discovery rate*)
+
+--
+
+- Sea $k$ el más grande de los $i$ tal que
+$$p_i\leq\frac{i}{n}\alpha$$
+entonces rechar todos los $H_i$ para $i=1,2,\ldots,k$
+
+- En la práctica usamos R
+
+
+---
+
+# Ejemplo: Benjamini & Hochberg (1995)
+
+.pull-left[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+
+data.pvalues<-read_csv("./data_benjamini_hochberg.csv",
+                       locale = locale(encoding = "latin1"))  
+n <- 15
+alpha <- 0.05
+```
+]
+
+.pull-right[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+data.pvalues
+```
+]
+
+
+---
+
+# Ejemplo: Bonferroni
+
+.pull-left[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+#Bonferroni
+data.bonferroni <- data.pvalues %>% 
+  mutate(bonferroni_alpha=alpha/n) %>% 
+  mutate(bonferrini_rechazar=ifelse(poriginal<=bonferroni_alpha,1,0))
+```
+]
+
+.tiny[
+.pull-right[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+data.bonferroni
+```
+]
+]
+
+
+---
+
+# Ejemplo: Hochberg
+
+.pull-left[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+#Hochberg
+data.hochberg <- data.pvalues %>% 
+  mutate(hochberg_alpha=alpha/(n-hipotesis+1)) %>% 
+  mutate(hochberg_rechazar=ifelse(poriginal<=hochberg_alpha,1,0))
+```
+]
+
+.tiny[
+.pull-right[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+data.hochberg
+```
+]
+]
+
+---
+
+# Ejemplo: Benjamini & Hochberg
+
+.pull-left[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+#Benjamini & Hochberg
+data.bh <- data.pvalues %>% 
+  mutate(bh_alpha=alpha*hipotesis/n) %>% 
+  mutate(bh_rechazar=ifelse(poriginal<=bh_alpha,1,0))
+```
+]
+
+.tiny[
+.pull-right[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+data.bh
+```
+]
+]
+
+---
+
+class: inverse, middle, center
+
+# Índices
+
+---
+
+# Creación de $z$-scores
+
+- Otra forma comúnmente usada de evitar el problema de las múltiples hipótesis es crear índices
+
+- Kling, Liebmand y Katz (2007) proponen el siguiente promedio de los $z$-score para generar un solo índice
+
+  1. Definir las familias y las variables que componen cada familia, donde $y_{ij}$ es la $j$ésima variable en la familia con $J$ variables
+  
+  1. Definir las varibles $y_{ij}$ de tal forma que mayores valores se interpreten como *mejora*
+  
+  1. Crear $z_{ij}$ como $z_{ij}=\frac{y_{ij}-\bar{y_j}^C}{sd(y_j)^C}\sim(0,1)$, es decir, estandarizar cada una de las $J$ variables usando al grupo de control como referencia
+  
+  1. Crear $z_i$, un solo índice para cada individuo que agregue los $J$ índices creados antes
+
+- El procedimiento descrito en Banerjee et al. (2015) es bastante general, pues incluye el caso donde hay varias rondas de seguimiento y varios países
+  
+---
+
+# Creación de $z$-scores
+
+- Podemos escribir el índice descrito como
+
+  $$z_i=\frac{(\frac{1}{J}\sum_j z_{ij})-\bar{z}_j^C}{sd(z_j^C)}$$
+
+- Esta transformación tiene la ventaja de que en la siguiente regresión de efecto de tratamiento
+
+$$z_i=\alpha+\beta T_i + X_i'\gamma+\varepsilon_i$$
+
+el coeficiente $\beta$ se interpreta como el efecto del tratamiento medido en desviaciones estándar con respecto a la media del grupo de control
+
+--
+
+- Noten que todos las variables dentro de la familia *pesan* igual
+
+- Quizás nos gustaría tomar en cuenta la correlación entre las variables dentro del índice
+
+---
+
+# Índice de Anderson
+
+- Anderson (2008) propone el siguiente índice, que puede verse como una generalización del de Kling:
+
+$$\bar{s}_i=\frac{1}{W_{i}}\sum_{j\in J} w_j z_{ij}$$
+- $w_j$ es el peso para la variable $j$ y $W_i=\sum_{j\in J}w_{j}$
+
+- Los pesos son una función de la matriz de covarianzas entre las variables que conforman la familia
+
+---
+
+# Próxima sesión
+
+- Continuaré con para afinar la estimación, ahora hablando sobre errores estándar y formas alternativas de hacer inferencia 
+
+  - MHE, Capítulo 8
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+
+

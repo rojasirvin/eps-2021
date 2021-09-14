@@ -21,4 +21,8 @@ weight: 70
 
 [Clase 7](https://eps-2021.netlify.app/clases/clase_7.html#1). Métodos experimentales en R
 
-[Clase 8](https://eps-2021.netlify.app/clases/clase_8.html#1). LATE y variables instrumentales
+Clase 8. Aplicaciones de métodos experimentales
+
+- [Reporte 1](/uploads/reporte_1.pdf)
+
+[Clase 9](https://eps-2021.netlify.app/clases/clase_9.html#1). LATE y variables instrumentales
