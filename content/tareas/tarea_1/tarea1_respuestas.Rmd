@@ -1,0 +1,294 @@
+---
+title: "Respuestas a la tarea 1"
+summary: " "
+weight: 2
+type: book
+toc: false
+---
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+library(janitor)
+library(sandwich)
+#library(nnet)
+#library(mlogit)
+library(readr)
+library(clubSandwich)
+library(modelsummary)
+library(estimatr)
+
+xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
+```
+
+# Respuestas
+
+## Pregunta 1
+
+Suponga que para un experimento en un laboratorio se asignó a un grupo pacientes a un brazo de tratamiento o a uno de control. Antes de comenzar el experimento se recolectaron una serie de características $x_{ji}$, $j=1,\ldots 10$, de cada paciente. Se busca medir el efecto del tratamiento sobre una variable de resultados $y_i$. En el experimento, se trabaja con $\alpha=0.10$.
+
+a. [5 puntos] El investigador A quedó a cargo de comprobar el balance de la asignación del tratamiento y le reporta lo siguiente:
+
+    *Para verificar que la aleatorización fue exitosa, tomé la serie de variables pre-intervención y la dummy de asignación al tratamiento $T_i$ para correr la siguiente regresión:*
+$$T_i=\alpha+\sum_{j=1}^{10}x_{ji}'\beta +\varepsilon_i$$
+
+    *Después realicé una prueba $F$ de significancia conjunta sobre los coeficientes $\beta_j$ que resultó tener un valor $p$ de 0.52.*
+
+    Explique cuál es la hipótesis nula en la prueba realizada y qué se esperaría de haberse logrado una aleatorización exitosa del tratamiento.
+
+    *Si la integridad del diseño se mantuvo durante el experimento, se esperaría que las características observables no predijeran el estado de tratamiento. En otras palabras, esperaríamos que los coeficientes en su conjunto no fueran significativos. Es decir, $H_0: \beta_1=\beta_2=\ldots=\beta_k=0$. La hipótesis nula se rechaza si la probabilidad de observar el estadístico $F$ es mayor que el valor de $\alpha$ elegido para el estudio.*
+
+b. [5 puntos] ¿Qué concluye a partir de lo que le reporta el investigador A?
+
+    *Un valor $p$ grande indica que es altamente probable observar el estadístico $F$ bajo la $H_0$. Por tanto, no rechazamos la $H_0$ y concluimos que no existe evidencia de que las características observables sean predictores del estado de tratamiento. En otras palabras, no hay evidencia de que el experimento esté comprometido.*
+    
+a. [5 puntos] Por otro lado, el investigador B le reporta lo siguiente:
+
+    *Yo realicé un análisis para determinar el balance en la asignación del tratamiento. Para cada una de las características $x_{ji}$ corrí la siguiente regresión:*
+$$x_{ji}=\gamma+\pi T_i+u_i$$
+*A continuación, le reporto una tabla con los valores p asociados al coeficiente estimado de $\pi$ en cada una de las 10 regresiones.*
+
+    | **Característica** |	**Valor $p$** || **Característica** |	**Valor $p$**
+    |--- | --- |---|---|---|
+    | $x_{1i}$	| 0.25 | |$x_{6i}$	| 0.15 |
+    | $x_{2i}$	| 0.12 | |$x_{7i}$	| 0.33 |
+    | $x_{3i}$	| 0.27 | |$x_{8i}$	| 0.19 |
+    | $x_{4i}$	| 0.76 | |$x_{9i}$	| 0.28 |
+    | $x_{5i}$	| 0.02 | |$x_{10i}$	| 0.17 |
+    
+    Explique la hipótesis nula detrás de las pruebas que realizó el investigador B y qué se esperaría de haberse logrado una aleatorización exitosa del tratamiento,
+
+    *Otra forma de proveer evidencia de la integridad del tratamiento es analizando el balance de las características observadas entre grupos de tratamiento. En este caso, si las medias de cada $x_{ij}$ entre los grupos de tratados y de control son iguales, esperaríamos que el coeficiente $\pi$ fuera no significativo. Con el nivel de significancia de $\alpha=0.10$, rechazamos la $H_0$ solo una vez, por lo que no hay evidencia de que la asignación no fue aleatoria.*
+
+a. [5 puntos] ¿Cómo reconcilia la evidencia encontrada por el investigador A y el B y qué concluye sobre el balance en la asignación del tratamiento? ¿Qué características tendría una diferencia de medias de $y_i$ después del tratamiento como estimador del impacto de este?
+
+    *La evidencia reportada por los investigadores A y B es totalmente consistente entre sí. El investigador A concluye que el tratamiento no se puede predecir usando las características observables. Por su parte, el investigador B muestra que las características observables son estadísticamente iguales entre los grupos de tratamiento y de control. Por tanto, hay evidencia de que la asignación del tratamiento efectivamente fue aleatoria. Bajo este supuesto, una diferencia de medias de $y_i$ entre tratados y controles resulta en un estimador insesgado y consistente del efecto de tratamiento.*
+
+## Pregunta 2
+
+Suponga que desea evaluar el impacto de una vacuna contra el covid-19. Asuma que dispone de ilimitados recursos financieros y humanos. Considere por ahora a todos los tipos de vacunas como un mismo tratamiento. Se desea estudiar la efectividad de las vacunas para reducir la probabilidad de ser hospitaliazado por covid-19.
+
+a. [10 puntos] Describa cómo diseñaría su experimento ideal para  determinar la efectividad de la vacuna para reducir la probabilidad de hospitalización.
+
+    *Una posible propuesta de experimento ideal consistiría en seleccionar aleatoriamente localidades de tratamiento y control. Antes del inicio de la vacunación, se recolectaría información sociodemográfica de una muestra de individuos y de las características de las localidades en los grupos tratados y de control para determinar si efectivamente ambos tipos de localidades tienen características similares.*
+
+    *Varias semanas después del inicio del programa de vacunación, se deberá recolectar información para construir la tasa de hospitalización por localidad. Bajo los supuestos de asignación aleatoria y SUTVA, se pueden comparar las tasas de hospitalización entre localidades de tratamiento y control para determinar si efectivamente las localidades tratadas tiene una tasa de hospitalización menor que sus contrapartes de control.*
+
+a. [5 puntos] Escriba la regresión que usaría para estimar los efectos de las medidas implementadas en una variable de mortalidad.
+
+    *Si el diseño permitió generar grupos estadísticamente idénticos de localidades tratadas y y de control, podemos evaluar el impacto de la intervención estimando:*
+$$y_i=\alpha+\beta T_i+X_i'\Gamma+\varepsilon_i$$
+*donde $y_i$ es la tasa de hospitalización por localidad, $T_i$ es un indicador del estado de tratamiento y $X_i$ es un vector de características observables de las localidades.*
+
+a. [5 puntos] ¿Cuáles considera que serían las distintas dificultades prácticas, institucionales y éticas en la implementación de su experimento ideal?
+
+    *La evaluación propuesta permitiría identificar el efecto a nivel localidad de una política que tiene impactos sobre la salud de las personas. Esto supondría un debate ético si asumimos que la vacunación solo puede mejorar la salud de las personas (y, el peor de los casos, no hacer nada). ¿Cómo se puede justificar de forma ética el realizar la intervención antes descrita sobre un subgrupo de la población?*
+    
+    *Un problema adicional en la implementación es la posibilidad de que las personas de las localidades de control reciban la vacuna. A menos de que hubiera restricciones físicas para evitar que esto sucediera, es posible que el experimento se vea comprometido y que el efecto estimado esté sesgado.*
+    
+    *Noten que en esta pregunta no hay una sola respuesta correcta.*
+
+## Pregunta 3
+
+Replique el ejercicio de representar la FEC de salarios en función de educación para México, como en la Figura 3.1.1 de MHE (p. 39), usando los datos del primer trimestre de 2021 de la ENOE. El gráfico es complejo, pero recibirá crédito completo si reproduce, al menos por separado, los dos siguientes tipos de gráficos:
+
+a.	[10 puntos] Gráfico de la relación promedio entre años de educación e ingresos.
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE, cache=TRUE}
+#Del laboratorio 1 tomo la base data_empleo1. Si hago un colnames(data_socdem) puedo ver las variables que inclue la base.
+    
+
+data_socdem<-read_csv(
+  "./ENOEN_SDEMT121.csv",
+  locale=locale(encoding="latin1")) %>% 
+  clean_names()
+    
+colnames(data_socdem)
+    
+#Un vistazo a los archivos de las bases me permite identificar que anios_esc es la variable de años de educación e ingocup me da el ingreso laboral mensual
+
+#Elijo quedarme con personas de más de 15 años y que se consideren parte de la PEA y calculo el log de los ingresos semanales
+data_fec <- data_socdem %>%
+  filter(anios_esc<=20) %>% 
+  filter(clase1==1) %>% 
+  mutate(ing.mensual=ingocup/4.3) %>% 
+  mutate(lingreso=ifelse(ing.mensual>0,log(ing.mensual),NA))
+
+#FEC:
+library(srvyr) #Para trabajar con los pesos
+
+g1 <- data_fec %>%
+      as_survey(weights = c(fac_tri)) %>%
+      group_by(anios_esc) %>%
+      summarize(lingreso=survey_mean(lingreso, na.rm = TRUE)) %>%
+      ggplot(aes(anios_esc, lingreso)) +
+      geom_line() +
+  labs(title ="Función de esperanza condicional",
+       caption="Fuente: datos de la ENOE, T12021")+
+  ylab("Log del ingreso semanal (MXN)")+
+  xlab("Años de educación")+
+  scale_x_continuous(breaks = c(0,2,4,6,8,10,12,14,16,18,20))
+
+g1
+```
+
+a.	[10 puntos] Gráfico de la distribución de ingresos para cuatro niveles de educación que usted considere relevante destacar. Argumente sobre los niveles de educación elegidos.
+
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE, cache=TRUE}
+#Densidad por grupos
+#Con algo más de talacha podríamos superponerla
+#sobre la FEC
+
+g2 <- data_fec %>%
+  filter(anios_esc==c(6,12,15,18)) %>% 
+  ggplot(aes(y=lingreso))+
+  geom_density(aes(weight=fac_tri), bw = 0.09)+
+  facet_wrap(anios_esc~.,nrow=1) +
+  labs(title ="Función de densidad de salarios",
+       subtitle ="Cuatro años de educación seleccionados",
+         caption="Fuente: datos de la ENOE, T12021")+
+  ylim(6, 10) +
+  ylab("Log del ingreso semanal (MXN)")+
+  xlab("Densidad")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size=8))
+
+g2
+```
+
+## Pregunta 4
+
+Use los datos del archivo *STAR_public_use.csv* para este problema. En este problema replicará la fila correspondiente a la variable **age** de la Tabla 1 en [Angrist et al. (2009)](https://pubs.aeaweb.org/doi/pdfplus/10.1257/app.1.1.136).[^1]
+  
+[^1]: Angrist, J., Lang, D., y Oreopoulos, P. (2009). Incentives and services for college achievement: Evidence from a randomized trial. *American Economic Journal: Applied Economics*, 1(1), 136-63.
+
+a. [5 puntos] Obtenga la media y la desviación estándar de la edad, **age**, en el grupo de control (columna 1), restringiendo la muestra a aquellos individuos con **noshow** igual a 0.
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+data.angrist<-read_csv("./STAR_public_use.csv",
+                       locale = locale(encoding = "latin1"))   %>% 
+  clean_names() %>% 
+      filter(noshow==0)
+
+#Estadística descriptiva
+
+data.angrist %>% 
+    filter(control==1) %>% 
+  summarize(media=mean(age))
+
+data.angrist %>% 
+      filter(control==1) %>%
+  summarize(desvest=sd(age)) 
+
+data.angrist %>% 
+  summarize(numero=n())
+
+```
+
+a. [10 puntos] Usando una regresión lineal, muestre que los distintos tratamientos son independientes de la edad. De nuevo, debe restringir la muestra quienes tienen **noshow** igual a 0. Reporte los coeficientes y los errores estándar (columnas 2 a 4).
+
+```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+#Balance de características
+balance<-lm(age~ ssp + sfp+ sfsp,
+            data=data.angrist)
+
+summary(balance)
+    
+```
+
+a. [5 puntos] Realice una prueba de significancia conjunta de los coeficientes obtenidos en el punto b. Reporte el estadístico $F$ y el valor $p$ asociado (columna 5).
+
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+#La prueba F ya está realizada con la regresión. Basta con pedirla
+summary(balance)$fstatistic
+
+#En la salida puedo ver el valor de F. ¿Pero cómo puedo calcularl p?
+pvalue<-pf(summary(balance)$fstatistic[1],
+           summary(balance)$fstatistic[2],
+           summary(balance)$fstatistic[3],
+           lower.tail=FALSE)
+pvalue
+```
+
+## Pregunta 5
+
+Nuevamente, use los datos del archivo *STAR_public_use.csv* para este problema. En este problema, replicará dos columnas del efecto de tratamiento de la Tabla 5. Note que de nuevo se deben usar solo las observaciones que tienen **noshow** igual a 0. Además, note que se usan las siguientes variables de control: **sex**, **mtongue**, **hsgroup**, **numcourses_nov1**, **lastmin**, **mom_edn**, y **dad_edn**, todas ellas categóricas.
+
+Antes de estimar los efectos, los autores sustituyen **gpa_year1** por NA cuando **grade_20059_fall** es NA y sustituyen **grade_20059_fall** por NA cuando **gpa_year1** es NA Esto le permitirá quedarse con los individuos que tienen información completa.
+
+a.	[10 puntos] Estime el efecto de cada tipo de tratamiento sobre el *GPA*, es decir, sobre la variable **gpa_year1**, para toda la muestra (Panel B, columna 1). Calcule correctamente los errores estándar. Interprete los resultados.
+
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+#Efecto de tratamiento
+    
+data.angrist <- data.angrist %>% 
+      mutate(gpa_year1=ifelse(is.na(grade_20059_fall),NA,gpa_year1),
+             grade_20059_fall=ifelse(is.na(gpa_year1),NA,grade_20059_fall))
+    
+reg1<-lm(gpa_year1 ~ ssp + sfp+ sfsp+
+           factor(sex)+
+           factor(mtongue)+ factor(hsgroup)+factor(numcourses_nov1)+
+           factor(lastmin)+
+           factor(mom_edn)+
+           factor(dad_edn),
+         data=data.angrist)
+
+#Noten que los coeficientes estimados son correctos
+summary(reg1)$coef[1:4,]
+
+#Los errores estándar correctos son los robustos:
+coeftest(reg1, vcov = vcovHC(reg1, "HC1"))[1:4,]
+
+#Finalmente, lo que se reporta en la tabla como la media del grupo de control no es la constante en la regresión, sino la simple media y desviación
+
+data.angrist.reg <- data.angrist %>% 
+  filter(!is.na(gpa_year1) & !is.na(grade_20059_fall)
+         & !is.na(ssp)
+         & !is.na(sfp)
+         & !is.na(sfsp)
+         & !is.na(sex)
+         & !is.na(mtongue)
+         & !is.na(hsgroup)
+         & !is.na(numcourses_nov1)
+         & !is.na(lastmin)
+         & !is.na(mom_edn)
+         & !is.na(dad_edn))
+
+data.angrist.reg %>%
+  filter(control==1) %>%
+  summarize(media=mean(gpa_year1,na.rm=TRUE))
+
+data.angrist.reg %>%
+  filter(control==1) %>%
+  summarize(desvest=sd(gpa_year1,na.rm=TRUE))
+
+data.angrist.reg %>%
+  summarize(numero=n())
+```
+    *Los individuos en los grupos de tratamiento SSP o SFP no tienen diferencias significativas en términos de su puntaje, con respecto al grupo de control. En cambio, los individuos tratados con SFSP tienen en promedio 0.21 puntos más que los del grupo de control, y esta diferencia es estadísticamente significativa, con un nivel de confianza de 95\%.*
+    
+a. [10 puntos] Estime el efecto de recibir cada tipo de tratamiento, considerando los tratamientos SSP o SFP (de cualquier tipo) en las mujeres de la muestra (Panel B, columna 6). Esto es, considere el tratamiento SSP como un primer tipo de tratamiento y, ya sea SFP o SFSP, como un segundo tipo de tratamiento. Calcule correctamente los errores estándar. Interprete sus resultados.
+
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+#Efecto de cualquier tratamiento solo en mujeres
+data.angrist <- data.angrist %>%
+      mutate(sspany = ifelse(sfp == 1 | sfsp == 1, 1, 
+    0))
+    
+reg2<-lm(gpa_year1 ~ ssp + sspany+
+           factor(mtongue)+
+           factor(hsgroup)+
+           factor(numcourses_nov1)+
+           factor(lastmin)+
+           factor(mom_edn)+
+           factor(dad_edn),
+         data=filter(data.angrist,female==1))
+
+#Los coeficientes con los errores correctos son:
+coeftest(reg2, vcov = vcovHC(reg2, "HC1"))[1:3,]
+```
+
+    *No existe un efecto significativo del tratamiento SSP en las mujeres de la muestra. En cambio, las mujeres tratadas con SFP o SFSP tienen 0.15 puntos más en su calificación del primer año que las mujeres del grupo de control. Esta diferencia es estadísticamente significativa a un nivel de significacia del 5\%.*
