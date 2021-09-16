@@ -17,10 +17,7 @@ library(readr)
 library(clubSandwich)
 library(modelsummary)
 library(estimatr)
-<<<<<<< HEAD
 library(lmtest)
-=======
->>>>>>> cbb17142789a793eb615ef504c2a3a256ace9a99
 
 xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
