@@ -23,6 +23,9 @@ weight: 70
 
 Clase 8. Aplicaciones de métodos experimentales
 
-- [Reporte 1](/uploads/reporte_1.pdf)
+  - De La O, A. L. (2013). Do conditional cash transfers affect electoral behavior? Evidence from a randomized experiment in Mexico. *American Journal of Political Science*, 57(1), 1-14.
+
+  - [Diapositivas](/uploads/De_la_O_diapositvas.pdf)
+  - [Resumen](/uploads/De_la_O_resumen.pdf)
 
 [Clase 9](https://eps-2021.netlify.app/clases/clase_9.html#1). LATE y variables instrumentales
