@@ -2,7 +2,7 @@
 title: "Errores estándar e inferencia"
 author: "Irvin Rojas"
 institute: "CIDE"
-date: "21 de septiembre de 2021"
+date: "23 de septiembre de 2021"
 header-includes:
   - \usepackage{tikz}
   - \usetikzlibrary{shapes, shadows,arrows}
@@ -482,13 +482,8 @@ $$\small V(\hat{\beta}_{agrup.})=\left(\begin{matrix} \hat{\sigma}_{1,1}^2 & \ha
 
 # Próxima sesión
 
-- Hablaré sobre inferencia por aleatorización
+- Hablaremos sobre los problemas que surgen cuando probamos múltiples hipótesis y cómo solucionamos estos problemas
 
-  - Ho, D. E., & Imai, K. (2006). Randomization inference with natural experiments: An analysis of ballot effects in the 2003 California recall election. *Journal of the American Statistical Association*, 101(475), 888-900.
-  
-- Discutiremos cómo lo que hemos visto sobre errores e inferencia está implementado en
-
-  - Rojas Valdes, R.I., Wydick, B., & Lybbert, T.J. (2020). Can Hope Elevate Microfinance? Evidence from Oaxaca, Mexico. Forthcoming in *Oxford Economic Papers*.
 ---
 
 class: center, middle
