@@ -271,7 +271,7 @@ $$
 
 --
 
-- Es decir, el efecto causal de $Z$ sobre $Y$ para $i$ es el producto del efecto causal de $D$ sobre $Y$ y del efecto causal de $Z$ sobre $Y$:
+- Es decir, el efecto causal de $Z$ sobre $Y$ para $i$ es el producto del efecto causal de $D$ sobre $Y$ y del efecto causal de $Z$ sobre $D$:
 
 $$
 \underbrace{Y_i(1,D_i(1))-Y_i(0,D_i(0))}_B=(Y_i(1)-Y_i(0))(D_i(1)-D_i(0))
@@ -386,9 +386,9 @@ scroll_box(t1, height="60%")
 
 # LATE y TT
 
-- En general el LATE y el TT difieren
+- En general el LATE y el TT (TOT o ATET) difieren
 
-- Pero recordemos que $TOT=E(y_{1i}-y_{0i}|D_i=1)$
+- Pero recordemos que $TT=E(y_{1i}-y_{0i}|D_i=1)$
 
 - Noten que en el conjunto con $D_i=1$ se encuentran los cumplidores y los siempre adoptadores
 
@@ -440,7 +440,7 @@ $$\lambda_{LATE}=\frac{\rho}{\phi}$$
 
 - $y_i$: tasa de reincidencia en conductas de violencia doméstica
 
-- $T_i=\begin{cases} 1\quad \text{si apercibido} \\ 0\quad \text{otro caso}\ \end{cases}$
+- $Z_i=\begin{cases} 1\quad \text{si apercibido} \\ 0\quad \text{otro caso}\ \end{cases}$
 
 --
 
@@ -469,7 +469,7 @@ t <- asignacion %>%
       escape = FALSE,
       full_width = FALSE) %>%
   kable_paper(c("hover", "condensed", "responsive")) %>%
-        add_header_above(c(" ", "Traamiento recibido:"=2, " "),
+        add_header_above(c(" ", "Tramiento recibido:"=2, " "),
                    bold = TRUE,
                    background = "white") %>% 
       add_header_above(c("Tratamiento asignado y recibido en casos de violencia doméstica" = 4 ),
@@ -513,7 +513,7 @@ scroll_box(t, height="60%")
 
 - La primera etapa es el efecto causal en la probabilidad de recibir el tratamiento de apercibimiento por el hecho de haber sido asignado a ese tratamiento: $E(D_i|Z_i=1)-E(D_i|Z_i=0)=0.797-0.011=0.786$
   
-- La forma reducida es el efecto causal de la asignación al tratamiento sobre la tasa de reincidencia: $E(y_i|Z_i=1)-E(y_i|Z_i=0)=0.211-0.097=0.0.114$
+- La forma reducida es el efecto causal de la asignación al tratamiento sobre la tasa de reincidencia: $E(y_i|Z_i=1)-E(y_i|Z_i=0)=0.211-0.097=0.114$
 
 --
 
@@ -556,8 +556,8 @@ $$y_i=\alpha+\lambda D_i+\varepsilon_i$$
 
 $$
 \begin{aligned}
-E(y_i|z_i=1)&=\beta+\lambda E(D_i| z_i=1) \\
-E(y_i|z_i=0)&=\beta+\lambda E(D_i| z_i=0) \\
+E(y_i|z_i=1)&=\alpha+\lambda E(D_i| z_i=1) \\
+E(y_i|z_i=0)&=\alpha+\lambda E(D_i| z_i=0) \\
 \end{aligned}
 $$
 - Restando: 
@@ -594,7 +594,7 @@ donde $\phi_i$ es el efecto causal de la asignación sobre el cumplimiento
 
 # Mínimos cuadrados en dos etapas (MC2E)
 
-- Podemos concevir el problema como uno en el que primero se estima la primera etapa y se sustituyen los valores ajustados de $D_i$ en el modelo estructural
+- Podemos concebir el problema como uno en el que primero se estima la primera etapa y se sustituyen los valores ajustados de $D_i$ en el modelo estructural
 
 - Sustituyendo la primera etapa en el modelo estructural
 
