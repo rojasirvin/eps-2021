@@ -1,6 +1,6 @@
 ---
 title: "Tarea 2"
-summary: "Jueves 30 de septiembre a las 8:00"
+summary: "Lunes 4 de octubre a las 17:00"
 weight: 1
 type: book
 toc: false
@@ -18,68 +18,123 @@ toc: false
 </div>
 <div id="fecha-de-entrega" class="section level2">
 <h2>Fecha de entrega</h2>
-<p>Jueves 30 de septiembre a las 8:00.</p>
+<p>Lunes 4 de octubre a las 20:00.</p>
 </div>
 <div id="archivos" class="section level2">
 <h2>Archivos</h2>
+<p><a href="/tareas/tarea_2/crepon_morocco_balance.csv">crepon_morocco_balance.csv</a></p>
 <p><a href="/tareas/tarea_2/crepon_morocco_analysis.csv">crepon_morocco_analysis.csv</a></p>
 <p><a href="/tareas/tarea_2/STAR_public_use.csv">STAR_public_use.csv</a></p>
 <p><a href="/tareas/tarea_2/pvalues.csv">pvalues.csv</a></p>
 </div>
 <div id="pregunta-1" class="section level2">
 <h2>Pregunta 1</h2>
-<p>En la Sesión 7 introducimos los datos de una intervención en Marruecos en la que un producto financiero fue ofrecido de manera aleatoria, pero la adopción del producto obedeció a un proceso de selección. Para este problema use la base <em>crepon_morocco_analysis.csv</em>, que tiene un subconjunto de los datos usados en dicha sesión ya listos para su análisis. La variable <strong>treatment</strong> contiene la variable de tratamiento y la variable <strong>client</strong> es la variable de adopción. En esta pregunta nos enfocaremos en el efecto causal de la adopción en el gasto total de los hogares, <strong>expense_total</strong>.</p>
+<p>En Crepon et al. (2015)<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> se estudia una intervención en Marruecos en la que se estudia el efecto de la <em>adopción</em> de microfinanzas, a través de un experimento de campo. En 81 de 162 localidades estudiadas se introdujo aleatoriamente una empresa de microfinanzas. Para seleccionar las localidades de tratamiento, primero se <em>emparejaron</em> localidades de acuerdo a características observables y, para cada pareja se asignó a tratamiento y otra a control. La base de datos <em>crepon_morocco_balance.csv</em> contiene los datos de este estudio usados para mostrar la integridad del diseño. La variable <strong>treatment</strong> es la variable de asignación aleatoria, mientras que la variable <strong>client</strong> es la variable de adopción</p>
 <ol style="list-style-type: lower-alpha">
-<li><p>[5 puntos] Primero mostraremos cómo el estimador de Wald es equivalente al estimador de VI cuando no hay controles y cuando las variables de asignación y adopción son binarias. Obtenga el estimador de Wald como el cociente de la diferencia en gasto total promedio entre los hogares asignados a tratamiento y control dividido por la diferencia en la probabilidad de adopción entre los hogares asignados a tratamiento y control.</p></li>
-<li><p>[5 puntos] Ahora estime por MC2E el efecto de la adopción sobre el gasto total, usando la variable de asignación como instrumento para la adopción. ¿Qué ventaja observa con respecto al estimador de Wald? En R, la función <em>ivreg</em> del paquete <em>AER</em> le permite hacer la estimación de MC2E.</p></li>
-<li><p>[3 puntos] Estime la forma reducida del efecto de ser asignado al tratamiento sobre gasto total. Comente los resultados, en particular, comente sobre la magnitud y la significancia estadística de la variable <strong>treatment</strong>. Aquí y en adelante, incluya los siguientes controles en la regresión: <strong>members_resid_bl</strong>, <strong>nadults_resid_bl</strong>, <strong>head_age_bl</strong>, <strong>act_livestock_bl</strong>, <strong>act_business_bl</strong>, <strong>borrowed_total_bl</strong>, <strong>members_resid_d_bl</strong>, <strong>nadults_resid_d_bl</strong>, <strong>head_age_d_bl</strong>, <strong>act_livestock_d_bl</strong>, <strong>act_business_d_bl</strong>, <strong>borrowed_total_d_bl</strong>, <strong>ccm_resp_activ</strong>, <strong>other_resp_activ</strong>, <strong>ccm_resp_activ_d</strong> y <strong>other_resp_activ_d</strong>. Además, incluya efectos fijos por pareja introduciendo la variable <strong>paire</strong> como factor. Y finalmente, para realizar inferencia, reporte los errores estándar agrupados a nivel <strong>demi_paire</strong> usando la función <em>coef_test</em> del paquete <em>clubSandwich</em>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p></li>
-<li><p>[2 puntos] Estime ahora la <strong>primera etapa</strong>, es decir, estime por MCO el efecto causal de la asignación sobre la adopción. Use los mismos controles que en la parte c. Comente sobre la magnitud, la significancia estadística y la interpretación de la variable <strong>treatment</strong> en términos del comportamiento de los <strong>cumplidores</strong>.</p></li>
-<li><p>[5 puntos] Considere la columna 3 del panel A en la Tabla 9 del artículo. Aquí se reporta la estimación por MCO de la relación entre <strong>client</strong> y gasto total, con los mismos controles y tipo de errores que en c. Replique este resultado. ¿Se puede interpretar de forma causal el coeficiente sobre <strong>client</strong>?</p></li>
+<li><p>[3 puntos] Primero recordaremos cómo mostrar que el tratamiento efectivamente fue asignado de manera aleatoria. El siguiente código carga la base de datos que debemos usar y se queda con las observaciones de la línea base. Con estos datos, mostraremos que la variable <strong>members_resid_bl</strong>, que indica el número de personas que viven en promedio en cada igual, está balanceada entre los grupos asignados a tratamiento y control. Noten que la media del número de personas que viven en el hogar en el grupo de control es 5.14 (d.e. 2.70) y que hay 2,266 hogares en dicho grupo de control. Esto es exactamente lo que se reporta en la primera fila de la tabla 1 del artículo.</p>
+<pre class="r"><code>data.morocco &lt;- read_csv(&quot;./crepon_morocco_balance.csv&quot;, locale = locale(encoding = &quot;latin1&quot;)) %&gt;% 
+    clean_names() %&gt;% filter(merge_indicator != 1)
+
+data.morocco %&gt;% group_by(treatment) %&gt;% summarize(mean = mean(members_resid_bl), 
+    std = sd(members_resid_bl), n = n()) %&gt;% ungroup()
+## # A tibble: 2 x 4
+##   treatment  mean   std     n
+##       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+## 1         0  5.14  2.69  2266
+## 2         1  5.19  2.76  2199</code></pre>
+<p>Obtenga ahora el valor de la diferencia entre el grupo de tratamiento y el de control, así como su valor p (últimas dos columnas). Para ello, estime una regresión en la que la variable dependiente sea el tamaño del hogar <strong>members_resid_bl</strong>, en función de la variable de asignación <strong>treatment</strong> y variables dummy de pareja de localidad (la variable <strong>paire</strong> indica cuáles son las parejas). La regresión permite recuperar la diferencia de 0.04 miembros del hogar promedio que se reporta en la primera fila de la tabla 1. Para recuperar el valor <span class="math inline">\(p\)</span>, estime errores agrupados usando la variable <strong>demi_paire</strong> como variable de agrupación. Una forma de realizar esto es con la función <em>coef_test</em> del paquete <em>clubSandwich</em>.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p></li>
+<li><p>[2 puntos] Ahora mostremos que efectivamente este es un ejemplo de una intervención con cumplimiento imperfecto. Genere un cuadro que indique: 1) cuántas personas que fueron asignadas a recibir el tratamiento efectivamente fueron clientes; 2) cuántas personas que fueron asignadas a recibir el tratamiento no se convirtieron en clientes; 3) cuántas personas que no fueron asignadas a recibir el tratamiento sí se convirtieron en clientes; y 4) cuántas personas que no fueron asignadas a recibir el tratamiento tampoco se convirtieron en clientes.</p></li>
+<li><p>[5 puntos] Ahora mostraremos que la adopción, es decir, convertirse en cliente, no es independiente de las características de los hogares. Por ejemplo, considere las variables <strong>members_resid_bl</strong> y <strong>act_number_bl</strong>, que indican el número de miembros del hogar y el número de actividades económicas del hogar. Para cada una de estas dos variables, utilice la misma especificación que en la parte a., pero ahora para usando la variable <strong>cliente</strong> como regresor. ¿Qué concluye?</p></li>
+<li><p>[5 puntos] Con estos elementos estamos convencidos de que es necesario emplear lo que sabemos sobre cumplimiento imperfecto. Usaremos ahora los datos en <em>crepon_morocco_analysis.csv</em>, que contiene los datos empleados para evaluar el impacto de la adopción. Estos datos están listos para analizarse. Estime la forma reducida del efecto de ser asignado al tratamiento sobre gasto total, <strong>expense_total</strong>. Comente los resultados, en particular, comente sobre la magnitud y la significancia estadística de la variable <strong>treatment</strong>. Aquí y en adelante, incluya los siguientes controles en la regresión: <strong>members_resid_bl</strong>, <strong>nadults_resid_bl</strong>, <strong>head_age_bl</strong>, <strong>act_livestock_bl</strong>, <strong>act_business_bl</strong>, <strong>borrowed_total_bl</strong>, <strong>members_resid_d_bl</strong>, <strong>nadults_resid_d_bl</strong>, <strong>head_age_d_bl</strong>, <strong>act_livestock_d_bl</strong>, <strong>act_business_d_bl</strong>, <strong>borrowed_total_d_bl</strong>, <strong>ccm_resp_activ</strong>, <strong>other_resp_activ</strong>, <strong>ccm_resp_activ_d</strong> y <strong>other_resp_activ_d</strong>. Además, incluya efectos fijos por pareja introduciendo la variable <strong>paire</strong> como factor. Use los mismos errores estándar que en la parte a. Con esto deberá poder recuperar el coeficiente y el error estándar de la columna (3) de la tabla 3.</p></li>
+<li><p>[5 puntos] Estime ahora la <strong>primera etapa</strong>, es decir, estime por MCO el efecto causal de la asignación sobre la adopción. Use los mismos controles que en la parte c. Comente sobre la magnitud, la significancia estadística y la interpretación de la variable <strong>treatment</strong> en términos del comportamiento de los <strong>cumplidores</strong>. Debería poder replicar el coeficiente y el error estándar de la tabla 2.</p></li>
+<li><p>[5 puntos] Considere la columna 3 del panel A en la Tabla 9 del artículo. Aquí se reporta la estimación por MCO de la relación entre <strong>client</strong> y gasto total, con los mismos controles y tipo de errores que antes. Replique este resultado. ¿Se puede interpretar de forma causal el coeficiente sobre <strong>client</strong>?</p></li>
 <li><p>[5 puntos] ¿Cuáles son los supuestos que permiten la estimación del Local Average Treatment Effect (LATE) en el contexto de este problema? Comente sobre la evidencia que respalda el supuesto de que los instrumentos no son débiles en este problema.</p></li>
-<li><p>[5 puntos] Estime el efecto del cumplimiento sobre el gasto total, usando la asignación aleatoria como instrumento del cumplimiento. Es decir, estime el LATE. Use los mismos controles y tipo de errores que en c. Este resultado se reporta en la columna 3 del panel B en la Tabla 9. ¿Cuál es la interpretación del coeficiente de la variable <strong>client</strong>?</p></li>
+<li><p>[5 puntos] Estime el efecto del cumplimiento sobre el gasto total, usando la asignación aleatoria como instrumento del cumplimiento. Es decir, estime el LATE. Use los mismos controles y tipo de errores que en c. Este resultado se reporta en la columna 3 del panel B en la Tabla 9. ¿Cuál es la interpretación del coeficiente de la variable <strong>client</strong>? En R, la función <em>ivreg</em> del paquete <em>AER</em> le permite hacer la estimación de MC2E.</p></li>
 </ol>
 </div>
 <div id="pregunta-2" class="section level2">
 <h2>Pregunta 2</h2>
-<p>En la Pregunta 1 obtuvo el estimador de Wald para aproximar el efecto de la adopción en el gasto total. Considere dicho cálculo sin controles para lo que resta de esta pregunta.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[5 puntos] En esta pregunta mostraremos cómo el estimador de Wald es equivalente al estimador de VI cuando no hay controles y cuando las variables de asignación y adopción son binarias. Use nuevamente los datos en <em>crepon_morocco_analysis.csv</em>. Obtenga el estimador de Wald como el cociente de la diferencia en gasto total promedio entre los hogares asignados a tratamiento y control dividido por la diferencia en la probabilidad de adopción entre los hogares asignados a tratamiento y control. Recuerde que la variable del gasto total es <strong>expense_total</strong>.</p></li>
+<li><p>[5 puntos] Ahora estime por MC2E el efecto de la adopción sobre el gasto total, usando la variable de asignación como instrumento para la adopción. ¿Qué ventaja observa con respecto al estimador de Wald?</p></li>
+</ol>
+</div>
+<div id="pregunta-3" class="section level2">
+<h2>Pregunta 3</h2>
+<p>En la Pregunta 2, parte a, obtuvo el estimador de Wald para aproximar el efecto de la adopción en el gasto total. Considere dicho cálculo sin controles para lo que resta de esta pregunta.</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>[5 puntos] Utilice un procedimiento bootstrap <em>a mano</em> para estimar el error estándar del estimador de Wald usando 50 repeticiones. Es decir, debe realizar un remuestreo de los datos originales y para cada muestra obtener el estimador de Wald. Luego, obtenga la desviación estándar de los 50 estadísticos calculados. Utilice una semilla para poder replicar sus resultados.</p></li>
 <li><p>[5 puntos] Reemplace la semilla de la parte a. por una nueva semilla y estime nuevamente el error estándar del estimador de Wald con 50 repeticiones. Comente sobre la diferencia entre este error estándar y el de la parte a.</p></li>
 <li><p>[5 puntos] Regrese el valor de la semilla al usado en a. y estime nuevamente el error estándar del estimador de Wald, esta vez usando 1000 repeticiones. Comente sobre la diferencia entre este error estándar y el de la parte a.</p></li>
 </ol>
 </div>
-<div id="pregunta-3" class="section level2">
-<h2>Pregunta 3</h2>
-<p>El país A se propone evaluar el efecto de una exención fiscal para las empresas sobre la tasa de desempleo. El país A está compuesto por cientos de islas y, durante el periodo analizado, el movimiento de personas y empresas entre islas estuvo prohibido. El programa fue implementado por los gobiernos de las islas que así lo decidieron. Se dispone de datos de la tasa de desempleo en varias islas en los momentos <span class="math inline">\(t=0\)</span> y <span class="math inline">\(t=1\)</span>. Entre el periodo <span class="math inline">\(0\)</span> y el <span class="math inline">\(1\)</span> se sabe que en alrededor de un tercio de las ciudades se implementó una medida para fiscal que, en la práctica, se tradujo en un menor impuesto sobre la nómina de las empresas. En el resto de las islas, el no hubo cambios económicos relevantes.</p>
-<ol style="list-style-type: lower-alpha">
-<li><p>[5 puntos] ¿Cómo evaluar los resultados de los cambios fiscales por medio de diferencia en diferencias? ¿Le preocupa que haya islas con alto y bajo desempleo en el periodo <span class="math inline">\(0\)</span>? ¿Le preocupa que las islas que implementaron el programa sean aquellas que tenían un nivel alto de inversión?</p></li>
-<li><p>[5 puntos] ¿Cuáles son los supuestos sobre los que recae la estrategia de evaluación por diferencia en diferencias? ¿Qué factores podrían amenazar el uso de esta estrategia para evaluar el efecto de la intervención?</p></li>
-<li><p>[5 puntos] Suponga que un archipiélago vecino, el país B, también conformado por 1000 ciudades-isla implementa también un programa de entrega de exenciones fiscales, pero a diferencia de la isla A, en la isla B las exenciones se asignaron de manera aleatoria. Por razones presupuestales, el país B solo puede hacer exenciones fiscales en 100 islas. Las islas asignadas al tratamiento son escogidas en una lotería pública con un generador de números aleatorios. Explique cómo usaría inferencia por aleatorización (<em>randomization inference</em>) para estimar el impacto de la intervención en la tasa de desempleo Describa con detalle el procedimiento seguido y cómo juzgaría la significancia estadística de las diferencias que observe.</p></li>
-</ol>
-</div>
 <div id="pregunta-4" class="section level2">
 <h2>Pregunta 4</h2>
-<p>Considere nuevamente la base <em>STAR_public_use.csv</em> usada en la Tarea 1 del artículo Angrist, Lang y Oreopoulos (2009)<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>. En esta pregunta nos concentraremos en los efectos de la intervención en el año 2, mostrados en la columna (4) de la Tabla 6, sobre dos variables, el promedio de calificaciones <strong>gpa_year2</strong> y los créditos completados <strong>credits_earned2</strong>.</p>
+<p>Considere nuevamente la base <em>STAR_public_use.csv</em> usada en la Tarea 1 del artículo Angrist, Lang y Oreopoulos (2009)<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>. En esta pregunta nos concentraremos en los efectos de la intervención en el año 2, mostrados en la columna (4) de la Tabla 6, sobre dos variables, el promedio de calificaciones <strong>gpa_year2</strong> y los créditos completados <strong>credits_earned2</strong>.</p>
 <p>El propósito de esta pregunta es mostrar la función de los <span class="math inline">\(z\)</span>-scores en el análisis de efectos de tratamiento. De nuevo, puede quedarse solo con las observaciones que tienen <strong>noshow</strong> igual a 0. Antes de comenzar su análisis, sustituya por NA los valores en <strong>credits_earned2</strong> para aquellas observaciones que tienen <span class="math inline">\(NA\)</span> en la variable <strong>prob_year1</strong>.</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>[5 puntos] Para tener un punto de comparación, estime la ecuación del efecto de tratamiento para <strong>credits_earned2</strong> usando la misma especificación que en la pregunta 5 de la Tarea 1. Use también errores robustos. Deberá poder replicar los coeficientes y errores estándar del panel D, columna (4). ¿Cómo se interpretan el coeficiente sobre la variable <strong>ssp</strong>?</p></li>
 <li><p>[5 puntos] Genere un <span class="math inline">\(z\)</span>-score para la variable <strong>credits_earned2</strong> al que llame <strong>credits_earned2_sd</strong>. Para ello, calcule la media y desviación estándar de <strong>credits_earned2</strong> para el grupo de control y luego genere <strong>credits_earned2_sd</strong> restándole a <strong>credits_earned2</strong> la media obtenida y dividiendo esta diferencia por la desviación estándar obtenida. Compruebe que si calcula la media y la desviación estándar de <strong>credits_earned2_sd</strong>, en el grupo de control estas deberían ser 0 y 1, respectivamente.</p></li>
 <li><p>[5 puntos] Realice la misma estimación que en la parte a., pero ahora use como variable dependiente <strong>credits_earned2_sd</strong>. ¿Cómo se interpreta el coeficiente sobre <strong>ssp</strong>? ¿Qué es diferente y qué es igual entre los resultados obtenidos en esta parte y los obtenidos en la parte a.?</p></li>
-<li><p>[5 puntos] Ahora realizaremos un índice de mejora en educación, al agregar los resultados de estos dos indicadores en una sola variable, como se describe en Banerjee et al. (2015)<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>. Para ello, primero genere <strong>gpa_year2_sd</strong>, que será la versión estandarizada de <strong>gpa_year2</strong>, siguiendo el mismo procedimiento que en la parte b. En seguida, genere una nueva variable llamada <strong>promedio_vars</strong>, que será el promedio de <strong>credits_earned2_sd</strong> y <strong>gpa_year2_sd</strong>. Luego, calcule la media y la desviación estándar de <strong>promedio_vars</strong> en el grupo de control. Finalmente, genere una nueva variable <strong>promedio_vars_sd</strong> restándole a <strong>promedio_vars</strong> la media antes calculada y dividiendo esta diferencia por la desviación estándar antes calculada. Muestre que la variable <strong>promedio_vars_sd</strong> tiene media 0 y desviación estándar 1 en el grupo de control.</p></li>
-<li><p>[5 puntos] Estime ahora el efecto de tratamiento sobre <strong>promedio_vars_sd</strong>, siguiendo la misma especificación econométrica que en la parte a. y usando errores robustos. ¿Qué concluye?</p></li>
+<li><p>[5 puntos] Ahora realizaremos un índice de mejora en educación, al agregar los resultados de estos dos indicadores en una sola variable, como se describe en Banerjee et al. (2015)<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>. Para ello, primero genere <strong>gpa_year2_sd</strong>, que será la versión estandarizada de <strong>gpa_year2</strong>, siguiendo el mismo procedimiento que en la parte b. En seguida, genere una nueva variable llamada <strong>indice_escolar</strong>, que será el promedio de <strong>credits_earned2_sd</strong> y <strong>gpa_year2_sd</strong>. Luego, calcule la media y la desviación estándar de <strong>indice_escolar</strong> en el grupo de control. Finalmente, genere una nueva variable <strong>indice_escolar_sd</strong> restándole a <strong>indice_escolar</strong> la media antes calculada y dividiendo esta diferencia por la desviación estándar antes calculada. Muestre que la variable <strong>indice_escolar_sd</strong> tiene media 0 y desviación estándar 1 en el grupo de control.</p></li>
+<li><p>[5 puntos] Estime ahora el efecto de tratamiento sobre <strong>indice_escolar_sd</strong>, siguiendo la misma especificación econométrica que en la parte a. y usando errores robustos. ¿Qué concluye?</p></li>
 </ol>
 </div>
 <div id="pregunta-5" class="section level2">
 <h2>Pregunta 5</h2>
-<p><strong>PENDIENTE</strong></p>
+<p>Considere los valores <span class="math inline">\(p\)</span> del archivo <em>pvalues.csv</em>. Cada valor <span class="math inline">\(p_i\)</span> está asociado a una prueba de hipótesis <span class="math inline">\(i\)</span>. La variable familia denota tres grupos de hipótesis sobre las cuales estamos interesados en hacer correcciones de múltiples hipótesis. La investigación en cuestión emplea <span class="math inline">\(\alpha=0.05\)</span>.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[5 puntos] Para cada una de las pruebas de hipótesis, genere un cuadro como el que se presenta a continuación y diga si se rechaza o no la hipótesis nula, bajo los siguientes criterios:</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="22%" />
+<col width="22%" />
+<col width="22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"></th>
+<th>Hipótesis sin corrección</th>
+<th>Controlando la tasa de errores en la familia (FWER) usando el método de Bonferroni</th>
+<th>Controlando la tasa de falso descubrimiento (FDR) dentro de la familia usando el método de Benjamini y Hochberg</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td align="center"><span class="math inline">\(\vdots\)</span></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td align="center">15</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></li>
+<li><p>[5 puntos] Suponga que encuentra buenas razones conceptuales para afirmar que las familias 2 y 3 deben ser consideraras una sola familia. Tendríamos ahora solo dos familias, la familia 1 original y una nueva familia numerada como 4, como se indica en la variable familia_corregida. ¿Cómo cambian sus conclusiones respecto a la parte a. de esta pregunta? Genere un nuevo cuadro con esta redefinición.</p></li>
+<li><p>[5 puntos] Suponga que su asistente de investigación olvidó el concepto de familia y realiza las correcciones por pruebas de múltiples hipótesis ignorando las familias. ¿Qué concluiría en este caso? Genere un nuevo cuadro bajo esta circunstancia. Comente sobre la diferencia en las conclusiones entre las partes b. y c.</p></li>
+</ol>
 </div>
 <div class="footnotes">
 <hr />
 <ol>
 <li id="fn1"><p>Por ejemplo, suponga que estima un modelo al que llame <em>modelo1</em>. Entonces, si ejecuta</p>
-<pre class="r"><code>coef_test(modelo1, vcov=&quot;CR1S&quot;,cluster=mis_datos$demi_paire, test=&quot;naive-t&quot;)[1:2,]</code></pre>
-<p>obtendrá los coeficientes con los errores agrupados requeridos. La opción <em>CR1S</em> toma en cuenta el número de grupos o <em>clusters</em> para realizar inferencia. Puede leer más al respecto en la ayuda al ejecutar <em>?vcovCR</em>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>Angrist, J., Lang, D., y Oreopoulos, P. (2009). Incentives and services for college achievement: Evidence from a randomized trial. <em>American Economic Journal: Applied Economics</em>, 1(1), 136-63.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>Banerjee, A. et al. (2015). A multifaceted program causes lasting progress for the very poor: Evidence from six countries. <em>Science</em>, 348(6236).<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<pre class="r"><code>coef_test(modelo1,
+      vcov=&quot;CR1S&quot;,
+      cluster=mis_datos$demi_paire)[1:2,]</code></pre>
+<p>obtendrá los coeficientes con los errores agrupados requeridos. La opción <em>CR1S</em> toma en cuenta el número de grupos o <em>clusters</em> para realizar inferencia. Puede leer más al respecto en la ayuda al ejecutar <em>?vcovCR</em>. Este es el tipo de ajuste de muestras finitas que usan los autores. Esta corrección consiste en multiplicar la matriz de sándwich agrupada CR0 por <span class="math inline">\(\frac{G(N-1)}{(G-1)(N-p)}\)</span>, donde <span class="math inline">\(G\)</span> es el número de grupos, <span class="math inline">\(N\)</span> es el número total de observaciones y <span class="math inline">\(p\)</span> es el número de regresores.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Crépon, B., Devoto, F., Duflo, E., &amp; Parienté, W. (2015). Estimating the impact of microcredit on those who take it up: Evidence from a randomized experiment in Morocco. <em>American Economic Journal: Applied Economics</em>, 7(1), 123-50.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Angrist, J., Lang, D., y Oreopoulos, P. (2009). Incentives and services for college achievement: Evidence from a randomized trial. <em>American Economic Journal: Applied Economics</em>, 1(1), 136-63.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Banerjee, A. et al. (2015). A multifaceted program causes lasting progress for the very poor: Evidence from six countries. <em>Science</em>, 348(6236).<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
