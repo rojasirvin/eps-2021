@@ -440,28 +440,6 @@ mean(data.b$expense_total)
 ```
 ]
 
-
-
----
-
-# Refinamiento asintótico
-
-- Una aplicación de las técnicas bootstrap es el *refinamiento asintótico* de la prueba $t$ de coeficientes de regresión
-
-- Supongamos que $H_0:\quad \beta=0$ y trabajamos con un nivel $\alpha$ 
-
---
-
-- En cada repetición bootstrap el estadístico calculado es $t_b$
-
-- Ordenamos los $B$ estadísticos obtenidos
-
-- Rechazamos $H_0$ si $|t|$ está por encima del $(1-\alpha)$ésimo percentil de los $|t_b|$ en la distribución bootstrap
-
---
-
-- A pesar de sus propiedades teóricas, el refinamiento asintótico es poco usado
-
 ---
 
 # Aplicaciones comunes de bootstrap
@@ -479,8 +457,6 @@ mean(data.b$expense_total)
 - Pensemos siempre en la estructura de los datos antes de hacer boostrap
 
 - Usar una semilla siempre para poder reproducir sus resultados
-
-
 
 ---
 
@@ -513,6 +489,28 @@ $$v_i^*=\begin{cases} 1 \quad\text{con probabilidad 0.5} \\ -1 \quad\text{con pr
 - La ventaja de este método es que conserva la relación entre las varianzas residuales y las $X_i$ observadas en los datos originales
 
 - [Davidson & Flachaire (2008)](https://www.sciencedirect.com/science/article/pii/S0304407608000833) utilizan simulaciones para mostrar que con esta forma para $f(\hat{u}_i)v_i^*$ la inferencia es más confiable que con otras especificaciones
+
+
+---
+
+# Refinamiento asintótico
+
+- Una aplicación de las técnicas bootstrap es el *refinamiento asintótico* de la prueba $t$ de coeficientes de regresión
+
+- Supongamos que $H_0:\quad \beta=0$ y trabajamos con un nivel $\alpha$ 
+
+--
+
+- En cada repetición bootstrap el estadístico calculado es $t_b$
+
+- Ordenamos los $B$ estadísticos obtenidos
+
+- Rechazamos $H_0$ si $|t|$ está por encima del $(1-\alpha)$ésimo percentil de los $|t_b|$ en la distribución bootstrap
+
+--
+
+- A pesar de sus propiedades teóricas, el refinamiento asintótico es poco usado
+
 
 ---
 
