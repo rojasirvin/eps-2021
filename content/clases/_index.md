@@ -30,3 +30,5 @@ Clase 8. Aplicaciones de métodos experimentales
 [Clase 9](https://eps-2021.netlify.app/clases/clase_9.html#1). LATE y variables instrumentales
 
 [Clase 10](https://eps-2021.netlify.app/clases/clase_10.html#1). Errores estándar e inferencia
+
+[Clase 11](https://eps-2021.netlify.app/clases/clase_11.html#1). Múltiples hipótesis

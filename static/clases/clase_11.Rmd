@@ -1,5 +1,5 @@
 ---
-title: "Número de rondas e hipótesis múltiples"
+title: "Hipótesis múltiples"
 author: "Irvin Rojas"
 institute: "CIDE"
 date: "28 de septiembre de 2021"
@@ -30,7 +30,6 @@ class: title-slide
 knitr::opts_chunk$set(echo = FALSE, fig.path = "figures/")
 
 library(tidyverse)
-library(pacman)
 library(janitor)
 library(sandwich)
 #library(nnet)
@@ -40,10 +39,6 @@ library(clubSandwich)
 library(modelsummary)
 library(estimatr)
 
-p_load(tidyverse, foreign, reshape2, psych, qwraps2, forcats, readxl, 
-       broom, lmtest, margins, plm, rdrobust, multiwayvcov,
-       wesanderson, sandwich, stargazer,
-       readstata13, pscore, optmatch, kdensity, MatchIt, bootstrap, matlib, dplyr)
 
 xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
@@ -190,20 +185,6 @@ class: inverse, middle, center
 
 ---
 
-# Método de Hochberg
-
-- Si $p_j\leq \frac{\alpha}{n-j+1}$ para todo $j=1,\ldots,n$, rechazar todas las hipótesis $H_i$ para $i<j$
-
-- Visto de otro modo
-
-  - Rechazar todas las $H_i$ si $p_n\leq \alpha$
-  
-  - Si no, pasar a la hipótesis $n-1$. Rechazar las hipótesis $H_1,\ldots,H_{n-1}$ si $p_{n-1}\leq \frac{\alpha}{2}$
-  
-  - Continuar hasta encontrar la hipótesis $j$ tal que se rechacen las hipótesis $H_1,\ldots,H_{j}$
-
----
-
 # ¿Por qué preocuparnos por la FWER?
 
 - La idea de la FWER tiene sentido si nos preocupa tener incluso un solo falso positivo
@@ -271,27 +252,6 @@ data.bonferroni
 ]
 ]
 
-
----
-
-# Ejemplo: Hochberg
-
-.pull-left[
-```{r echo=T, include=T, eval=T, message=F, warning=F}
-#Hochberg
-data.hochberg <- data.pvalues %>% 
-  mutate(hochberg_alpha=alpha/(n-hipotesis+1)) %>% 
-  mutate(hochberg_rechazar=ifelse(poriginal<=hochberg_alpha,1,0))
-```
-]
-
-.tiny[
-.pull-right[
-```{r echo=T, include=T, eval=T, message=F, warning=F}
-data.hochberg
-```
-]
-]
 
 ---
 
@@ -373,9 +333,9 @@ $$\bar{s}_i=\frac{1}{W_{i}}\sum_{j\in J} w_j z_{ij}$$
 
 # Próxima sesión
 
-- Continuaré con para afinar la estimación, ahora hablando sobre errores estándar y formas alternativas de hacer inferencia 
+- Hablaremos sobre diferencia en diferencias
 
-  - MHE, Capítulo 8
+
 ---
 
 class: center, middle
