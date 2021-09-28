@@ -83,7 +83,7 @@ class: inverse, middle, center
 
 # Hipótesis múltiples
 
-- **Error tipo I**: concluir que hay un efecto de tratamiento cuando la $H_0$ es verdader, es decir, cuando $H_0:\;\beta_i=0$
+- **Error tipo I**: concluir que hay un efecto de tratamiento cuando la $H_0$ es verdadera, es decir, cuando $H_0:\;\beta_i=0$
 
 - En una investigación fijamos $\alpha$, la probabilidad de rechazar $H_0$ cuando $H_0$ es cierto
 
