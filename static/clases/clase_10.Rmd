@@ -173,128 +173,6 @@ $$HC3:\quad\hat{\psi}_i=\frac{1}{(1-h_{ii})^2}\hat{u}_i^2$$
 
 class: inverse, middle, center
 
-# Bootstrap
-
----
-
-# Bootstrap
-
-- A veces es difícil encontrar una expresión analítica de los errores estándar
-
-- La idea de las técnicas bootstrap es consutrir una distribución empírica del estimador de interés
-
-- Una muestra bootstrap es una muestra tomada de los mismos datos
-
---
-
-- En las rutinas para errores bootstrap, pensamos en $\{(y_1,x_1),\ldots,(y_N,X_n)\}$ como la población
-
-- Una muestra bootstrap es una muestra de tamaño $N$ tomada de la muestra original
-
---
-
-- El procedimiento bootstrap más usado es el bootstrap no paramétrico o boostrap en parejas (nos enfocaremos en este tipo de bootstrap en el curso)
-
-- La idea es remuestrear la pareja completa $(y_i,x_i)$
-
----
-
-# Algoritmo para errores estándar bootstrap
-
-1. Dada una muestra $W_1,\ldots,W_N$, obtener una muestra de tamaño $N$, remuestreando de la muestra original **con reemplazo**
-
-1. Calcular el estadístico $\hat{\theta}_b$ usado con la muestra bootstrap (coeficiente de regresión, diferencia de medias, función de coeficientes)
-
-1. Repetir los pasos 1 y 2 $B$ veces, donde $B$ es lo suficientemente grande (usualmente 1000 es suficiente)
-
-1. Usar las $B$ repeticiones para obtener el error estándar del estadístico como la raíz cuadrada de $s^2_{\hat{\theta},B}$:
-
-$$s^2_{\hat{\theta},B}=\frac{1}{B-1}\sum_{b=1}^B(\hat{\theta}_{b}-\bar{\hat{\theta}})^2$$
-donde $\bar{\hat{\theta}}=\frac{1}{B}\sum_{b=1}^B\hat{\theta}_b$
-
----
-
-# Refinamiento asintótico
-
-- Una aplicación de las técnicas bootstrap es el *refinamiento asintótico* de la prueba $t$ de coeficientes de regresión
-
-- Supongamos que $H_0:\quad \beta=0$ y trabajamos con un nivel $\alpha$ 
-
---
-
-- En cada repetición bootstrap el estadístico calculado es $t_b$
-
-- Ordenamos los $B$ estadísticos obtenidos
-
-- Rechazamos $H_0$ si $|t|$ está por encima del $(1-\alpha)$ésimo percentil de los $|t_b|$ en la distribución bootstrap
-
---
-
-- A pesar de sus propiedades teóricas, el refinamiento asintótico es poco usado
-
----
-
-# Aplicaciones comunes de bootstrap
-
-- Métodos de varias etapas (por ejemplo, el estimador de dos etapas de Heckman)
-
-- Funciones de estimadores (aunque aquí el método Delta también podría ser usado)
-
-- Datos agrupados con pocos grupos
-
---
-
-- El consejo práctico es usar resultados teóricos cuando se puede (por ejemplo, las matrices robustas descritas antes)
-
-- Pensemos siempre en la estructura de los datos antes de hacer boostrap
-
-- Usar una semilla siempre para poder reproducir sus resultados
-
-
-
----
-
-# Bootstrap salvaje
-
-- En presencia de heterocedasticidad se prefiere usar bootstrap salvaje (*wild bootstrap*) ([MacKinnon, 2012](https://link.springer.com/chapter/10.1007%2F978-1-4614-1653-1_17#enumeration))
-
-- Propuesto originalmente por Liu (1988), cada muestra bootstrap tiene la siguiente forma:
-
-$$y_i^*=X_i\hat{\beta}+f(\hat{u}_i)v_i^*$$
-- Noten que mantiene fijos los $X_i$ en cada muestra bootstrap
-
---
-
-- Una especificación comúnmente usada es hacer es $f(\hat{u}_i)=\hat{u}_i$ y 
-$$v_i^*=\begin{cases} 1 \quad\text{con probabilidad 0.5} \\ -1 \quad\text{con probabilidad 0.5} \end{cases}$$
-
-- $\hat{\beta}$ y $\hat{u}_i$ son estimados con la muestra original
-
----
-
-# Bootstrap salvaje
-
-- En cada una de las $B$ muestras bootstrap, mantenemos a los mismos individuos (no hay remuestreo)
-
-- Tendremos $B$ muestras bootstrap, pero ahora la aleatoriedad viene por $f(\hat{u}_i)v_i^*$
-
-- Pueden usarse otras funciones más complicadas para $f(\hat{u}_i)$
-
-- La ventaja de este método es que conserva la relación entre las varianzas residuales y las $X_i$ observadas en los datos originales
-
-- [Davidson & Flachaire (2008)](https://www.sciencedirect.com/science/article/pii/S0304407608000833) utilizan simulaciones para mostrar que con esta forma para $f(\hat{u}_i)v_i^*$ la inferencia es más confiable que con otras especificaciones
-
----
-
-# Otras aplicaciones
-
-- Bootstrap jacknife (útil para problemas con errores agrupados y pocos grupos)
-
-
----
-
-class: inverse, middle, center
-
 # Errores agrupados
 
 ---
@@ -433,27 +311,34 @@ $$V({\hat{\beta}}_{MCO})=(X'X)^{-1}\left(\sum_{g=1}^G X_g'u_gu_g'X\right)(X'X)^{
 
 - Con errores heterocedásticos, pero sin agrupamiento, la matriz de varianzas de White (1980) tiene una estructura como sigue:
 
+$$\hat{V}(\hat{\beta}_{R})=(X'X)^{-1}X'\hat{\Sigma} X (X'X)^{-1}$$
 
-$$V(\hat{\beta}_{het.})=\left(\begin{matrix} \hat{\sigma}_{1} & 0  & 0  & \ldots & 0 \\ 0 & \hat{\sigma}_{2} & 0 & \ldots & 0 \\ \vdots & & & & \\ 0 & & &  \ldots & \hat{\sigma}_{N}\end{matrix}\right)$$
+- Donde
+
+$$\hat{\Sigma}=\left(\begin{matrix} \hat{u}_{1}^2 & 0  & 0  & \ldots & 0 \\ 0 & \hat{u}_{2}^2 & 0 & \ldots & 0 \\ \vdots & & & & \\ 0 & & &  \ldots & \hat{u}_{n}^2\end{matrix}\right)$$
 ---
 
 # Errores estándar agrupados
 
-- Para estimar la varianza empleamos una generalización de la propuesta de White para errores robustos
+- Para estimar la varianza con errores agrupados empleamos una generalización de la propuesta de White para errores robustos
 
 - Si $G\to\infty$, el estimador de la matriz de errores agrupados robusta (CRVE) es consistente para estimar $V(\hat{\beta})$:
 
-$$\hat{V}_{CRVE}(\hat{\beta})=(X'X)^{-1}\left(\sum_{g=1}^G X_g'\hat{u}_g\hat{u}_g'X_g\right)(X'X)^{-1}$$
+$$\hat{V}_{CR}(\hat{\beta})=(X'X)^{-1}\left(\sum_{g=1}^G X_g'\hat{u}_g\hat{u}_g'X_g\right)(X'X)^{-1}$$
 donde $\hat{u}_g\hat{u}_g'$ es la matriz de varianzas para los individuos del grupo $g$
+
+- De manera compacta
+
+$$\hat{V}_{CR}(\hat{\beta})=(X'X)^{-1}X'\hat{\Sigma} X(X'X)^{-1}$$
 
 ---
 
 # Errores estándar agrupados
 
-- En cambio, con errores agrupados, la matriz de varianzas tiene una estructura por bloques:
+- Y en este caso la matriz $\hat{\Sigma}$ tiene una estructura agrupada
 
-$$\small V(\hat{\beta}_{agrup.})=\left(\begin{matrix} \hat{\sigma}_{1,1}^2 & \hat{\sigma}_{12,1} & \ldots & \hat{\sigma}_{1n,1} & 0 & 0 & \ldots &  0 & \ldots & 0 & 0 & \ldots &  0 \\ \hat{\sigma}_{21,1} & \hat{\sigma}_{2,1}^2 & \ldots & \hat{\sigma}_{2n,1} & 0 & 0 & \ldots & 0 & \ldots  & 0 & 0 & \ldots &  0\\ 
-\vdots & \vdots  & & \vdots & \vdots & \vdots  & &  \vdots& & \vdots & \vdots &  &  \vdots \\ \hat{\sigma}_{n,1} & \hat{\sigma}_{n,2}& \ldots & \hat{\sigma}_{n,1}^2& 0 & 0 &\ldots & 0 & \ldots & 0 & 0 & \ldots &  0 \\  0 & 0 & \ldots &  0 & \hat{\sigma}_{1,2}^2 & \hat{\sigma}_{12,2} & \ldots & \hat{\sigma}_{1n,2} &\ldots & 0 & 0 & \ldots &  0  \\ 0 & 0 & \ldots &  0 & \hat{\sigma}_{21,2} & \hat{\sigma}_{2,2}^2 & \ldots & \hat{\sigma}_{2n,2} &\ldots & 0 & 0 & \ldots &  0 \\ \vdots & \vdots  & & \vdots & \vdots & \vdots  & &  \vdots& & \vdots & \vdots &  &  \vdots  \\ 0 & 0 & \ldots &  0 & \hat{\sigma}_{n1,2} & \hat{\sigma}_{n2,2} & \ldots & \hat{\sigma}_{n,2}^2 &\ldots & 0 & 0 & \ldots &  0 \\ \vdots & \vdots  & & \vdots & \vdots & \vdots  & &  \vdots& & \vdots & \vdots &  &  \vdots \\ 0 & 0 & \ldots &  0 & 0 &  0 & \ldots & 0 &\ldots & \hat{\sigma}_{1,G}^2 & \hat{\sigma}_{12,G} & \ldots &  \hat{\sigma}_{1n,G} \\  0 & 0 & \ldots &  0 & 0 &  0 & \ldots & 0 &\ldots & \hat{\sigma}_{21,G} & \hat{\sigma}_{2,G}^2 & \ldots &  \hat{\sigma}_{2n,G} \\ \vdots & \vdots  & & \vdots & \vdots & \vdots  & &  \vdots& & \vdots & \vdots &  &  \vdots \\  0 & 0 & \ldots &  0 & 0 &  0 & \ldots & 0 &\ldots & \hat{\sigma}_{n1,G} & \hat{\sigma}_{n2,G} & \ldots &  \hat{\sigma}_{n,G}^2 \end{matrix}\right)$$
+$$\small \hat{\Sigma}=\left(\begin{matrix} \hat{u}_{1,1}^2 & \hat{u}_{12,1} & \ldots & \hat{u}_{1n,1} & 0 & 0 & \ldots &  0 & \ldots & 0 & 0 & \ldots &  0 \\ \hat{u}_{21,1} & \hat{u}_{2,1}^2 & \ldots & \hat{u}_{2n,1} & 0 & 0 & \ldots & 0 & \ldots  & 0 & 0 & \ldots &  0\\ 
+\vdots & \vdots  & & \vdots & \vdots & \vdots  & &  \vdots& & \vdots & \vdots &  &  \vdots \\ \hat{u}_{n,1} & \hat{u}_{n,2}& \ldots & \hat{u}_{n,1}^2& 0 & 0 &\ldots & 0 & \ldots & 0 & 0 & \ldots &  0 \\  0 & 0 & \ldots &  0 & \hat{u}_{1,2}^2 & \hat{u}_{12,2} & \ldots & \hat{u}_{1n,2} &\ldots & 0 & 0 & \ldots &  0  \\ 0 & 0 & \ldots &  0 & \hat{u}_{21,2} & \hat{u}_{2,2}^2 & \ldots & \hat{u}_{2n,2} &\ldots & 0 & 0 & \ldots &  0 \\ \vdots & \vdots  & & \vdots & \vdots & \vdots  & &  \vdots& & \vdots & \vdots &  &  \vdots  \\ 0 & 0 & \ldots &  0 & \hat{u}_{n1,2} & \hat{u}_{n2,2} & \ldots & \hat{u}_{n,2}^2 &\ldots & 0 & 0 & \ldots &  0 \\ \vdots & \vdots  & & \vdots & \vdots & \vdots  & &  \vdots& & \vdots & \vdots &  &  \vdots \\ 0 & 0 & \ldots &  0 & 0 &  0 & \ldots & 0 &\ldots & \hat{u}_{1,G}^2 & \hat{u}_{12,G} & \ldots &  \hat{u}_{1n,G} \\  0 & 0 & \ldots &  0 & 0 &  0 & \ldots & 0 &\ldots & \hat{u}_{21,G} & \hat{u}_{2,G}^2 & \ldots &  \hat{u}_{2n,G} \\ \vdots & \vdots  & & \vdots & \vdots & \vdots  & &  \vdots& & \vdots & \vdots &  &  \vdots \\  0 & 0 & \ldots &  0 & 0 &  0 & \ldots & 0 &\ldots & \hat{u}_{n1,G} & \hat{u}_{n2,G} & \ldots &  \hat{u}_{n,G}^2 \end{matrix}\right)$$
 
 
 ---
@@ -477,6 +362,164 @@ $$\small V(\hat{\beta}_{agrup.})=\left(\begin{matrix} \hat{\sigma}_{1,1}^2 & \ha
 - La recomendación práctica es que se tomen en serio el problema de los pocos clusters
 
 - ¿Cuánto es poco? Cameron y Miller (2015) citan 50. (¡Qué raro, el número de estados en EUA!)
+
+
+---
+
+class: inverse, middle, center
+
+# Bootstrap
+
+---
+
+# Bootstrap
+
+- A veces es difícil encontrar una expresión analítica de los errores estándar
+
+- La idea de las técnicas bootstrap es consutrir una distribución empírica del estimador de interés
+
+- Una muestra bootstrap es una muestra tomada de los mismos datos
+
+--
+
+- En las rutinas para errores bootstrap, pensamos en $\{(y_1,x_1),\ldots,(y_N,X_n)\}$ como la población
+
+- Una muestra bootstrap es una muestra de tamaño $N$ tomada de la muestra original
+
+--
+
+- El procedimiento bootstrap más usado es el bootstrap no paramétrico o boostrap en parejas (nos enfocaremos en este tipo de bootstrap en el curso)
+
+- La idea es remuestrear la pareja completa $(y_i,x_i)$
+
+---
+
+# Algoritmo para errores estándar bootstrap
+
+1. Dada una muestra $W_1,\ldots,W_N$, obtener una muestra de tamaño $N$, remuestreando de la muestra original **con reemplazo**
+
+1. Calcular el estadístico $\hat{\theta}_b$ usado con la muestra bootstrap (coeficiente de regresión, diferencia de medias, función de coeficientes)
+
+1. Repetir los pasos 1 y 2 $B$ veces, donde $B$ es lo suficientemente grande (usualmente 1000 es suficiente)
+
+1. Usar las $B$ repeticiones para obtener el error estándar del estadístico como la raíz cuadrada de $s^2_{\hat{\theta},B}$:
+
+$$s^2_{\hat{\theta},B}=\frac{1}{B-1}\sum_{b=1}^B(\hat{\theta}_{b}-\bar{\hat{\theta}})^2$$
+donde $\bar{\hat{\theta}}=\frac{1}{B}\sum_{b=1}^B\hat{\theta}_b$
+
+---
+
+# ¿Cómo hacer remuestreo en R?
+
+.pull-left[
+```{r tidy=TRUE, include=T,echo=T,warning=FALSE, message=FALSE}
+set.seed(927)
+
+data.morocco<- read.csv("./crepon_morocco_analysis.csv")%>%
+  select(treatment,client,expense_total )
+
+obs <- nrow(data.morocco)
+obs
+
+#En la muestra original
+mean(data.morocco$expense_total)
+```
+]
+
+.pull-right[
+```{r tidy=TRUE, include=T,echo=T,warning=FALSE, message=FALSE}
+#Una muestra bootstrap
+data.b <-data.morocco[sample(nrow(data.morocco),obs, replace = TRUE),]
+
+mean(data.b$expense_total)
+
+#Otra muestra bootstrap
+data.b <-data.morocco[sample(nrow(data.morocco),obs, replace = TRUE),]
+
+mean(data.b$expense_total)
+```
+]
+
+
+
+---
+
+# Refinamiento asintótico
+
+- Una aplicación de las técnicas bootstrap es el *refinamiento asintótico* de la prueba $t$ de coeficientes de regresión
+
+- Supongamos que $H_0:\quad \beta=0$ y trabajamos con un nivel $\alpha$ 
+
+--
+
+- En cada repetición bootstrap el estadístico calculado es $t_b$
+
+- Ordenamos los $B$ estadísticos obtenidos
+
+- Rechazamos $H_0$ si $|t|$ está por encima del $(1-\alpha)$ésimo percentil de los $|t_b|$ en la distribución bootstrap
+
+--
+
+- A pesar de sus propiedades teóricas, el refinamiento asintótico es poco usado
+
+---
+
+# Aplicaciones comunes de bootstrap
+
+- Métodos de varias etapas (por ejemplo, el estimador de dos etapas de Heckman)
+
+- Funciones de estimadores (aunque aquí el método Delta también podría ser usado)
+
+- Datos agrupados con pocos grupos
+
+--
+
+- El consejo práctico es usar resultados teóricos cuando se puede (por ejemplo, las matrices robustas descritas antes)
+
+- Pensemos siempre en la estructura de los datos antes de hacer boostrap
+
+- Usar una semilla siempre para poder reproducir sus resultados
+
+
+
+---
+
+# Bootstrap salvaje
+
+- En presencia de heterocedasticidad se prefiere usar bootstrap salvaje (*wild bootstrap*) ([MacKinnon, 2012](https://link.springer.com/chapter/10.1007%2F978-1-4614-1653-1_17#enumeration))
+
+- Propuesto originalmente por Liu (1988), cada muestra bootstrap tiene la siguiente forma:
+
+$$y_i^*=X_i\hat{\beta}+f(\hat{u}_i)v_i^*$$
+- Noten que mantiene fijos los $X_i$ en cada muestra bootstrap
+
+--
+
+- Una especificación comúnmente usada es hacer es $f(\hat{u}_i)=\hat{u}_i$ y 
+$$v_i^*=\begin{cases} 1 \quad\text{con probabilidad 0.5} \\ -1 \quad\text{con probabilidad 0.5} \end{cases}$$
+
+- $\hat{\beta}$ y $\hat{u}_i$ son estimados con la muestra original
+
+---
+
+# Bootstrap salvaje
+
+- En cada una de las $B$ muestras bootstrap, mantenemos a los mismos individuos (no hay remuestreo)
+
+- Tendremos $B$ muestras bootstrap, pero ahora la aleatoriedad viene por $f(\hat{u}_i)v_i^*$
+
+- Pueden usarse otras funciones más complicadas para $f(\hat{u}_i)$
+
+- La ventaja de este método es que conserva la relación entre las varianzas residuales y las $X_i$ observadas en los datos originales
+
+- [Davidson & Flachaire (2008)](https://www.sciencedirect.com/science/article/pii/S0304407608000833) utilizan simulaciones para mostrar que con esta forma para $f(\hat{u}_i)v_i^*$ la inferencia es más confiable que con otras especificaciones
+
+---
+
+# Otras aplicaciones
+
+- Bootstrap jacknife (útil para problemas con errores agrupados y pocos grupos)
+
 
 ---
 
