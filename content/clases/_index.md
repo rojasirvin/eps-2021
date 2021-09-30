@@ -32,3 +32,5 @@ Clase 8. Aplicaciones de métodos experimentales
 [Clase 10](https://eps-2021.netlify.app/clases/clase_10.html#1). Errores estándar e inferencia
 
 [Clase 11](https://eps-2021.netlify.app/clases/clase_11.html#1). Múltiples hipótesis
+
+[Clase 12](https://eps-2021.netlify.app/clases/clase_12.html#1). Diferencia en diferencias

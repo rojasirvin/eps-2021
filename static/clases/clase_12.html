@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Diferencia en diferencias</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Irvin Rojas" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="libs/cide.css" type="text/css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: title-slide
+
+
+
+&lt;style type="text/css"&gt;
+.huge .remark-code { /*Change made here*/
+  font-size: 200% !important;
+}
+.tiny .remark-code { /*Change made here*/
+  font-size: 60% !important;
+}
+&lt;/style&gt;
+
+.title[
+# Clase 12. Diferencia en diferencias
+]
+.subtitle[
+## Evaluación de Programas
+]
+.author[
+### Irvin Rojas &lt;br&gt; [rojasirvin.com](https://www.rojasirvin.com/) &lt;br&gt; [&lt;i class="fab fa-github"&gt;&lt;/i&gt;](https://github.com/rojasirvin) [&lt;i class="fab fa-twitter"&gt;&lt;/i&gt;](https://twitter.com/RojasIrvin) [&lt;i class="ai ai-google-scholar"&gt;&lt;/i&gt;](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&amp;hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas &lt;br&gt; División de Economía
+]
+
+---
+# Agenda
+
+1. Comenzaremos a estudiar situaciones en las que es imposible generar variación experimental
+
+1. Veremos los supuestos sobre los que recae el uso de diferencia en diferencias en los casos más simples
+
+1. Introduciremos el uso de regresión para la implementación del estimador
+
+
+---
+
+# Motivación 
+
+- La estrategia de diferencia en diferencias especifica las condiciones bajo las cuales es posible identificar el efecto del tratamiento al comparar unidades tratadas y no tratadas, cuando se dispone de información antes y después de la intervención
+
+- Esta estrategia es ampliamente utilizada para analizar el efecto de leyes y políticas que afectan a un grupo de individuos al mismo tiempo
+
+- Además, constituye el fundamento para otro de los métodos en donde la investigación actual es muy activa, el control sintético
+
+---
+
+class: inverse, middle, center
+
+# Diferencia en diferencias
+
+---
+
+# Diferencia en diferencias
+
+.pull-left[
+- Angrist &amp; Pischke (2014) describen lo sucedido con el sector bancario en Mississippi durante la Gran Depresión
+
+- En EUA, la FED tiene 12 bancos regionales y cada uno tiene autonomía para tomar ciertas decisiones de política monetaria
+
+- En particular, Mississippi tiene una parte del estado bajo el mando del distrito 6 (Atlanta) y la otra mitad en el distrito 8 (San Luis)
+]
+
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/banks_map.png" alt="Fuente: Richardson &amp;amp; Troost (2009)" width="75%" /&gt;
+&lt;p class="caption"&gt;Fuente: Richardson &amp; Troost (2009)&lt;/p&gt;
+&lt;/div&gt;
+
+]
+
+---
+
+# Diferencia en diferencias
+
+
+- Como respuesta a las corridas bancarias que caracterizaron la crisis de 1929, los bancos comerciales en Mississippi se vieron expuestos a dos políticas distintas
+
+$$
+T=
+`\begin{cases}
+1\quad\quad \text{proveer liquidez adicional (distrito 6)} \\
+0\quad\quad \text{dar igual o menos liquidez (distrito 8)} \\
+\end{cases}`
+$$
+
+
+- Si estamos interesados en la cantidad de bancos que sobrevivieron y decir algo sobre qué política es más efectiva, ¿qué podemos hacer?
+
+- Una primera respuesta sería contar la diferencia después de la crisis:
+
+| Distrito 8 | Distrito 6 | Diferencia |
+|:---:|:---:|:---:|
+| `\(T=0\)` | `\(T=1\)` | |
+| 132 bancos | 121 bancos | 11 bancos
+
+--
+
+- Pareciera que la política de proveer liquidez, *easy money*, **causó** que quebraran más bancos
+
+- Sin embargo, esta comparación claramente ignora las condiciones iniciales
+
+---
+
+# Diferencia en diferencias
+
+.pull-left[
+
+- Gráficamente observamos
+
+
+
+
+&lt;img src="figures/unnamed-chunk-4-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+- Del distrito 8 (no tratado) podemos obtener la pendiente:
+
+`$$m_{NT}=\frac{Y_{8,post}-Y_{8,pre}}{X_{8,post}-X_{8,pre}}=\frac{132-165}{1931-1930}=-33$$`
+- Y entonces, podemos encontrar cuál hubiera sido el número de bancos en el distrio 6 (tratado) si hubiera seguido la pendiente del distrito 8:
+
+`$$m_T=\frac{Y_{6,post}-Y_{6,pre}}{X_{6,post}-X_{6,pre}}=\frac{Y_{8,post}-135}{1931-1930}=-33$$`
+- Por tanto, `\(Y_{8,post}=102\)` es el número de bancos que el distrito 6 hubiera tendio si hubiera seguido una tendencia paralela a la del distrito 8 ]
+
+---
+
+# Diferencia en diferencias
+
+.pull-left[
+- Podemos contruir el contrafactual para el distrito 6 observando la pendiente del distrito 8
+
+
+
+
+```r
+dd_grafica &lt;- banks_contrafactual %&gt;% 
+  ggplot(aes(x=year, y=banks, color=distrito, linetype=tipo))+
+  geom_line(size=2) +
+  scale_linetype_manual(values=c("dashed", "solid")) +
+  scale_y_continuous(limits=c(100,180))+
+  geom_brace(aes(c(1931.1,1931.3), c(121,102), label="Efecto del\ntratamiento"), inherit.data=F, labelsize=3, rotate = 90)
+```
+]
+
+.pull-right[
+
+```r
+dd_grafica
+```
+
+![](figures/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Diferencia en diferencias
+
+- Podemos dar así una primera definición de lo que es la diferencia en diferencias del número de bancos que sobrevivieron a la Gran Depresión en Mississippi
+
+$$
+`\begin{aligned}
+\delta_{DID}&amp;=(Y_{6,post}-Y_{6,pre})-(Y_{8,post}-Y_{8,pre}) \\
+&amp;=(Y_{6,1931}-Y_{6,1931})-(Y_{8,1930}-Y_{8,1930}) \\
+&amp;=(121-135)-(132-165) \\
+&amp;-14+33 = 19
+\end{aligned}`
+$$
+
+- El estimador de DID toma en cuenta las diferencias inciales
+
+- En este caso, el distrito 8 ya tenía más bancos abiertos que el 6 antes de la crisis
+
+- DID construye un contrafactual para las unidades tratadas usando la pendiente de las unidades no tratadas
+
+---
+
+# Diferencia en diferencias
+
+- El supuesto fundamental es el de **tendencias comunes**, es decir, que en ausencia del tratamiento, el grupo de tratamiento se hubiera comportado igual al grupo de control
+
+- Si hay varios puntos pre intervención, el supuesto de tendencias comunes puede probarse empíricamente
+
+---
+
+# Regresión en DID
+
+- El método puede generalizarse a más periodos de tiempo 
+
+- Aquí, una regresión nos permite identificar el efecto del tratamiento
+
+- Tenemos datos sobre el número de bancos en cada distrito en cada año (1929-1934)
+
+`$$y_{dt}=\alpha+\beta T_d+\gamma POST_t + \delta_{r,DID}(T_d\times POST_t)+e_{dt}$$`
+- `\(T_d\)` es una dummy para los distritos tratados (distrito 6 en este caso)
+  
+  - Les llamamos **efectos fijos individuales** y sirven para controlar diferencias entre distritos que no cambian en el tiempo
+  
+- `\(POST_t\)` es una dummy para los periodos post tratamiento (1931 en adelante)
+
+- Al término `\(T_d\times POST_t\)` se le conoce como el **término de interacción**, que es una dummy igual a 1 para los distritos tratados en los años post intervención
+
+- `\(\delta_{r,DID}\)` es el estimador de DID del efecto del tratamiento
+
+
+---
+
+# Regresión en DID
+
+
+.pull-left[
+
+```r
+did_bank &lt;- lm(banks ~ treatment + post+ treatment*post,
+               data=banks)
+```
+]
+
+
+.tiny[
+.pull-right[
+
+```r
+banks
+```
+
+```
+## # A tibble: 12 x 5
+##     year distrito banks treatment  post
+##    &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
+##  1  1929 bib6       141         1     0
+##  2  1930 bib6       135         1     0
+##  3  1931 bib6       121         1     1
+##  4  1932 bib6       113         1     1
+##  5  1933 bib6       102         1     1
+##  6  1934 bib6       102         1     1
+##  7  1929 bib8       169         0     0
+##  8  1930 bib8       165         0     0
+##  9  1931 bib8       132         0     1
+## 10  1932 bib8       120         0     1
+## 11  1933 bib8       111         0     1
+## 12  1934 bib8       109         0     1
+```
+]
+]
+---
+
+# Regresión en DID
+
+.tiny[
+
+```r
+summary(did_bank)
+```
+
+```
+## 
+## Call:
+## lm(formula = banks ~ treatment + post + treatment * post, data = banks)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -9.000 -7.125  0.000  3.125 14.000 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     167.000      6.190  26.980 3.83e-09 ***
+## treatment       -29.000      8.754  -3.313 0.010652 *  
+## post            -49.000      7.581  -6.464 0.000195 ***
+## treatment:post   20.500     10.721   1.912 0.092224 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 8.754 on 8 degrees of freedom
+## Multiple R-squared:  0.8906,	Adjusted R-squared:  0.8496 
+## F-statistic: 21.71 on 3 and 8 DF,  p-value: 0.0003369
+```
+]
+
+---
+
+# Regresión en DID
+
+.pull-left[
+- Noten que si solo usamos dos años, obtenemos exactamente lo que obtendríamos haciendo las diferencias *a mano*
+
+`$$\delta_{DiD}=(Y_{6,1931}-Y_{6,1931})-(Y_{8,1930}-Y_{8,1930})=19$$`
+
+
+```r
+did_bank2 &lt;- lm(banks ~ treatment + post+ treatment*post,
+               data=filter(banks,year==1930 | year==1931))
+```
+]
+
+.tiny[
+.pull-right[
+
+```r
+summary(did_bank2)
+```
+
+```
+## 
+## Call:
+## lm(formula = banks ~ treatment + post + treatment * post, data = filter(banks, 
+##     year == 1930 | year == 1931))
+## 
+## Residuals:
+## ALL 4 residuals are 0: no residual degrees of freedom!
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)         165        NaN     NaN      NaN
+## treatment           -30        NaN     NaN      NaN
+## post                -33        NaN     NaN      NaN
+## treatment:post       19        NaN     NaN      NaN
+## 
+## Residual standard error: NaN on 0 degrees of freedom
+## Multiple R-squared:      1,	Adjusted R-squared:    NaN 
+## F-statistic:   NaN on 3 and 0 DF,  p-value: NA
+```
+]
+]
+---
+
+class: inverse, middle, center
+
+# Diferencias en la edad legal para beber
+
+
+---
+
+# Diferencias en la edad legal para beber
+
+- ¿Las restricciones a la edad mínima para comprar alcohol tienen un impacto en la mortalidad?
+
+- Alabama redujo la edad legal a 19 en 1975, mientras que, por ejemplo, Arkansas mantuvo la edad en 21
+
+- Tenemos datos de mortalidad de 1970 a 1983 para personas de entre 18 y 20 años
+
+--
+
+- Lo que hemos aprendido hasta ahora nos sugiere estimar el impacto por DID comos sigue
+
+`$$y_{st}=\alpha+\beta T_s+\gamma POST_t+\delta_{DID}(T_s\times POST_t)+e_{st}$$`
+- `\(T_s\)` es una dummy igual a 0 para Arkansas en todos los periodos e igual a 1 para Alabama en todos los periodos
+
+- `\(POST_t\)` es igual a cero para el periodo 1970-1975 e igual a 1 para el periodo 1976-1983
+
+- `\(T_s\times POST_t\)` es igual a 1 para las observaciones de Alabama en los años en los que la nueva política ya está en vigor
+
+
+---
+
+# Más de un estado
+
+- ¿Por qué quedarnos solo con la comparación con Arkansas?
+
+- Podemos incluir más unidades que implementen cambios en la política en distintos momentos
+
+- En vez de `\(POST_t\)` usamos efectos fijos por año
+
+- Y en vez de una dummy de tratamiento, incluimos efectos fijos por unidad
+
+- Además, en el cambio en la ley podría no ser el mismo
+
+  - Algunos estados mueven la edad a 18, otros a 19 y otros a 20
+  
+  - Podemos definir `\(LEGAL_{st}\)` como la proporción de individuos de entre 18 y 20 años autorizados para beber en el estado `\(s\)` y en el año `\(t\)`
+
+--
+
+`$$y_{st}=\alpha+\delta_{DID}LEGAL_{st}+\sum_k\beta_k STATE_{ks}+\sum_j \gamma_j YEAR_{jt}+e_{st}$$`
+---
+
+# Estructura de datos en panel
+
+- Los datos que acabamos de describir tienen una estructura de panel
+
+- La variable de panel es el estado `\(s\)` y la variable de tiempo es el año `\(t\)`
+
+- En nuestros datos, cada estado se encuentra presente en varios años, y para cada estado y año sabemos la mortalidad y la fracción de personas de 18 a 20 años que pueden beber
+
+- **Efectos fijos** `\(STATE_{ks}\)`: diferencias entre estados que no cambian con el tiempo
+
+- **Efectos año** `\(YEAR_{jt}\)`: factores que afectan a todas las unidades por igual en un momento del tiempo
+
+
+
+---
+
+# Interpretación
+
+| Muertes por 100,000 habs.: | `\(\hat{\delta}_{DID}\)` |
+|:--- | :---: |
+| Todas | 10.80 |
+| | (4.59)|
+| Accidentes en vehículos | 7.59 |
+| | (2.50) |
+| Suicidio | 0.59|
+| | (0.59) |
+| Causas internas | 1.33 |
+| | (1.59)    |
+
+
+- La interpretación de los resultados es directa
+
+- El acceso a alcohol causa un incremento de casi 11 muertes adicionales por cada 100,000 habitantes y este efecto es estadísticamente significativo
+
+- No hay efectos donde no esperaríamos tenerlos
+
+---
+
+class: inverse, middle, center
+
+# Violación a los supuestos
+
+---
+
+# Violación a los supuestos
+
+.pull-left[
+- Consideremos cosas que podrían salir mal con respecto al supuesto de tendencias paralelas
+
+- En este ejemplo estilizado algo sucedió en Allatsea que produjo un cambio en la trayectoria de mortalidad antes del cambio en la legislación
+
+- El supuesto de tendencias paralelas sí se sostenía hasta antes de este cambio
+
+- Sin embargo, nuestra estrategia de DID atribuiría el efecto al cambio en la legislación
+]
+
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/trends_1.png" alt="Fuente: Angrist &amp;amp; Pischke (2014)" width="100%" /&gt;
+&lt;p class="caption"&gt;Fuente: Angrist &amp; Pischke (2014)&lt;/p&gt;
+&lt;/div&gt;
+]
+---
+
+# Violación a los supuestos
+
+.pull-left[
+- En este segundo ejemplo, el supuesto de tendencias paralelas pre intervención se viola
+
+- Aunque en el momento del cambio de la política, la línea de Allatsea es más inclinada, estimar esta relación por DID de nuevo atribuiría a la política diferencias que ya existían antes de la intervención
+
+]
+
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/trends_2.png" alt="Fuente: Angrist &amp;amp; Pischke (2014)" width="100%" /&gt;
+&lt;p class="caption"&gt;Fuente: Angrist &amp; Pischke (2014)&lt;/p&gt;
+&lt;/div&gt;
+]
+
+---
+
+# Violación a los supuestos
+
+.pull-left[
+- En este tercer ejemplo hay tendencias que no son paralelas pre intervención
+
+- Sin embargo, después de la intervención, la trayectoria de Allatsea tiene una pendiente claramente más inclinada que antes de la intervención
+
+- Quisiéramos incorporar esta posibilidad en la estimación
+
+]
+
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/trends_3.png" alt="Fuente: Angrist &amp;amp; Pischke (2014)" width="100%" /&gt;
+&lt;p class="caption"&gt;Fuente: Angrist &amp; Pischke (2014)&lt;/p&gt;
+&lt;/div&gt;
+]
+
+---
+
+# Relajación de supuestos
+
+- Cuando tenemos datos en panel con varios periodos pre y post intervención podemos relajar el supuesto de tendencias paralelas
+
+- Podemos estimar un modelo con tendencias específicas por estado:
+
+`$$y_{st}=\alpha+\delta_{DID}LEGAL_{st}+\sum_k\beta_k STATE_{ks}+\sum_j \gamma_j YEAR_{jt}+\sum_k\theta_k(STATE_{ks}\times t)+ e_{st}$$`
+- `\(\theta_k\)` captura tendencias específicas por cada estado
+
+- `\(\delta_{DID}\)` captura las desviaciones respecto a una tendencia suave, aún cuando las tendencias no sean comúnes
+
+---
+
+# Próxima sesión
+
+- Examen parcial
+  - Durante la hora de clase
+  - Muy similar a las tareas
+  - Pueden usar sus notas y otros recursos
+  - Pueden usar los códigos que ya elaboraron y los que les he dado yo
+  - Si trabajan con programas que compilen .tex o Markdown, les recomiendo que se preparen con una plantilla mínima para que no pierdan tiempo haciéndola desde cero
+
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script src="libs/cols_macro.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
