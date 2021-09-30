@@ -187,8 +187,8 @@ banks %>%
 $$m_{NT}=\frac{Y_{8,post}-Y_{8,pre}}{X_{8,post}-X_{8,pre}}=\frac{132-165}{1931-1930}=-33$$
 - Y entonces, podemos encontrar cuál hubiera sido el número de bancos en el distrio 6 (tratado) si hubiera seguido la pendiente del distrito 8:
 
-$$m_T=\frac{Y_{6,post}-Y_{6,pre}}{X_{6,post}-X_{6,pre}}=\frac{Y_{8,post}-135}{1931-1930}=-33$$
-- Por tanto, $Y_{8,post}=102$ es el número de bancos que el distrito 6 hubiera tendio si hubiera seguido una tendencia paralela a la del distrito 8 ]
+$$m_T=\frac{\tilde{Y}_{6,post}-Y_{6,pre}}{X_{6,post}-X_{6,pre}}=\frac{\tilde{Y}_{6,post}-135}{1931-1930}=-33$$
+- Por tanto, $\tilde{Y}_{6,post}=102$ es el número de bancos que el distrito 6 hubiera tenido si hubiera seguido una tendencia paralela a la del distrito 8 ]
 
 ---
 
@@ -239,7 +239,7 @@ $$
 \delta_{DID}&=(Y_{6,post}-Y_{6,pre})-(Y_{8,post}-Y_{8,pre}) \\
 &=(Y_{6,1931}-Y_{6,1931})-(Y_{8,1930}-Y_{8,1930}) \\
 &=(121-135)-(132-165) \\
-&-14+33 = 19
+&=-14+33 = 19
 \end{aligned}
 $$
 
