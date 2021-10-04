@@ -239,8 +239,6 @@ obs &lt;- nrow(data.morocco)
 #Solo para ejemplificar, la siguiente línea pide el remuestreo, es decir, obtener una muestra de tamaño N de la muestra original, con reemplazo
 data.b &lt;-data.morocco[sample(nrow(data.morocco),obs, replace = TRUE),]
 
-
-#2a
 #Simplemente repetimos el proceso anterior B veces
 set.seed(821)
 B=50
@@ -251,7 +249,7 @@ for (i in 1:B)
 {
   data.b &lt;-data.morocco[sample(nrow(data.morocco),obs, replace = TRUE),]
 
-  #Literalmente pegamos el cálculo de un W, hecho en la Pregunta 1a
+  #Literalmente pegamos el cálculo de un W, hecho en la Pregunta 2a
 
   mean_cliente&lt;-data.b %&gt;%
 group_by(treatment) %&gt;% 
@@ -276,7 +274,7 @@ sd(Wrep50_1$W)
 ## [1] 14735.91</code></pre></li>
 <li><p>[5 puntos] Reemplace la semilla de la parte a. por una nueva semilla y estime nuevamente el error estándar del estimador de Wald con 50 repeticiones. Comente sobre la diferencia entre este error estándar y el de la parte a.</p>
 <p><em>El cambio que observamos en el error estándar estimado por bootstrap entre esta parte y la parte a. es que al cambiar la semilla, los números aleatorios generados son distitnos y, por tanto, cada muestra bootstrap tiene distintos individuos.</em></p>
-<pre class="r"><code>#2b Simplemente cambiamos la semilla
+<pre class="r"><code>#Simplemente cambiamos la semilla
 set.seed(8212)
 B=50
 #Inicializamos el vector donde guardaremos los W estimados
@@ -306,7 +304,7 @@ sd(Wrep50_2$W)
 ## [1] 14869.02</code></pre></li>
 <li><p>[5 puntos] Regrese el valor de la semilla al usado en a. y estime nuevamente el error estándar del estimador de Wald, esta vez usando 1000 repeticiones. Comente sobre la diferencia entre este error estándar y el de la parte a.</p>
 <p><em>Ahora las diferencias en el error estimado surgen porque tenemos muchas más repeticiones bootstrap. Lo más importante de estos procedimientos es que pueda implementarlos a otros contextos. Por ejemplo, podemos hacer obtener errores bootstrap para el vector de coeficientes de una estimación de MC2E, para el producto de dos coeficientes, etc.</em></p>
-<pre class="r"><code>#2c regresamos a la primera semilla pero ahora B=1000
+<pre class="r"><code>#Regresamos a la primera semilla pero ahora B=1000
 set.seed(820)
 B=1000
 
@@ -344,8 +342,7 @@ sd(Wrep1000$W)
 <ol style="list-style-type: lower-alpha">
 <li><p>[5 puntos] Para tener un punto de comparación, estime la ecuación del efecto de tratamiento para <strong>credits_earned2</strong> usando la misma especificación que en la pregunta 5 de la Tarea 1. Use también errores robustos. Deberá poder replicar los coeficientes y errores estándar del panel D, columna (4). ¿Cómo se interpretan el coeficiente sobre la variable <strong>ssp</strong>?</p>
 <p><em>Usando la misma especificación que usamos en la Tarea 1, obtenemos los coeficientes en el artículo.</em></p>
-<pre class="r"><code>#4a 
-data.angrist&lt;-read_csv(&quot;./STAR_public_use.csv&quot;,
+<pre class="r"><code>data.angrist&lt;-read_csv(&quot;./STAR_public_use.csv&quot;,
              locale = locale(encoding = &quot;latin1&quot;))   %&gt;% 
   clean_names()
 
@@ -371,7 +368,7 @@ coeftest(reg_credits_earned2, vcov = vcovHC(reg_credits_earned2, &quot;HC1&quot;
 ## sfsp         0.07157034  0.1302458  0.5495021 0.58274953</code></pre></li>
 <li><p>[5 puntos] Genere un <span class="math inline">\(z\)</span>-score para la variable <strong>credits_earned2</strong> al que llame <strong>credits_earned2_sd</strong>. Para ello, calcule la media y desviación estándar de <strong>credits_earned2</strong> para el grupo de control y luego genere <strong>credits_earned2_sd</strong> restándole a <strong>credits_earned2</strong> la media obtenida y dividiendo esta diferencia por la desviación estándar obtenida. Compruebe que si calcula la media y la desviación estándar de <strong>credits_earned2_sd</strong>, en el grupo de control estas deberían ser 0 y 1, respectivamente.</p>
 <p><em>Creamos un z-score y notamos que tiene media cero y varianza 1 en el grupo de control:</em></p>
-<pre class="r"><code>#4b z-score para credits_earned2
+<pre class="r"><code>#z-score para credits_earned2
 
 credits_earned2_stats &lt;- data.angrist %&gt;% 
 filter(control==1) %&gt;% 
@@ -399,7 +396,7 @@ data.angrist %&gt;%
 ## 1       1</code></pre></li>
 <li><p>[5 puntos] Realice la misma estimación que en la parte a., pero ahora use como variable dependiente <strong>credits_earned2_sd</strong>. ¿Cómo se interpreta el coeficiente sobre <strong>ssp</strong>? ¿Qué es diferente y qué es igual entre los resultados obtenidos en esta parte y los obtenidos en la parte a.?</p>
 <p><em>Los coeficientes estimados son diferentes. Ahora el coeficiente sobre ssp es el efecto que tiene el programa en el z-score de créditos cursados, es decir, el SSP tiene un efecto de -0.098 desviaciones estándar en el z-score de créditos cursados, aunque este efecto no es estadísticamente significativo. La magnitud del error estándar también es diferente, pues ahora las variables están en distintas unidades. Noten en cambio que el estadístico t asociado a SSP es exactamente igual al de la parte a., por lo que en ambos casos no se rechaza la <span class="math inline">\(H_0\)</span>.</em></p>
-<pre class="r"><code>#4c Regresión con variable estandarizada
+<pre class="r"><code>#Regresión con variable estandarizada
 reg_credits_earned2_sd&lt;-lm(credits_earned2_sd ~ ssp + sfp+ sfsp+
          factor(sex)+
          factor(mtongue)+
@@ -427,8 +424,7 @@ coeftest(reg_credits_earned2, vcov = vcovHC(reg_credits_earned2, &quot;HC1&quot;
 ## sfsp         0.07157034  0.1302458  0.5495021 0.58274953</code></pre></li>
 <li><p>[5 puntos] Ahora realizaremos un índice de mejora en educación, al agregar los resultados de estos dos indicadores en una sola variable, como se describe en Banerjee et al. (2015)<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>. Para ello, primero genere <strong>gpa_year2_sd</strong>, que será la versión estandarizada de <strong>gpa_year2</strong>, siguiendo el mismo procedimiento que en la parte b. En seguida, genere una nueva variable llamada <strong>promedio_vars</strong>, que será el promedio de <strong>credits_earned2_sd</strong> y <strong>gpa_year2_sd</strong>. Luego, calcule la media y la desviación estándar de <strong>promedio_vars</strong> en el grupo de control. Finalmente, genere una nueva variable <strong>promedio_vars_sd</strong> restándole a <strong>promedio_vars</strong> la media antes calculada y dividiendo esta diferencia por la desviación estándar antes calculada. Muestre que la variable <strong>promedio_vars_sd</strong> tiene media 0 y desviación estándar 1 en el grupo de control.</p>
 <p><em>Siguiendo las instrucciones obtenemos un índice agregado de desempeño escolar. Quizás debimos llamar a promedio_vars_sd con otro nombre, uno más intuitivo, como indice_escolar_sd. Conservaremos por ahora la notación planteada originalmente:</em></p>
-<pre class="r"><code>#4d
-gpa_year2_stats &lt;- data.angrist %&gt;% 
+<pre class="r"><code>gpa_year2_stats &lt;- data.angrist %&gt;% 
   filter(control==1) %&gt;% 
   summarize(media=mean(gpa_year2,na.rm=T),desvest=sd(gpa_year2,na.rm=T))
 
@@ -465,7 +461,7 @@ data.angrist %&gt;%
 ## 1       1</code></pre></li>
 <li><p>[5 puntos] Estime ahora el efecto de tratamiento sobre <strong>promedio_vars_sd</strong>, siguiendo la misma especificación econométrica que en la parte a. y usando errores robustos. ¿Qué concluye?</p>
 <p><em>En este ejemplo en particular, el índice no es estadísticamente significativo para ninguno de los tipos de tratamiento. Quizás el ejemplo fue aburrido, pero ahora ya sabe crear índices para agregar múltiples indicadores individuales sobre cierta dimensión de interés.</em></p>
-<pre class="r"><code>#4e Regresión con el índice
+<pre class="r"><code>#Regresión con el índice
 reg_promedio_vars_sd&lt;-lm(promedio_vars_sd ~ ssp + sfp+ sfsp+
                          factor(sex)+
                          factor(mtongue)+
@@ -532,7 +528,7 @@ coeftest(reg_promedio_vars_sd, vcov = vcovHC(reg_credits_earned2_sd, &quot;HC1&q
 
 alpha &lt;- 0.05
 
-#5a Corrección con familias originales
+#Corrección con familias originales
 #Ordenar de menor a mayor por familia
 data.fam.or &lt;- data.pvalues
 setorder(data.fam.or,familia,p) #usé setorder de la libreria data.table
@@ -578,7 +574,7 @@ data.fam.or %&gt;%
 ## 15        15       3             1                1        1</code></pre></li>
 <li><p>[5 puntos] Suponga que encuentra buenas razones conceptuales para afirmar que las familias 2 y 3 deben ser consideraras una sola familia. Tendríamos ahora solo dos familias, la familia 1 original y una nueva familia numerada como 4, como se indica en la variable familia_corregida. ¿Cómo cambian sus conclusiones respecto a la parte a. de esta pregunta? Genere un nuevo cuadro con esta redefinición.</p>
 <p><em>Ahora solo tenemos dos familias, pero la familia 1 se mantiene igual. Entonces, no debe haber cambios en qué hipótesis se rechazan dentro de la familia 1 sin importar el método, lo cual ocurre en este caso. Al reagrupar las familias, ahora se rechazan en total cuatro hipótesis con el método de Bonferroni y cinco con el de Benjamini y Hochberg.</em></p>
-<pre class="r"><code>#5b Ahora familias es la familia corregida
+<pre class="r"><code>#Ahora familias es la familia corregida
 data.fam.corr &lt;- data.pvalues
 setorder(data.fam.corr,familia_corregida,p) #usé setorder de la libreria data.table
 
@@ -623,7 +619,7 @@ data.fam.corr %&gt;%
 <li><p>[5 puntos] Suponga que su asistente de investigación olvidó el concepto de familia y realiza las correcciones por pruebas de múltiples hipótesis ignorando las familias. ¿Qué concluiría en este caso? Genere un nuevo cuadro bajo esta circunstancia. Comente sobre la diferencia en las conclusiones entre las partes b. y c.</p>
 <p><em>Finalmente, podemos ver esta parte como si hubiera una sola gran familia. En este caso, usando el método de Bonferroni se rechazarían solo tres hipótesis. Usando el método de Benjamini y Hochberg se rechazan cinco hipótesis.</em></p>
 <p><em>En esta pregunta comprobamos que el procedimiento de Bonferroni es demasiado conservador, así como no agrupar por familias lo es también. El cómo decidamos agrupar las variables en familias tiene importantes consecuencias al momento de realizar las correcciones. El procedimiento de Benjamini y Hochberg es ampliamente usado en la literatura de evaluación, como lo hemos visto en varias de las aplicaciones de clase.</em></p>
-<pre class="r"><code>#5c Sin considerar las familias
+<pre class="r"><code>#Sin considerar las familias
 data.nofam &lt;- data.pvalues
 setorder(data.nofam,p)
 

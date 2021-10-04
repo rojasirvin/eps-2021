@@ -253,8 +253,6 @@ obs <- nrow(data.morocco)
 #Solo para ejemplificar, la siguiente línea pide el remuestreo, es decir, obtener una muestra de tamaño N de la muestra original, con reemplazo
 data.b <-data.morocco[sample(nrow(data.morocco),obs, replace = TRUE),]
 
-
-#2a
 #Simplemente repetimos el proceso anterior B veces
 set.seed(821)
 B=50
@@ -265,7 +263,7 @@ for (i in 1:B)
 {
   data.b <-data.morocco[sample(nrow(data.morocco),obs, replace = TRUE),]
   
-  #Literalmente pegamos el cálculo de un W, hecho en la Pregunta 1a
+  #Literalmente pegamos el cálculo de un W, hecho en la Pregunta 2a
   
   mean_cliente<-data.b %>%
     group_by(treatment) %>% 
@@ -294,7 +292,7 @@ a.	[5 puntos] Reemplace la semilla de la parte a. por una nueva semilla y estime
     *El cambio que observamos en el error estándar estimado por bootstrap entre esta parte y la parte a. es que al cambiar la semilla, los números aleatorios generados son distitnos y, por tanto, cada muestra bootstrap tiene distintos individuos.*
 
     ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
-#2b Simplemente cambiamos la semilla
+#Simplemente cambiamos la semilla
 set.seed(8212)
 B=50
 #Inicializamos el vector donde guardaremos los W estimados
@@ -328,7 +326,7 @@ a.	[5 puntos] Regrese el valor de la semilla al usado en a. y estime nuevamente 
     *Ahora las diferencias en el error estimado surgen porque tenemos muchas más repeticiones bootstrap. Lo más importante de estos procedimientos es que pueda implementarlos a otros contextos. Por ejemplo, podemos hacer obtener errores bootstrap para el vector de coeficientes de una estimación de MC2E, para el producto de dos coeficientes, etc.*
 
     ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
-#2c regresamos a la primera semilla pero ahora B=1000
+#Regresamos a la primera semilla pero ahora B=1000
 set.seed(820)
 B=1000
 
@@ -369,7 +367,6 @@ a. [5 puntos] Para tener un punto de comparación, estime la ecuación del efect
     *Usando la misma especificación que usamos en la Tarea 1, obtenemos los coeficientes en el artículo.*
 
     ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
-#4a 
 data.angrist<-read_csv("./STAR_public_use.csv",
                  locale = locale(encoding = "latin1"))   %>% 
   clean_names()
@@ -396,7 +393,7 @@ a. [5 puntos] Genere un $z$-score para la variable **credits_earned2** al que ll
     *Creamos un z-score y notamos que tiene media cero y varianza 1 en el grupo de control:*
 
     ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
-#4b z-score para credits_earned2
+#z-score para credits_earned2
 
 credits_earned2_stats <- data.angrist %>% 
     filter(control==1) %>% 
@@ -421,7 +418,7 @@ a. [5 puntos] Realice la misma estimación que en la parte a., pero ahora use co
     *Los coeficientes estimados son diferentes. Ahora el coeficiente sobre ssp es el efecto que tiene el programa en el z-score de créditos cursados, es decir, el SSP tiene un efecto de -0.098 desviaciones estándar en el z-score de créditos cursados, aunque este efecto no es estadísticamente significativo. La magnitud del error estándar también es diferente, pues ahora las variables están en distintas unidades. Noten en cambio que el estadístico t asociado a SSP es exactamente igual al de la parte a., por lo que en ambos casos no se rechaza la $H_0$.*
 
     ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
-#4c Regresión con variable estandarizada
+#Regresión con variable estandarizada
 reg_credits_earned2_sd<-lm(credits_earned2_sd ~ ssp + sfp+ sfsp+
              factor(sex)+
              factor(mtongue)+
@@ -444,7 +441,6 @@ a. [5 puntos] Ahora realizaremos un índice de mejora en educación, al agregar 
     *Siguiendo las instrucciones obtenemos un índice agregado de desempeño escolar. Quizás debimos llamar a promedio_vars_sd con otro nombre, uno más intuitivo, como indice_escolar_sd. Conservaremos por ahora la notación planteada originalmente:*
 
     ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
-#4d
 gpa_year2_stats <- data.angrist %>% 
   filter(control==1) %>% 
   summarize(media=mean(gpa_year2,na.rm=T),desvest=sd(gpa_year2,na.rm=T))
@@ -479,7 +475,7 @@ a. [5 puntos] Estime ahora el efecto de tratamiento sobre **promedio_vars_sd**, 
     *En este ejemplo en particular, el índice no es estadísticamente significativo para ninguno de los tipos de tratamiento. Quizás el ejemplo fue aburrido, pero ahora ya sabe crear índices para agregar múltiples indicadores individuales sobre cierta dimensión de interés.*
 
     ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
-#4e Regresión con el índice
+#Regresión con el índice
 reg_promedio_vars_sd<-lm(promedio_vars_sd ~ ssp + sfp+ sfsp+
                              factor(sex)+
                              factor(mtongue)+
@@ -516,7 +512,7 @@ data.pvalues<-read_csv("./pvalues.csv",
 
 alpha <- 0.05
 
-#5a Corrección con familias originales
+#Corrección con familias originales
 #Ordenar de menor a mayor por familia
 data.fam.or <- data.pvalues
 setorder(data.fam.or,familia,p) #usé setorder de la libreria data.table
@@ -550,7 +546,7 @@ a. [5 puntos] Suponga que encuentra buenas razones conceptuales para afirmar que
     *Ahora solo tenemos dos familias, pero la familia 1 se mantiene igual. Entonces, no debe haber cambios en qué hipótesis se rechazan dentro de la familia 1 sin importar el método, lo cual ocurre en este caso. Al reagrupar las familias, ahora se rechazan en total cuatro hipótesis con el método de Bonferroni y cinco con el de Benjamini y Hochberg.*
 
     ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
-#5b Ahora familias es la familia corregida
+#Ahora familias es la familia corregida
 data.fam.corr <- data.pvalues
 setorder(data.fam.corr,familia_corregida,p) #usé setorder de la libreria data.table
 
@@ -584,7 +580,7 @@ a. [5 puntos] Suponga que su asistente de investigación olvidó el concepto de 
    *En esta pregunta comprobamos que el procedimiento de Bonferroni es demasiado conservador, así como no agrupar por familias lo es también. El cómo decidamos agrupar las variables en familias tiene importantes consecuencias al momento de realizar las correcciones. El procedimiento de Benjamini y Hochberg es ampliamente usado en la literatura de evaluación, como lo hemos visto en varias de las aplicaciones de clase.*
 
     ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
-#5c Sin considerar las familias
+#Sin considerar las familias
 data.nofam <- data.pvalues
 setorder(data.nofam,p)
 
