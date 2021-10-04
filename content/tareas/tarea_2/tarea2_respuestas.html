@@ -1,0 +1,687 @@
+---
+title: "Respuestas a la tarea 2"
+summary: " "
+weight: 2
+type: book
+toc: false
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="pregunta-1" class="section level2">
+<h2>Pregunta 1</h2>
+<p>En Crepon et al. (2015)<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> se estudia una intervención en Marruecos en la que se analiza el efecto de la <em>adopción</em> de microfinanzas, a través de un experimento de campo. En 81 de 162 localidades estudiadas se introdujo aleatoriamente una empresa de microfinanzas. Para seleccionar las localidades de tratamiento, primero se <em>emparejaron</em> localidades de acuerdo a características observables y, para cada pareja se asignó a tratamiento y otra a control. La base de datos <em>crepon_morocco_balance.csv</em> contiene los datos de este estudio usados para mostrar la integridad del diseño. La variable <strong>treatment</strong> es la variable de asignación aleatoria, mientras que la variable <strong>client</strong> es la variable de adopción</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[3 puntos] Primero recordaremos cómo mostrar que el tratamiento efectivamente fue asignado de manera aleatoria. El siguiente código carga la base de datos que debemos usar y se queda con las observaciones de la línea base. Con estos datos, mostraremos que la variable <strong>members_resid_bl</strong>, que indica el número de personas que viven en promedio en cada igual, está balanceada entre los grupos asignados a tratamiento y control. Noten que la media del número de personas que viven en el hogar en el grupo de control es 5.14 (d.e. 2.70) y que hay 2,266 hogares en dicho grupo de control. Esto es exactamente lo que se reporta en la primera fila de la tabla 1 del artículo.</p>
+<pre class="r"><code>data.morocco&lt;-read_csv(&quot;./crepon_morocco_balance.csv&quot;,
+                   locale = locale(encoding = &quot;latin1&quot;))   %&gt;% 
+  clean_names() %&gt;% 
+  filter(merge_indicator!=1)
+
+data.morocco %&gt;% 
+  group_by(treatment) %&gt;%
+  summarize(mean=mean(members_resid_bl),
+        std=sd(members_resid_bl), n=n()) %&gt;% 
+  ungroup()</code></pre>
+<pre><code>## # A tibble: 2 x 4
+##   treatment  mean   std     n
+##       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+## 1         0  5.14  2.69  2266
+## 2         1  5.19  2.76  2199</code></pre>
+<p>Obtenga ahora el valor de la diferencia entre el grupo de tratamiento y el de control, así como su valor p (últimas dos columnas). Para ello, estime una regresión en la que la variable dependiente sea el tamaño del hogar <strong>members_resid_bl</strong>, en función de la variable de asignación <strong>treatment</strong> y variables dummy de pareja de localidad (la variable <strong>paire</strong> indica cuáles son las parejas). La regresión permite recuperar la diferencia de 0.04 miembros del hogar promedio que se reporta en la primera fila de la tabla 1. Para recuperar el valor <span class="math inline">\(p\)</span>, estime errores agrupados usando la variable <strong>demi_paire</strong> como variable de agrupación. Una forma de realizar esto es con la función <em>coef_test</em> del paquete <em>clubSandwich</em>.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<pre class="r"><code>dif_members &lt;- lm(members_resid_bl ~ treatment + factor(paire),
+   data=data.morocco)
+
+summary(dif_members)$coef[1:7,]</code></pre>
+<pre><code>##                   Estimate Std. Error    t value     Pr(&gt;|t|)
+## (Intercept)     4.06166091  0.3047365 13.3284357 9.311212e-40
+## treatment       0.04334484  0.0707258  0.6128576 5.400023e-01
+## factor(paire)2  1.78431373  0.4152704  4.2967514 1.770771e-05
+## factor(paire)3  1.06107184  0.4356350  2.4356902 1.490300e-02
+## factor(paire)4 -3.08333333  0.4594672 -6.7106719 2.184193e-11
+## factor(paire)5  1.85814080  0.4442115  4.1830089 2.933028e-05
+## factor(paire)6  2.88352450  0.4262934  6.7641779 1.517259e-11</code></pre>
+<pre class="r"><code>nobs(dif_members)</code></pre>
+<pre><code>## [1] 4465</code></pre>
+<pre class="r"><code>coef_test(dif_members,
+      vcov = &quot;CR1S&quot;, 
+      cluster = data.morocco$demi_paire)[1:2,]</code></pre>
+<pre><code>##         Coef. Estimate     SE t-stat  d.f. p-val (Satt) Sig.
+## 1 (Intercept)   4.0617 0.0647  62.80  1.03      0.00911   **
+## 2   treatment   0.0433 0.0787   0.55 76.54      0.58361</code></pre></li>
+<li><p>[2 puntos] Ahora mostremos que efectivamente este es un ejemplo de una intervención con cumplimiento imperfecto. Genere un cuadro que indique: 1) cuántas personas que fueron asignadas a recibir el tratamiento efectivamente fueron clientes; 2) cuántas personas que fueron asignadas a recibir el tratamiento no se convirtieron en clientes; 3) cuántas personas que no fueron asignadas a recibir el tratamiento sí se convirtieron en clientes; y 4) cuántas personas que no fueron asignadas a recibir el tratamiento tampoco se convirtieron en clientes.</p>
+<pre class="r"><code>##Pero hay selección, veamos un tabulado cruzado
+data.morocco %&gt;%
+  mutate(treatment=factor(treatment, levels=c(0,1),labels=c(&quot;Control&quot;, &quot;Tratamiento&quot;))) %&gt;%
+  mutate(client=factor(client, levels=c(0,1),labels=c(&quot;No cliente&quot;, &quot;Cliente&quot;))) %&gt;% 
+  tabyl(treatment, client)</code></pre>
+<pre><code>##    treatment No cliente Cliente NA_
+##      Control       2101       0 165
+##  Tratamiento       1753     251 195</code></pre></li>
+<li><p>[5 puntos] Ahora mostraremos que la adopción, es decir, convertirse en cliente, no es independiente de las características de los hogares. Por ejemplo, considere las variables <strong>members_resid_bl</strong> y <strong>act_number_bl</strong>, que indican el número de miembros del hogar y el número de actividades económicas del hogar. Para cada una de estas dos variables, utilice la misma especificación que en la parte a., pero ahora para usando la variable <strong>cliente</strong> como regresor. ¿Qué concluye?</p>
+<pre class="r"><code>#Para el número de miembros del hogar
+dif_members_client &lt;- lm(members_resid_bl ~ client + factor(paire),
+                     data=data.morocco)
+coef_test(dif_members_client,
+      vcov = &quot;CR1S&quot;, 
+      cluster = data.morocco$demi_paire)[1:2,]</code></pre>
+<pre><code>##         Coef. Estimate    SE t-stat d.f. p-val (Satt) Sig.
+## 1 (Intercept)     4.18 0.128  32.70  1.0       0.0195    *
+## 2      client     0.43 0.180   2.38 45.4       0.0214    *</code></pre>
+<pre class="r"><code>#Para el número de actividades económicas del hogar
+dif_activities_client &lt;- lm(act_number_bl ~ client + factor(paire),
+                        data=data.morocco)
+coef_test(dif_activities_client,
+      vcov = &quot;CR1S&quot;, 
+      cluster = data.morocco$demi_paire)[1:2,]</code></pre>
+<pre><code>##         Coef. Estimate     SE t-stat d.f. p-val (Satt) Sig.
+## 1 (Intercept)    1.109 0.2330   4.76  1.0      0.13185     
+## 2      client    0.191 0.0687   2.78 45.4      0.00787   **</code></pre>
+<p><em>La adopción no es independiente de las características de los hogares. Parece ser que los hogares que se convierten en clientes son más grandes y tienen más actividades económicas.</em></p></li>
+<li><p>[5 puntos] Con estos elementos estamos convencidos de que es necesario emplear lo que sabemos sobre cumplimiento imperfecto. Usaremos ahora los datos en <em>crepon_morocco_analysis.csv</em>, que contiene los datos empleados para evaluar el impacto de la adopción. Estos datos están listos para analizarse. Estime la forma reducida del efecto de ser asignado al tratamiento sobre gasto total, <strong>expense_total</strong>. Comente los resultados, en particular, comente sobre la magnitud y la significancia estadística de la variable <strong>treatment</strong>. Aquí y en adelante, incluya los siguientes controles en la regresión: <strong>members_resid_bl</strong>, <strong>nadults_resid_bl</strong>, <strong>head_age_bl</strong>, <strong>act_livestock_bl</strong>, <strong>act_business_bl</strong>, <strong>borrowed_total_bl</strong>, <strong>members_resid_d_bl</strong>, <strong>nadults_resid_d_bl</strong>, <strong>head_age_d_bl</strong>, <strong>act_livestock_d_bl</strong>, <strong>act_business_d_bl</strong>, <strong>borrowed_total_d_bl</strong>, <strong>ccm_resp_activ</strong>, <strong>other_resp_activ</strong>, <strong>ccm_resp_activ_d</strong> y <strong>other_resp_activ_d</strong>. Además, incluya efectos fijos por pareja introduciendo la variable <strong>paire</strong> como factor. Use los mismos errores estándar que en la parte a. Con esto deberá poder recuperar el coeficiente y el error estándar de la columna (3) de la tabla 3.</p>
+<p><em>La forma reducida estima la relación causal entre la variable de gasto y la asignación aleatoria. Se estima un efecto de 4057 unidades monetarias en el gasto, estadísticamente significativo al 5%. Este es el efecto de ser asignado al tratamiento o ITT.</em></p>
+<pre class="r"><code>data.morocco&lt;-read_csv(&quot;./crepon_morocco_analysis.csv&quot;)   %&gt;% 
+  clean_names() 
+
+res_fr&lt;- lm(expense_total ~ treatment +
+          members_resid_bl + nadults_resid_bl +
+          head_age_bl + act_livestock_bl + act_business_bl +
+          borrowed_total_bl + members_resid_d_bl +
+          nadults_resid_d_bl + head_age_d_bl + act_livestock_d_bl +
+          act_business_d_bl + borrowed_total_d_bl +
+          ccm_resp_activ + other_resp_activ + ccm_resp_activ_d + 
+          other_resp_activ_d + factor(paire),
+        data=data.morocco)
+
+coef_test(res_fr,
+      vcov = &quot;CR1S&quot;,
+      cluster = data.morocco$demi_paire)[1:2,]</code></pre>
+<pre><code>##         Coef. Estimate   SE t-stat d.f. p-val (Satt) Sig.
+## 1 (Intercept)   -18493 6735  -2.75  2.1        0.105     
+## 2   treatment     4057 1721   2.36 74.4        0.021    *</code></pre></li>
+<li><p>[5 puntos] Estime ahora la <strong>primera etapa</strong>, es decir, estime por MCO el efecto causal de la asignación sobre la adopción. Comente sobre la magnitud, la significancia estadística y la interpretación de la variable <strong>treatment</strong> en términos del comportamiento de los <strong>cumplidores</strong>. Debería poder replicar el coeficiente y el error estándar de la tabla 2.</p>
+<p><em>La primera etapa muestra un aumento de 16.7% en la probabilidad de ser cliente debido al tratamiento. Este efecto es estadísticamente significativo al 10%. En otras palabras, 16.7% de los individuos en la muestra son cumplidores, es decir, se vuelven clientes solo porque se les ofreció el tratamiento</em></p>
+<pre class="r"><code>res_fs&lt;- lm(client ~ treatment +
+          members_resid_bl + nadults_resid_bl +
+            head_age_bl + act_livestock_bl + act_business_bl +
+            borrowed_total_bl + members_resid_d_bl +
+            nadults_resid_d_bl + head_age_d_bl + act_livestock_d_bl +
+            act_business_d_bl + borrowed_total_d_bl +
+            ccm_resp_activ + other_resp_activ + ccm_resp_activ_d + 
+            other_resp_activ_d + factor(paire),
+        data=data.morocco)
+
+coef_test(res_fs,
+      vcov = &quot;CR1S&quot;, 
+      cluster = data.morocco$demi_paire)[1:2,]</code></pre>
+<pre><code>##         Coef. Estimate     SE t-stat d.f. p-val (Satt) Sig.
+## 1 (Intercept)  -0.0988 0.0549   -1.8  2.1        0.208     
+## 2   treatment   0.1672 0.0118   14.2 74.4       &lt;0.001  ***</code></pre></li>
+<li><p>[5 puntos] Considere la columna 3 del panel A en la Tabla 9 del artículo. Aquí se reporta la estimación por MCO de la relación entre <strong>client</strong> y gasto total, con los mismos controles y tipo de errores que antes. Replique este resultado. ¿Se puede interpretar de forma causal el coeficiente sobre <strong>client</strong>?</p>
+<p><em>Noten que para replicar la entrada la clave está en condicionar a aquellos asignados al tratamiento (como se indica en la tabla del artículo). No se puede interpretar de manera causal la relación de 11934 unidades monetarias más en el gasto en los clientes con respecto a los no clientes pues es posible que haya un efecto de autoselección.</em></p>
+<pre class="r"><code>res_mco &lt;- lm(expense_total ~ client +
+            members_resid_bl + nadults_resid_bl +
+            head_age_bl + act_livestock_bl + act_business_bl +
+            borrowed_total_bl + members_resid_d_bl +
+            nadults_resid_d_bl + head_age_d_bl + act_livestock_d_bl +
+            act_business_d_bl + borrowed_total_d_bl +
+            ccm_resp_activ + other_resp_activ + ccm_resp_activ_d + 
+            other_resp_activ_d + factor(paire),
+          data=filter(data.morocco,treatment==1))
+
+coef_test(res_mco,
+      vcov = &quot;CR1S&quot;, 
+      cluster =filter(data.morocco,treatment==1)$demi_paire)[1:2,]</code></pre>
+<pre><code>##         Coef. Estimate   SE t-stat d.f. p-val (Satt) Sig.
+## 1 (Intercept)   -12718 9447  -1.35 65.8       0.1828     
+## 2      client    11934 5580   2.14 41.1       0.0384    *</code></pre></li>
+<li><p>[5 puntos] ¿Cuáles son los supuestos que permiten la estimación del Local Average Treatment Effect (LATE) en el contexto de este problema? Comente sobre la evidencia que respalda el supuesto de que los instrumentos no son débiles en este problema.</p>
+<p><em>Los supuestos necesarios son:</em></p>
+<p><em>a. Asignación aleatoria. Se requiere que el tratamiento haya sido aleatorizado adecuadamente. En el artículo se muestra evidencia de esto. Además, esperamos que la atrición sea baja y no diferenciada entre grupos de tratados y no tratados.</em></p>
+<p><em>a. Relevancia del instrumento. Se requiere que la asignación aleatoria del tratamiento efectivamente afecte la probabilidad de ser cliente. La evidencia que respalda este requerimiento es el resultado de la primera etapa. El estadístico F de la primera etapa es 10.86, apenas arriba de la regla de dedo de 10 que comúnmente se usa para decir que no hay presencia de instrumentos débiles.</em></p>
+<p><em>a. Exclusión. Se requiere que el instrumento no pertenezca a la ecuación estructural. Esto se garantiza por la asignación aleatoria del tratamiento.</em></p>
+<p><em>a. SUTVA. El efecto del tratamiento asignado a <span class="math inline">\(i\)</span> solo afecta la probabilidad de ser cliente de <span class="math inline">\(i\)</span> y no de cualquier otro individuo <span class="math inline">\(j\)</span>. Del mismo modo, el efecto de ser cliente de <span class="math inline">\(i\)</span> solo afecta el gasto de <span class="math inline">\(i\)</span> y no de otros individuos <span class="math inline">\(j\)</span>.</em></p></li>
+<li><p>[5 puntos] Estime el efecto del cumplimiento sobre el gasto total, usando la asignación aleatoria como instrumento del cumplimiento. Es decir, estime el LATE. Use los mismos controles y tipo de errores que en c. Este resultado se reporta en la columna 3 del panel B en la Tabla 9. ¿Cuál es la interpretación del coeficiente de la variable <strong>client</strong>? En R, la función <em>ivreg</em> del paquete <em>AER</em> le permite hacer la estimación de MC2E.</p>
+<p><em>El LATE estimado es de 24263 monetarias adicionales de gasto debido a ser cliente. Esta cifra es considerablemente mayor que las 4057 unidades monetarias estimado en la forma reducida. Este es un efecto local pues solo considera el cambio en el gasto debido a ser cliente de la microfinanciera, en aquellos individuos que cambiaron su comportamiento debido a la asignación aleatoria del tratamiento. Noten también que en todas las regresiones se incluye errores agrupados a nivel pareja o paire.</em></p>
+<pre class="r"><code>#Columna 3, Panel B, Tabla 9. LATE:
+
+res_iv &lt;- ivreg(expense_total ~ client + members_resid_bl + nadults_resid_bl
+ + head_age_bl + act_livestock_bl + act_business_bl 
+ + borrowed_total_bl + members_resid_d_bl + nadults_resid_d_bl
+ + head_age_d_bl + act_livestock_d_bl + act_business_d_bl 
+ + borrowed_total_d_bl + ccm_resp_activ + other_resp_activ 
+ + ccm_resp_activ_d  + other_resp_activ_d + factor(paire) |
+   treatment +  members_resid_bl + nadults_resid_bl
+ + head_age_bl + act_livestock_bl + act_business_bl 
+ + borrowed_total_bl + members_resid_d_bl + nadults_resid_d_bl
+ + head_age_d_bl + act_livestock_d_bl + act_business_d_bl 
+ + borrowed_total_d_bl + ccm_resp_activ + other_resp_activ 
+ + ccm_resp_activ_d  + other_resp_activ_d + factor(paire),
+ data=data.morocco)
+
+summary(res_iv)$coefficients[1:2,]</code></pre>
+<pre><code>##              Estimate Std. Error   t value   Pr(&gt;|t|)
+## (Intercept) -16095.68   11033.49 -1.458802 0.14468442
+## client       24263.46   12419.55  1.953651 0.05080007</code></pre>
+<pre class="r"><code>#Errores agrupados a nivel pareja (paire)
+coef_test(res_iv,
+      vcov = &quot;CR1S&quot;, 
+      cluster = data.morocco$demi_paire)[1:2,]</code></pre>
+<pre><code>##         Coef. Estimate   SE t-stat  d.f. p-val (Satt) Sig.
+## 1 (Intercept)   -16096 7144  -2.25  2.11       0.1464     
+## 2      client    24263 9944   2.44 74.45       0.0171    *</code></pre></li>
+</ol>
+</div>
+<div id="pregunta-2" class="section level2">
+<h2>Pregunta 2</h2>
+<ol style="list-style-type: lower-alpha">
+<li><p>[5 puntos] En esta pregunta mostraremos cómo el estimador de Wald es equivalente al estimador de VI cuando no hay controles y cuando las variables de asignación y adopción son binarias. Use nuevamente los datos en <em>crepon_morocco_analysis.csv</em>. Obtenga el estimador de Wald como el cociente de la diferencia en gasto total promedio entre los hogares asignados a tratamiento y control dividido por la diferencia en la probabilidad de adopción entre los hogares asignados a tratamiento y control. Recuerde que la variable del gasto total es <strong>expense_total</strong>.</p>
+<p><em>Obtenemos el estadístico de Wald.</em></p>
+<pre class="r"><code>data.morocco&lt;-read_csv(&quot;./crepon_morocco_analysis.csv&quot;)   %&gt;% 
+  clean_names() 
+
+mean_cliente&lt;-data.morocco %&gt;%
+  group_by(treatment) %&gt;% 
+  summarize(p_cliente=mean(client, na.rm=F)) %&gt;% 
+  ungroup()
+
+mean_gasto&lt;-data.morocco %&gt;%
+  group_by(treatment) %&gt;% 
+  summarize(m_gasto=mean(expense_total, na.rm=F)) %&gt;% 
+  ungroup()
+
+#Neceistamos la diferencia de gastos y de probabilidad de ser cliente
+dif_gasto &lt;- mean_gasto[2,2]-mean_gasto[1,2]
+dif_cliente &lt;- mean_cliente[2,2]-mean_cliente[1,2]
+
+Wald &lt;- as.numeric(dif_gasto / dif_cliente)
+Wald
+## [1] 22869.23</code></pre></li>
+<li><p>[5 puntos] Ahora estime por MC2E el efecto de la adopción sobre el gasto total, usando la variable de asignación como instrumento para la adopción. ¿Qué ventaja observa con respecto al estimador de Wald?</p>
+<p><em>Notemos que obtenemos lo mismo al hacer una estimación de variables instrumentales. El coeficiente sobre la variable client es igual al estadístico de Wald. El estadístico de Wald es idéntico al estimador de variables instrumentales cuando el instrumento es binario. La mayor ventaja es que podemos obtener errores estándar, lo cual nos permite hacer inferencia estadística sobre el tamaño del efecto de ser cliente en el gasto.</em></p>
+<pre class="r"><code>Wald_vi &lt;- ivreg(expense_total ~ client  | treatment,
+            data=data.morocco)
+
+#Notemos que obtenemos directamente el error estándar
+summary(Wald_vi)
+## 
+## Call:
+## ivreg(formula = expense_total ~ client | treatment, data = data.morocco)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+##  -44264  -21394  -17064   -4804 1305816 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    21395       1496  14.298   &lt;2e-16 ***
+## client         22869      12684   1.803   0.0714 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 74610 on 4932 degrees of freedom
+## Multiple R-Squared: 0.00651, Adjusted R-squared: 0.006309 
+## Wald test: 3.251 on 1 and 4932 DF,  p-value: 0.07144</code></pre></li>
+</ol>
+</div>
+<div id="pregunta-3" class="section level2">
+<h2>Pregunta 3</h2>
+<p>En la Pregunta 2 obtuvo el estimador de Wald para aproximar el efecto de la adopción en el gasto total. Considere dicho cálculo sin controles para lo que resta de esta pregunta.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[5 puntos] Utilice un procedimiento bootstrap <em>a mano</em> para estimar el error estándar del estimador de Wald usando 50 repeticiones. Es decir, debe realizar un remuestreo de los datos originales y para cada muestra obtener el estimador de Wald. Luego, obtenga la desviación estándar de los 50 estadísticos calculados. Utilice una semilla para poder replicar sus resultados.</p>
+<p><em>Ya sabemos calcular un estadístico de Wald, como en la Pregunta 1a. La idea ahora es repetir dicho proceso B veces, pero en cada repetición con una muestra bootstrap a la mano:</em></p>
+<pre class="r"><code>data.morocco&lt;- read.csv(&quot;./crepon_morocco_analysis.csv&quot;)%&gt;%
+  select(treatment,client,expense_total )
+
+obs &lt;- nrow(data.morocco)
+
+#Solo para ejemplificar, la siguiente línea pide el remuestreo, es decir, obtener una muestra de tamaño N de la muestra original, con reemplazo
+data.b &lt;-data.morocco[sample(nrow(data.morocco),obs, replace = TRUE),]
+
+
+#2a
+#Simplemente repetimos el proceso anterior B veces
+set.seed(821)
+B=50
+#Inicializamos el vector donde guardaremos los W estimados
+Wrep50_1 &lt;- data.frame(W=matrix(ncol = 1, nrow = B))
+
+for (i in 1:B)
+{
+  data.b &lt;-data.morocco[sample(nrow(data.morocco),obs, replace = TRUE),]
+
+  #Literalmente pegamos el cálculo de un W, hecho en la Pregunta 1a
+
+  mean_cliente&lt;-data.b %&gt;%
+group_by(treatment) %&gt;% 
+summarize(p_cliente=mean(client, na.rm=F)) %&gt;% 
+ungroup()
+
+  mean_gasto&lt;-data.b %&gt;%
+group_by(treatment) %&gt;% 
+summarize(m_gasto=mean(expense_total, na.rm=F)) %&gt;% 
+ungroup()
+
+  dif_gasto &lt;- mean_gasto[2,2]-mean_gasto[1,2]
+  dif_cliente &lt;- mean_cliente[2,2]-mean_cliente[1,2]
+
+  #Y lo guardamos en la posición adecuada
+
+  Wrep50_1[i,1] &lt;- as.numeric(dif_gasto / dif_cliente)
+}
+
+#El error estimado es simplemente la desviación estándar de los B estadísticos estimados
+sd(Wrep50_1$W)
+## [1] 14735.91</code></pre></li>
+<li><p>[5 puntos] Reemplace la semilla de la parte a. por una nueva semilla y estime nuevamente el error estándar del estimador de Wald con 50 repeticiones. Comente sobre la diferencia entre este error estándar y el de la parte a.</p>
+<p><em>El cambio que observamos en el error estándar estimado por bootstrap entre esta parte y la parte a. es que al cambiar la semilla, los números aleatorios generados son distitnos y, por tanto, cada muestra bootstrap tiene distintos individuos.</em></p>
+<pre class="r"><code>#2b Simplemente cambiamos la semilla
+set.seed(8212)
+B=50
+#Inicializamos el vector donde guardaremos los W estimados
+Wrep50_2 &lt;- data.frame(W=matrix(ncol = 1, nrow = B))
+
+for (i in 1:B)
+{
+  data.b &lt;-data.morocco[sample(nrow(data.morocco),obs, replace = TRUE),]
+
+  mean_cliente&lt;-data.b %&gt;%
+group_by(treatment) %&gt;% 
+summarize(p_cliente=mean(client, na.rm=F)) %&gt;% 
+ungroup()
+
+  mean_gasto&lt;-data.b %&gt;%
+group_by(treatment) %&gt;% 
+summarize(m_gasto=mean(expense_total, na.rm=F)) %&gt;% 
+ungroup()
+
+  dif_gasto &lt;- mean_gasto[2,2]-mean_gasto[1,2]
+  dif_cliente &lt;- mean_cliente[2,2]-mean_cliente[1,2]
+
+  Wrep50_2[i,1] &lt;- as.numeric(dif_gasto / dif_cliente)
+}
+
+sd(Wrep50_2$W)
+## [1] 14869.02</code></pre></li>
+<li><p>[5 puntos] Regrese el valor de la semilla al usado en a. y estime nuevamente el error estándar del estimador de Wald, esta vez usando 1000 repeticiones. Comente sobre la diferencia entre este error estándar y el de la parte a.</p>
+<p><em>Ahora las diferencias en el error estimado surgen porque tenemos muchas más repeticiones bootstrap. Lo más importante de estos procedimientos es que pueda implementarlos a otros contextos. Por ejemplo, podemos hacer obtener errores bootstrap para el vector de coeficientes de una estimación de MC2E, para el producto de dos coeficientes, etc.</em></p>
+<pre class="r"><code>#2c regresamos a la primera semilla pero ahora B=1000
+set.seed(820)
+B=1000
+
+Wrep1000 &lt;- data.frame(W=matrix(ncol = 1, nrow = B))
+
+for (i in 1:B)
+{
+  data.b &lt;-data.morocco[sample(nrow(data.morocco),obs, replace = TRUE),]
+
+  mean_cliente&lt;-data.b %&gt;%
+group_by(treatment) %&gt;% 
+summarize(p_cliente=mean(client, na.rm=F)) %&gt;% 
+ungroup()
+
+  mean_gasto&lt;-data.b %&gt;%
+group_by(treatment) %&gt;% 
+summarize(m_gasto=mean(expense_total, na.rm=F)) %&gt;% 
+ungroup()
+
+  dif_gasto &lt;- mean_gasto[2,2]-mean_gasto[1,2]
+  dif_cliente &lt;- mean_cliente[2,2]-mean_cliente[1,2]
+
+  Wrep1000[i,1] &lt;- as.numeric(dif_gasto / dif_cliente)
+}
+
+#El error estimado es simplemente la desviación estándar de los B estadísticos estimados
+sd(Wrep1000$W)
+## [1] 12998.05</code></pre></li>
+</ol>
+</div>
+<div id="pregunta-4" class="section level2">
+<h2>Pregunta 4</h2>
+<p>Considere nuevamente la base <em>STAR_public_use.csv</em> usada en la Tarea 1 del artículo Angrist, Lang y Oreopoulos (2009)<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>. En esta pregunta nos concentraremos en los efectos de la intervención en el año 2, mostrados en la columna (4) de la Tabla 6, sobre dos variables, el promedio de calificaciones <strong>gpa_year2</strong> y los créditos completados <strong>credits_earned2</strong>.</p>
+<p>El propósito de esta pregunta es mostrar la función de los <span class="math inline">\(z\)</span>-scores en el análisis de efectos de tratamiento. De nuevo, puede quedarse solo con las observaciones que tienen <strong>noshow</strong> igual a 0. Antes de comenzar su análisis, sustituya por NA los valores en <strong>credits_earned2</strong> para aquellas observaciones que tienen <span class="math inline">\(NA\)</span> en la variable <strong>prob_year1</strong>.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[5 puntos] Para tener un punto de comparación, estime la ecuación del efecto de tratamiento para <strong>credits_earned2</strong> usando la misma especificación que en la pregunta 5 de la Tarea 1. Use también errores robustos. Deberá poder replicar los coeficientes y errores estándar del panel D, columna (4). ¿Cómo se interpretan el coeficiente sobre la variable <strong>ssp</strong>?</p>
+<p><em>Usando la misma especificación que usamos en la Tarea 1, obtenemos los coeficientes en el artículo.</em></p>
+<pre class="r"><code>#4a 
+data.angrist&lt;-read_csv(&quot;./STAR_public_use.csv&quot;,
+             locale = locale(encoding = &quot;latin1&quot;))   %&gt;% 
+  clean_names()
+
+data.angrist&lt;-data.angrist %&gt;% 
+  filter(noshow==0) %&gt;% 
+  mutate(credits_earned2=ifelse(is.na(prob_year1),NA,credits_earned2)) 
+
+
+reg_credits_earned2 &lt;-lm(credits_earned2 ~ ssp + sfp+ sfsp+
+         factor(sex)+
+         factor(mtongue)+
+         factor(hsgroup)+
+         factor(numcourses_nov1)+
+         factor(lastmin)+
+         factor(mom_edn)+
+         factor(dad_edn),
+       data.angrist)
+coeftest(reg_credits_earned2, vcov = vcovHC(reg_credits_earned2, &quot;HC1&quot;))[1:4,]
+##                Estimate Std. Error    t value   Pr(&gt;|t|)
+## (Intercept)  1.64433959  0.6485151  2.5355455 0.01133644
+## ssp         -0.09849430  0.1145949 -0.8594998 0.39021357
+## sfp          0.02661974  0.1076037  0.2473868 0.80464558
+## sfsp         0.07157034  0.1302458  0.5495021 0.58274953</code></pre></li>
+<li><p>[5 puntos] Genere un <span class="math inline">\(z\)</span>-score para la variable <strong>credits_earned2</strong> al que llame <strong>credits_earned2_sd</strong>. Para ello, calcule la media y desviación estándar de <strong>credits_earned2</strong> para el grupo de control y luego genere <strong>credits_earned2_sd</strong> restándole a <strong>credits_earned2</strong> la media obtenida y dividiendo esta diferencia por la desviación estándar obtenida. Compruebe que si calcula la media y la desviación estándar de <strong>credits_earned2_sd</strong>, en el grupo de control estas deberían ser 0 y 1, respectivamente.</p>
+<p><em>Creamos un z-score y notamos que tiene media cero y varianza 1 en el grupo de control:</em></p>
+<pre class="r"><code>#4b z-score para credits_earned2
+
+credits_earned2_stats &lt;- data.angrist %&gt;% 
+filter(control==1) %&gt;% 
+summarize(media=mean(credits_earned2,na.rm=T),desvest=sd(credits_earned2,na.rm=T))
+
+data.angrist &lt;- data.angrist %&gt;% 
+mutate(credits_earned2_sd=(credits_earned2-credits_earned2_stats$media)/credits_earned2_stats$desvest)
+
+#Media 0
+data.angrist %&gt;%
+  filter(control==1) %&gt;% 
+  summarize(media=mean(credits_earned2_sd,na.rm=T))
+## # A tibble: 1 x 1
+##      media
+##      &lt;dbl&gt;
+## 1 1.02e-16
+
+#Desv. Std. 1
+data.angrist %&gt;%
+  filter(control==1) %&gt;% 
+  summarize(desvest=sd(credits_earned2_sd,na.rm=T)) 
+## # A tibble: 1 x 1
+##   desvest
+##     &lt;dbl&gt;
+## 1       1</code></pre></li>
+<li><p>[5 puntos] Realice la misma estimación que en la parte a., pero ahora use como variable dependiente <strong>credits_earned2_sd</strong>. ¿Cómo se interpreta el coeficiente sobre <strong>ssp</strong>? ¿Qué es diferente y qué es igual entre los resultados obtenidos en esta parte y los obtenidos en la parte a.?</p>
+<p><em>Los coeficientes estimados son diferentes. Ahora el coeficiente sobre ssp es el efecto que tiene el programa en el z-score de créditos cursados, es decir, el SSP tiene un efecto de -0.098 desviaciones estándar en el z-score de créditos cursados, aunque este efecto no es estadísticamente significativo. La magnitud del error estándar también es diferente, pues ahora las variables están en distintas unidades. Noten en cambio que el estadístico t asociado a SSP es exactamente igual al de la parte a., por lo que en ambos casos no se rechaza la <span class="math inline">\(H_0\)</span>.</em></p>
+<pre class="r"><code>#4c Regresión con variable estandarizada
+reg_credits_earned2_sd&lt;-lm(credits_earned2_sd ~ ssp + sfp+ sfsp+
+         factor(sex)+
+         factor(mtongue)+
+         factor(hsgroup)+
+         factor(numcourses_nov1)+
+         factor(lastmin)+
+         factor(mom_edn)+
+         factor(dad_edn),
+       data.angrist)
+
+coeftest(reg_credits_earned2_sd, vcov = vcovHC(reg_credits_earned2_sd, &quot;HC1&quot;))[1:4,]
+##                Estimate Std. Error    t value  Pr(&gt;|t|)
+## (Intercept) -0.53653438 0.42971414 -1.2485844 0.2120281
+## ssp         -0.06526354 0.07593201 -0.8594998 0.3902136
+## sfp          0.01763857 0.07129956  0.2473868 0.8046456
+## sfsp         0.04742339 0.08630248  0.5495021 0.5827495
+
+#Noten que los estadísticos t son exactamente iguales
+#La inferencia no cambia, solo la interpretación
+coeftest(reg_credits_earned2, vcov = vcovHC(reg_credits_earned2, &quot;HC1&quot;))[1:4,]
+##                Estimate Std. Error    t value   Pr(&gt;|t|)
+## (Intercept)  1.64433959  0.6485151  2.5355455 0.01133644
+## ssp         -0.09849430  0.1145949 -0.8594998 0.39021357
+## sfp          0.02661974  0.1076037  0.2473868 0.80464558
+## sfsp         0.07157034  0.1302458  0.5495021 0.58274953</code></pre></li>
+<li><p>[5 puntos] Ahora realizaremos un índice de mejora en educación, al agregar los resultados de estos dos indicadores en una sola variable, como se describe en Banerjee et al. (2015)<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>. Para ello, primero genere <strong>gpa_year2_sd</strong>, que será la versión estandarizada de <strong>gpa_year2</strong>, siguiendo el mismo procedimiento que en la parte b. En seguida, genere una nueva variable llamada <strong>promedio_vars</strong>, que será el promedio de <strong>credits_earned2_sd</strong> y <strong>gpa_year2_sd</strong>. Luego, calcule la media y la desviación estándar de <strong>promedio_vars</strong> en el grupo de control. Finalmente, genere una nueva variable <strong>promedio_vars_sd</strong> restándole a <strong>promedio_vars</strong> la media antes calculada y dividiendo esta diferencia por la desviación estándar antes calculada. Muestre que la variable <strong>promedio_vars_sd</strong> tiene media 0 y desviación estándar 1 en el grupo de control.</p>
+<p><em>Siguiendo las instrucciones obtenemos un índice agregado de desempeño escolar. Quizás debimos llamar a promedio_vars_sd con otro nombre, uno más intuitivo, como indice_escolar_sd. Conservaremos por ahora la notación planteada originalmente:</em></p>
+<pre class="r"><code>#4d
+gpa_year2_stats &lt;- data.angrist %&gt;% 
+  filter(control==1) %&gt;% 
+  summarize(media=mean(gpa_year2,na.rm=T),desvest=sd(gpa_year2,na.rm=T))
+
+data.angrist &lt;- data.angrist %&gt;% 
+  mutate(gpa_year2_sd=(gpa_year2-gpa_year2_stats$media)/gpa_year2_stats$desvest)
+
+#Agregamos las dos variables
+data.angrist &lt;- data.angrist %&gt;% 
+  mutate(promedio_vars=rowMeans(select(.,credits_earned2_sd,gpa_year2_sd)))
+
+promedio_vars_stats &lt;- data.angrist %&gt;% 
+  filter(control==1) %&gt;% 
+  summarize(media=mean(promedio_vars,na.rm=T),desvest=sd(promedio_vars,na.rm=T))
+
+data.angrist &lt;- data.angrist %&gt;% 
+  mutate(promedio_vars_sd=(promedio_vars-promedio_vars_stats$media)/promedio_vars_stats$desvest)
+
+#Media 0
+data.angrist %&gt;%
+  filter(control==1) %&gt;% 
+  summarize(media=mean(promedio_vars_sd,na.rm=T))
+## # A tibble: 1 x 1
+##       media
+##       &lt;dbl&gt;
+## 1 -1.33e-17
+
+#Desv. Std. 1
+data.angrist %&gt;%
+  filter(control==1) %&gt;% 
+  summarize(desvest=sd(promedio_vars_sd,na.rm=T)) 
+## # A tibble: 1 x 1
+##   desvest
+##     &lt;dbl&gt;
+## 1       1</code></pre></li>
+<li><p>[5 puntos] Estime ahora el efecto de tratamiento sobre <strong>promedio_vars_sd</strong>, siguiendo la misma especificación econométrica que en la parte a. y usando errores robustos. ¿Qué concluye?</p>
+<p><em>En este ejemplo en particular, el índice no es estadísticamente significativo para ninguno de los tipos de tratamiento. Quizás el ejemplo fue aburrido, pero ahora ya sabe crear índices para agregar múltiples indicadores individuales sobre cierta dimensión de interés.</em></p>
+<pre class="r"><code>#4e Regresión con el índice
+reg_promedio_vars_sd&lt;-lm(promedio_vars_sd ~ ssp + sfp+ sfsp+
+                         factor(sex)+
+                         factor(mtongue)+
+                         factor(hsgroup)+
+                         factor(numcourses_nov1)+
+                         factor(lastmin)+
+                         factor(mom_edn)+
+                         factor(dad_edn),
+                       data.angrist)
+
+coeftest(reg_promedio_vars_sd, vcov = vcovHC(reg_credits_earned2_sd, &quot;HC1&quot;))[1:4,]
+##                Estimate Std. Error    t value  Pr(&gt;|t|)
+## (Intercept)  0.49452306 0.42971414  1.1508187 0.2500355
+## ssp          0.02805373 0.07593201  0.3694586 0.7118509
+## sfp         -0.02543190 0.07129956 -0.3566908 0.7213858
+## sfsp         0.03404990 0.08630248  0.3945414 0.6932513</code></pre></li>
+</ol>
+</div>
+<div id="pregunta-5" class="section level2">
+<h2>Pregunta 5</h2>
+<p>Considere los valores <span class="math inline">\(p\)</span> del archivo <em>pvalues.csv</em>. Cada valor <span class="math inline">\(p_i\)</span> está asociado a una prueba de hipótesis <span class="math inline">\(i\)</span>. La variable familia denota tres grupos de hipótesis sobre las cuales estamos interesados en hacer correcciones de múltiples hipótesis. La investigación en cuestión emplea <span class="math inline">\(\alpha=0.05\)</span>.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[5 puntos] Para cada una de las pruebas de hipótesis, genere un cuadro como el que se presenta a continuación y diga si se rechaza o no la hipótesis nula, bajo los siguientes criterios:</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="22%" />
+<col width="22%" />
+<col width="22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"></th>
+<th>Hipótesis sin corrección</th>
+<th>Controlando la tasa de errores en la familia (FWER) usando el método de Bonferroni</th>
+<th>Controlando la tasa de falso descubrimiento (FDR) dentro de la familia usando el método de Benjamini y Hochberg</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td align="center"><span class="math inline">\(\vdots\)</span></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td align="center">15</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><em>En este problema lo único posiblemente complicado era operacionalizar los procedimientos. Aquí les pongo mi propuesta. Las reglas de decisión para rechazar las <span class="math inline">\(H_0\)</span> son las mismas vistas en la <a href="https://rojasirvin.github.io/EPS2020/sesiones/s10/sesion10.html#31">Sesión 10</a>. La columna regla_sincorr indica qué <span class="math inline">\(H_0\)</span> se rechazaría con el valor p reportado originalmente en el estudio con <span class="math inline">\(\alpha=0.05\)</span>. La columna regla_bonferroni indica qué <span class="math inline">\(H_0\)</span> se rechazaría con la correción de Bonferroni, tomando en cuenta el agrupamiento con las familias en su definición original. Lo mismo sucede con regla_bh para la correción de Benjamini &amp; Hochberg.</em></p>
+<p><em>Sin corrección se rechazan las hipótesis 1, 4, 5, 7, 9, 11, 12, 13 y 15 (nueve hipótesis en total). Al agrupar con la definición de familia dada por la variable familia solo se rechazan cuatro hipótesis siguiendo el método de Bonferroni, es decir, la corrección fue muy conservadora. Con el método de Benjamini y Hochberg se rechazan siete hipótesis.</em></p>
+<pre class="r"><code>data.pvalues&lt;-read_csv(&quot;./pvalues.csv&quot;,
+                   locale = locale(encoding = &quot;latin1&quot;))  
+
+alpha &lt;- 0.05
+
+#5a Corrección con familias originales
+#Ordenar de menor a mayor por familia
+data.fam.or &lt;- data.pvalues
+setorder(data.fam.or,familia,p) #usé setorder de la libreria data.table
+
+#Número de posición
+data.fam.or &lt;- data.fam.or %&gt;% 
+  group_by(familia) %&gt;% 
+  mutate(posicion=seq(along.with = familia)) %&gt;% 
+  mutate(numerohipotesis=max(posicion)) %&gt;% 
+  ungroup()
+
+#Reglas (1 = rechazar H0, 0 = no rechazar)
+data.fam.or &lt;- data.fam.or %&gt;% 
+  mutate(regla_sincorr=ifelse(p&lt;.05,1,0)) %&gt;% 
+  mutate(alpha_bonferroni=alpha/numerohipotesis) %&gt;% 
+  mutate(corrector_bh=posicion/numerohipotesis) %&gt;% 
+  mutate(q=corrector_bh*alpha) %&gt;% 
+  mutate(regla_bonferroni=ifelse(p&lt;alpha_bonferroni,1,0)) %&gt;% 
+  mutate(regla_bh=ifelse(p&lt;q,1,0))
+
+setorder(data.fam.or,hipotesis)
+
+
+data.fam.or %&gt;% 
+  select(hipotesis,familia,regla_sincorr,regla_bonferroni,regla_bh)
+## # A tibble: 15 x 5
+##    hipotesis familia regla_sincorr regla_bonferroni regla_bh
+##        &lt;dbl&gt;   &lt;dbl&gt;         &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;
+##  1         1       1             1                0        1
+##  2         2       1             0                0        0
+##  3         3       1             0                0        0
+##  4         4       1             1                1        1
+##  5         5       1             1                0        0
+##  6         6       2             0                0        0
+##  7         7       2             1                1        1
+##  8         8       2             0                0        0
+##  9         9       3             1                1        1
+## 10        10       3             0                0        0
+## 11        11       3             1                0        1
+## 12        12       3             1                0        0
+## 13        13       3             1                0        1
+## 14        14       3             0                0        0
+## 15        15       3             1                1        1</code></pre></li>
+<li><p>[5 puntos] Suponga que encuentra buenas razones conceptuales para afirmar que las familias 2 y 3 deben ser consideraras una sola familia. Tendríamos ahora solo dos familias, la familia 1 original y una nueva familia numerada como 4, como se indica en la variable familia_corregida. ¿Cómo cambian sus conclusiones respecto a la parte a. de esta pregunta? Genere un nuevo cuadro con esta redefinición.</p>
+<p><em>Ahora solo tenemos dos familias, pero la familia 1 se mantiene igual. Entonces, no debe haber cambios en qué hipótesis se rechazan dentro de la familia 1 sin importar el método, lo cual ocurre en este caso. Al reagrupar las familias, ahora se rechazan en total cuatro hipótesis con el método de Bonferroni y cinco con el de Benjamini y Hochberg.</em></p>
+<pre class="r"><code>#5b Ahora familias es la familia corregida
+data.fam.corr &lt;- data.pvalues
+setorder(data.fam.corr,familia_corregida,p) #usé setorder de la libreria data.table
+
+#Número de posición
+data.fam.corr &lt;- data.fam.corr %&gt;% 
+  group_by(familia_corregida) %&gt;% 
+  mutate(posicion=seq(along.with = familia_corregida)) %&gt;% 
+  mutate(numerohipotesis=max(posicion)) %&gt;% 
+  ungroup()
+
+#Reglas (1 = rechazar H0, 0 = no rechazar)
+data.fam.corr &lt;- data.fam.corr %&gt;% 
+  mutate(regla_sincorr=ifelse(p&lt;.05,1,0)) %&gt;% 
+  mutate(alpha_bonferroni=alpha/numerohipotesis) %&gt;% 
+  mutate(corrector_bh=posicion/numerohipotesis) %&gt;% 
+  mutate(q=corrector_bh*alpha) %&gt;% 
+  mutate(regla_bonferroni=ifelse(p&lt;alpha_bonferroni,1,0)) %&gt;% 
+  mutate(regla_bh=ifelse(p&lt;q,1,0))
+
+setorder(data.fam.corr,hipotesis)
+
+data.fam.corr %&gt;% 
+  select(hipotesis,familia_corregida,regla_sincorr,regla_bonferroni,regla_bh)
+## # A tibble: 15 x 5
+##    hipotesis familia_corregida regla_sincorr regla_bonferroni regla_bh
+##        &lt;dbl&gt;             &lt;dbl&gt;         &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;
+##  1         1                 1             1                0        1
+##  2         2                 1             0                0        0
+##  3         3                 1             0                0        0
+##  4         4                 1             1                1        1
+##  5         5                 1             1                0        0
+##  6         6                 4             0                0        0
+##  7         7                 4             1                1        1
+##  8         8                 4             0                0        0
+##  9         9                 4             1                1        1
+## 10        10                 4             0                0        0
+## 11        11                 4             1                0        0
+## 12        12                 4             1                0        0
+## 13        13                 4             1                0        0
+## 14        14                 4             0                0        0
+## 15        15                 4             1                1        1</code></pre></li>
+<li><p>[5 puntos] Suponga que su asistente de investigación olvidó el concepto de familia y realiza las correcciones por pruebas de múltiples hipótesis ignorando las familias. ¿Qué concluiría en este caso? Genere un nuevo cuadro bajo esta circunstancia. Comente sobre la diferencia en las conclusiones entre las partes b. y c.</p>
+<p><em>Finalmente, podemos ver esta parte como si hubiera una sola gran familia. En este caso, usando el método de Bonferroni se rechazarían solo tres hipótesis. Usando el método de Benjamini y Hochberg se rechazan cinco hipótesis.</em></p>
+<p><em>En esta pregunta comprobamos que el procedimiento de Bonferroni es demasiado conservador, así como no agrupar por familias lo es también. El cómo decidamos agrupar las variables en familias tiene importantes consecuencias al momento de realizar las correcciones. El procedimiento de Benjamini y Hochberg es ampliamente usado en la literatura de evaluación, como lo hemos visto en varias de las aplicaciones de clase.</em></p>
+<pre class="r"><code>#5c Sin considerar las familias
+data.nofam &lt;- data.pvalues
+setorder(data.nofam,p)
+
+#Es como si solo hubiera una sola familia
+#Hago esto para usar mi mismo código
+data.nofam &lt;- data.nofam %&gt;% 
+  mutate(granfamilia=1)
+
+#Número de posición
+data.nofam &lt;- data.nofam %&gt;% 
+  group_by(granfamilia) %&gt;% 
+  mutate(posicion=seq(along.with = granfamilia)) %&gt;% 
+  mutate(numerohipotesis=max(posicion)) %&gt;% 
+  ungroup()
+
+#Reglas (1 = rechazar H0, 0 = no rechazar)
+data.nofam &lt;- data.nofam %&gt;% 
+  mutate(regla_sincorr=ifelse(p&lt;.05,1,0)) %&gt;% 
+  mutate(alpha_bonferroni=alpha/numerohipotesis) %&gt;% 
+  mutate(corrector_bh=posicion/numerohipotesis) %&gt;% 
+  mutate(q=corrector_bh*alpha) %&gt;% 
+  mutate(regla_bonferroni=ifelse(p&lt;alpha_bonferroni,1,0)) %&gt;% 
+  mutate(regla_bh=ifelse(p&lt;q,1,0))
+
+setorder(data.nofam,hipotesis)
+
+data.nofam %&gt;% 
+  select(hipotesis,regla_sincorr,regla_bonferroni,regla_bh)
+## # A tibble: 15 x 4
+##    hipotesis regla_sincorr regla_bonferroni regla_bh
+##        &lt;dbl&gt;         &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;
+##  1         1             1                0        1
+##  2         2             0                0        0
+##  3         3             0                0        0
+##  4         4             1                1        1
+##  5         5             1                0        0
+##  6         6             0                0        0
+##  7         7             1                1        1
+##  8         8             0                0        0
+##  9         9             1                0        1
+## 10        10             0                0        0
+## 11        11             1                0        0
+## 12        12             1                0        0
+## 13        13             1                0        0
+## 14        14             0                0        0
+## 15        15             1                1        1</code></pre></li>
+</ol>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Por ejemplo, suponga que estima un modelo al que llame <em>modelo1</em>. Entonces, si ejecuta</p>
+<pre class="r"><code>coef_test(modelo1,
+      vcov=&quot;CR1S&quot;,
+      cluster=mis_datos$demi_paire)[1:2,]</code></pre>
+<p>obtendrá los coeficientes con los errores agrupados requeridos. La opción <em>CR1S</em> toma en cuenta el número de grupos o <em>clusters</em> para realizar inferencia. Puede leer más al respecto en la ayuda al ejecutar <em>?vcovCR</em>. Este es el tipo de ajuste de muestras finitas que usan los autores. Esta corrección consiste en multiplicar la matriz de sándwich agrupada CR0 por <span class="math inline">\(\frac{G(N-1)}{(G-1)(N-p)}\)</span>, donde <span class="math inline">\(G\)</span> es el número de grupos, <span class="math inline">\(N\)</span> es el número total de observaciones y <span class="math inline">\(p\)</span> es el número de regresores.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Crépon, B., Devoto, F., Duflo, E., &amp; Parienté, W. (2015). Estimating the impact of microcredit on those who take it up: Evidence from a randomized experiment in Morocco. <em>American Economic Journal: Applied Economics</em>, 7(1), 123-50.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Angrist, J., Lang, D., y Oreopoulos, P. (2009). Incentives and services for college achievement: Evidence from a randomized trial. <em>American Economic Journal: Applied Economics</em>, 1(1), 136-63.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Banerjee, A. et al. (2015). A multifaceted program causes lasting progress for the very poor: Evidence from six countries. <em>Science</em>, 348(6236).<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>

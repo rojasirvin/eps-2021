@@ -22,8 +22,6 @@ library(lmtest)
 xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
 
-# Respuestas
-
 ## Pregunta 1
 
 Suponga que para un experimento en un laboratorio se asignó a un grupo pacientes a un brazo de tratamiento o a uno de control. Antes de comenzar el experimento se recolectaron una serie de características $x_{ji}$, $j=1,\ldots 10$, de cada paciente. Se busca medir el efecto del tratamiento sobre una variable de resultados $y_i$. En el experimento, se trabaja con $\alpha=0.10$.

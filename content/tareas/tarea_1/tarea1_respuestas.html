@@ -9,8 +9,6 @@ toc: false
 <script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-<div id="respuestas" class="section level1">
-<h1>Respuestas</h1>
 <div id="pregunta-1" class="section level2">
 <h2>Pregunta 1</h2>
 <p>Suponga que para un experimento en un laboratorio se asignó a un grupo pacientes a un brazo de tratamiento o a uno de control. Antes de comenzar el experimento se recolectaron una serie de características <span class="math inline">\(x_{ji}\)</span>, <span class="math inline">\(j=1,\ldots 10\)</span>, de cada paciente. Se busca medir el efecto del tratamiento sobre una variable de resultados <span class="math inline">\(y_i\)</span>. En el experimento, se trabaja con <span class="math inline">\(\alpha=0.10\)</span>.</p>
@@ -103,12 +101,13 @@ toc: false
 <p>Replique el ejercicio de representar la FEC de salarios en función de educación para México, como en la Figura 3.1.1 de MHE (p. 39), usando los datos del primer trimestre de 2021 de la ENOE. El gráfico es complejo, pero recibirá crédito completo si reproduce, al menos por separado, los dos siguientes tipos de gráficos:</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>[10 puntos] Gráfico de la relación promedio entre años de educación e ingresos.</p>
-<pre class="r"><code># Del laboratorio 1 tomo la base data_empleo1. Si hago un colnames(data_socdem)
-# puedo ver las variables que inclue la base.
+<pre class="r"><code>#Del laboratorio 1 tomo la base data_empleo1. Si hago un colnames(data_socdem) puedo ver las variables que inclue la base.
 
 
-data_socdem &lt;- read_csv(&quot;./ENOEN_SDEMT121.csv&quot;, locale = locale(encoding = &quot;latin1&quot;)) %&gt;% 
-    clean_names()
+data_socdem&lt;-read_csv(
+  &quot;./ENOEN_SDEMT121.csv&quot;,
+  locale=locale(encoding=&quot;latin1&quot;)) %&gt;% 
+  clean_names()
 
 colnames(data_socdem)
 ##   [1] &quot;r_def&quot;      &quot;loc&quot;        &quot;mun&quot;        &quot;est&quot;        &quot;est_d_tri&quot; 
@@ -134,33 +133,49 @@ colnames(data_socdem)
 ## [101] &quot;t_tra&quot;      &quot;emp_ppal&quot;   &quot;tue_ppal&quot;   &quot;trans_ppal&quot; &quot;mh_fil2&quot;   
 ## [106] &quot;mh_col&quot;     &quot;sec_ins&quot;    &quot;tipo&quot;       &quot;mes_cal&quot;    &quot;ca&quot;
 
-# Un vistazo a los archivos de las bases me permite identificar que anios_esc es
-# la variable de años de educación e ingocup me da el ingreso laboral mensual
+#Un vistazo a los archivos de las bases me permite identificar que anios_esc es la variable de años de educación e ingocup me da el ingreso laboral mensual
 
-# Elijo quedarme con personas de más de 15 años y que se consideren parte de la
-# PEA y calculo el log de los ingresos semanales
-data_fec &lt;- data_socdem %&gt;% filter(anios_esc &lt;= 20) %&gt;% filter(clase1 == 1) %&gt;% mutate(ing.mensual = ingocup/4.3) %&gt;% 
-    mutate(lingreso = ifelse(ing.mensual &gt; 0, log(ing.mensual), NA))
+#Elijo quedarme con personas de más de 15 años y que se consideren parte de la PEA y calculo el log de los ingresos semanales
+data_fec &lt;- data_socdem %&gt;%
+  filter(anios_esc&lt;=20) %&gt;% 
+  filter(clase1==1) %&gt;% 
+  mutate(ing.mensual=ingocup/4.3) %&gt;% 
+  mutate(lingreso=ifelse(ing.mensual&gt;0,log(ing.mensual),NA))
 
-# FEC:
-library(srvyr)  #Para trabajar con los pesos
+#FEC:
+library(srvyr) #Para trabajar con los pesos
 
-g1 &lt;- data_fec %&gt;% as_survey(weights = c(fac_tri)) %&gt;% group_by(anios_esc) %&gt;% summarize(lingreso = survey_mean(lingreso, 
-    na.rm = TRUE)) %&gt;% ggplot(aes(anios_esc, lingreso)) + geom_line() + labs(title = &quot;Función de esperanza condicional&quot;, 
-    caption = &quot;Fuente: datos de la ENOE, T12021&quot;) + ylab(&quot;Log del ingreso semanal (MXN)&quot;) + 
-    xlab(&quot;Años de educación&quot;) + scale_x_continuous(breaks = c(0, 2, 4, 6, 8, 10, 
-    12, 14, 16, 18, 20))
+g1 &lt;- data_fec %&gt;%
+  as_survey(weights = c(fac_tri)) %&gt;%
+  group_by(anios_esc) %&gt;%
+  summarize(lingreso=survey_mean(lingreso, na.rm = TRUE)) %&gt;%
+  ggplot(aes(anios_esc, lingreso)) +
+  geom_line() +
+  labs(title =&quot;Función de esperanza condicional&quot;,
+   caption=&quot;Fuente: datos de la ENOE, T12021&quot;)+
+  ylab(&quot;Log del ingreso semanal (MXN)&quot;)+
+  xlab(&quot;Años de educación&quot;)+
+  scale_x_continuous(breaks = c(0,2,4,6,8,10,12,14,16,18,20))
 
 g1</code></pre>
 <p><img src="/tareas/tarea_1/tarea1_respuestas_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p></li>
 <li><p>[10 puntos] Gráfico de la distribución de ingresos para cuatro niveles de educación que usted considere relevante destacar. Argumente sobre los niveles de educación elegidos.</p>
-<pre class="r"><code># Densidad por grupos Con algo más de talacha podríamos superponerla sobre la FEC
+<pre class="r"><code>#Densidad por grupos
+#Con algo más de talacha podríamos superponerla
+#sobre la FEC
 
-g2 &lt;- data_fec %&gt;% filter(anios_esc == c(6, 12, 15, 18)) %&gt;% ggplot(aes(y = lingreso)) + 
-    geom_density(aes(weight = fac_tri), bw = 0.09) + facet_wrap(anios_esc ~ ., nrow = 1) + 
-    labs(title = &quot;Función de densidad de salarios&quot;, subtitle = &quot;Cuatro años de educación seleccionados&quot;, 
-        caption = &quot;Fuente: datos de la ENOE, T12021&quot;) + ylim(6, 10) + ylab(&quot;Log del ingreso semanal (MXN)&quot;) + 
-    xlab(&quot;Densidad&quot;) + theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8))
+g2 &lt;- data_fec %&gt;%
+  filter(anios_esc==c(6,12,15,18)) %&gt;% 
+  ggplot(aes(y=lingreso))+
+  geom_density(aes(weight=fac_tri), bw = 0.09)+
+  facet_wrap(anios_esc~.,nrow=1) +
+  labs(title =&quot;Función de densidad de salarios&quot;,
+   subtitle =&quot;Cuatro años de educación seleccionados&quot;,
+     caption=&quot;Fuente: datos de la ENOE, T12021&quot;)+
+  ylim(6, 10) +
+  ylab(&quot;Log del ingreso semanal (MXN)&quot;)+
+  xlab(&quot;Densidad&quot;)+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size=8))
 
 g2</code></pre>
 <p><img src="/tareas/tarea_1/tarea1_respuestas_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p></li>
@@ -171,32 +186,40 @@ g2</code></pre>
 <p>Use los datos del archivo <em>STAR_public_use.csv</em> para este problema. En este problema replicará la fila correspondiente a la variable <strong>age</strong> de la Tabla 1 en <a href="https://pubs.aeaweb.org/doi/pdfplus/10.1257/app.1.1.136">Angrist et al. (2009)</a>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
 <ol style="list-style-type: lower-alpha">
 <li><p>[5 puntos] Obtenga la media y la desviación estándar de la edad, <strong>age</strong>, en el grupo de control (columna 1), restringiendo la muestra a aquellos individuos con <strong>noshow</strong> igual a 0.</p>
-<pre class="r"><code>data.angrist &lt;- read_csv(&quot;./STAR_public_use.csv&quot;, locale = locale(encoding = &quot;latin1&quot;)) %&gt;% 
-    clean_names() %&gt;% filter(noshow == 0)
+<pre class="r"><code>data.angrist&lt;-read_csv(&quot;./STAR_public_use.csv&quot;,
+                   locale = locale(encoding = &quot;latin1&quot;))   %&gt;% 
+  clean_names() %&gt;% 
+  filter(noshow==0)
 
-# Estadística descriptiva
+#Estadística descriptiva
 
-data.angrist %&gt;% filter(control == 1) %&gt;% summarize(media = mean(age))
+data.angrist %&gt;% 
+filter(control==1) %&gt;% 
+  summarize(media=mean(age))
 ## # A tibble: 1 x 1
 ##   media
 ##   &lt;dbl&gt;
 ## 1  18.3
 
-data.angrist %&gt;% filter(control == 1) %&gt;% summarize(desvest = sd(age))
+data.angrist %&gt;% 
+  filter(control==1) %&gt;%
+  summarize(desvest=sd(age)) 
 ## # A tibble: 1 x 1
 ##   desvest
 ##     &lt;dbl&gt;
 ## 1   0.616
 
-data.angrist %&gt;% summarize(numero = n())
+data.angrist %&gt;% 
+  summarize(numero=n())
 ## # A tibble: 1 x 1
 ##   numero
 ##    &lt;int&gt;
 ## 1   1571</code></pre></li>
 <li><p>[10 puntos] Usando una regresión lineal, muestre que los distintos tratamientos son independientes de la edad. De nuevo, debe restringir la muestra quienes tienen <strong>noshow</strong> igual a 0. Reporte los coeficientes y los errores estándar (columnas 2 a 4).</p></li>
 </ol>
-<pre class="r"><code># Balance de características
-balance &lt;- lm(age ~ ssp + sfp + sfsp, data = data.angrist)
+<pre class="r"><code>#Balance de características
+balance&lt;-lm(age~ ssp + sfp+ sfsp,
+            data=data.angrist)
 
 summary(balance)
 ## 
@@ -221,14 +244,16 @@ summary(balance)
 ## F-statistic: 0.7522 on 3 and 1567 DF,  p-value: 0.5211</code></pre>
 <ol style="list-style-type: lower-alpha">
 <li><p>[5 puntos] Realice una prueba de significancia conjunta de los coeficientes obtenidos en el punto b. Reporte el estadístico <span class="math inline">\(F\)</span> y el valor <span class="math inline">\(p\)</span> asociado (columna 5).</p>
-<pre class="r"><code># La prueba F ya está realizada con la regresión. Basta con pedirla
+<pre class="r"><code>#La prueba F ya está realizada con la regresión. Basta con pedirla
 summary(balance)$fstatistic
 ##        value        numdf        dendf 
 ##    0.7522152    3.0000000 1567.0000000
 
-# En la salida puedo ver el valor de F. ¿Pero cómo puedo calcularl p?
-pvalue &lt;- pf(summary(balance)$fstatistic[1], summary(balance)$fstatistic[2], summary(balance)$fstatistic[3], 
-    lower.tail = FALSE)
+#En la salida puedo ver el valor de F. ¿Pero cómo puedo calcularl p?
+pvalue&lt;-pf(summary(balance)$fstatistic[1],
+       summary(balance)$fstatistic[2],
+       summary(balance)$fstatistic[3],
+       lower.tail=FALSE)
 pvalue
 ##     value 
 ## 0.5210527</code></pre></li>
@@ -240,74 +265,97 @@ pvalue
 <p>Antes de estimar los efectos, los autores sustituyen <strong>gpa_year1</strong> por NA cuando <strong>grade_20059_fall</strong> es NA y sustituyen <strong>grade_20059_fall</strong> por NA cuando <strong>gpa_year1</strong> es NA Esto le permitirá quedarse con los individuos que tienen información completa.</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>[10 puntos] Estime el efecto de cada tipo de tratamiento sobre el <em>GPA</em>, es decir, sobre la variable <strong>gpa_year1</strong>, para toda la muestra (Panel B, columna 1). Calcule correctamente los errores estándar. Interprete los resultados.</p>
-<pre class="r"><code># Efecto de tratamiento
+<pre class="r"><code>#Efecto de tratamiento
 
-data.angrist &lt;- data.angrist %&gt;% mutate(gpa_year1 = ifelse(is.na(grade_20059_fall), 
-    NA, gpa_year1), grade_20059_fall = ifelse(is.na(gpa_year1), NA, grade_20059_fall))
+data.angrist &lt;- data.angrist %&gt;% 
+  mutate(gpa_year1=ifelse(is.na(grade_20059_fall),NA,gpa_year1),
+         grade_20059_fall=ifelse(is.na(gpa_year1),NA,grade_20059_fall))
 
-reg1 &lt;- lm(gpa_year1 ~ ssp + sfp + sfsp + factor(sex) + factor(mtongue) + factor(hsgroup) + 
-    factor(numcourses_nov1) + factor(lastmin) + factor(mom_edn) + factor(dad_edn), 
-    data = data.angrist)
+reg1&lt;-lm(gpa_year1 ~ ssp + sfp+ sfsp+
+       factor(sex)+
+       factor(mtongue)+ factor(hsgroup)+factor(numcourses_nov1)+
+       factor(lastmin)+
+       factor(mom_edn)+
+       factor(dad_edn),
+     data=data.angrist)
 
-# Noten que los coeficientes estimados son correctos
-summary(reg1)$coef[1:4, ]
+#Noten que los coeficientes estimados son correctos
+summary(reg1)$coef[1:4,]
 ##               Estimate Std. Error  t value     Pr(&gt;|t|)
 ## (Intercept) 1.60138378 0.46453145 3.447310 0.0005854449
 ## ssp         0.07259427 0.06603498 1.099331 0.2718404422
 ## sfp         0.01025889 0.06515735 0.157448 0.8749178181
 ## sfsp        0.20971238 0.08554012 2.451626 0.0143604306
 
-# Los errores estándar correctos son los robustos:
-coeftest(reg1, vcov = vcovHC(reg1, &quot;HC1&quot;))[1:4, ]
+#Los errores estándar correctos son los robustos:
+coeftest(reg1, vcov = vcovHC(reg1, &quot;HC1&quot;))[1:4,]
 ##               Estimate Std. Error   t value     Pr(&gt;|t|)
 ## (Intercept) 1.60138378 0.46059228 3.4767925 0.0005252628
 ## ssp         0.07259427 0.06601070 1.0997349 0.2716642613
 ## sfp         0.01025889 0.06357889 0.1613569 0.8718389856
 ## sfsp        0.20971238 0.09221545 2.2741566 0.0231293441
 
-# Finalmente, lo que se reporta en la tabla como la media del grupo de control no
-# es la constante en la regresión, sino la simple media y desviación
+#Finalmente, lo que se reporta en la tabla como la media del grupo de control no es la constante en la regresión, sino la simple media y desviación
 
-data.angrist.reg &lt;- data.angrist %&gt;% filter(!is.na(gpa_year1) &amp; !is.na(grade_20059_fall) &amp; 
-    !is.na(ssp) &amp; !is.na(sfp) &amp; !is.na(sfsp) &amp; !is.na(sex) &amp; !is.na(mtongue) &amp; !is.na(hsgroup) &amp; 
-    !is.na(numcourses_nov1) &amp; !is.na(lastmin) &amp; !is.na(mom_edn) &amp; !is.na(dad_edn))
+data.angrist.reg &lt;- data.angrist %&gt;% 
+  filter(!is.na(gpa_year1) &amp; !is.na(grade_20059_fall)
+     &amp; !is.na(ssp)
+     &amp; !is.na(sfp)
+     &amp; !is.na(sfsp)
+     &amp; !is.na(sex)
+     &amp; !is.na(mtongue)
+     &amp; !is.na(hsgroup)
+     &amp; !is.na(numcourses_nov1)
+     &amp; !is.na(lastmin)
+     &amp; !is.na(mom_edn)
+     &amp; !is.na(dad_edn))
 
-data.angrist.reg %&gt;% filter(control == 1) %&gt;% summarize(media = mean(gpa_year1, na.rm = TRUE))
+data.angrist.reg %&gt;%
+  filter(control==1) %&gt;%
+  summarize(media=mean(gpa_year1,na.rm=TRUE))
 ## # A tibble: 1 x 1
 ##   media
 ##   &lt;dbl&gt;
 ## 1  1.80
 
-data.angrist.reg %&gt;% filter(control == 1) %&gt;% summarize(desvest = sd(gpa_year1, na.rm = TRUE))
+data.angrist.reg %&gt;%
+  filter(control==1) %&gt;%
+  summarize(desvest=sd(gpa_year1,na.rm=TRUE))
 ## # A tibble: 1 x 1
 ##   desvest
 ##     &lt;dbl&gt;
 ## 1   0.902
 
-data.angrist.reg %&gt;% summarize(numero = n())
+data.angrist.reg %&gt;%
+  summarize(numero=n())
 ## # A tibble: 1 x 1
 ##   numero
 ##    &lt;int&gt;
 ## 1   1255</code></pre>
 <p><em>Los individuos en los grupos de tratamiento SSP o SFP no tienen diferencias significativas en términos de su puntaje, con respecto al grupo de control. En cambio, los individuos tratados con SFSP tienen en promedio 0.21 puntos más que los del grupo de control, y esta diferencia es estadísticamente significativa, con un nivel de confianza de 95%.</em></p></li>
 <li><p>[10 puntos] Estime el efecto de recibir cada tipo de tratamiento, considerando los tratamientos SSP o SFP (de cualquier tipo) en las mujeres de la muestra (Panel B, columna 6). Esto es, considere el tratamiento SSP como un primer tipo de tratamiento y, ya sea SFP o SFSP, como un segundo tipo de tratamiento. Calcule correctamente los errores estándar. Interprete sus resultados.</p>
-<pre class="r"><code># Efecto de cualquier tratamiento solo en mujeres
-data.angrist &lt;- data.angrist %&gt;% mutate(sspany = ifelse(sfp == 1 | sfsp == 1, 1, 
-    0))
+<pre class="r"><code>#Efecto de cualquier tratamiento solo en mujeres
+data.angrist &lt;- data.angrist %&gt;%
+  mutate(sspany = ifelse(sfp == 1 | sfsp == 1, 1, 
+0))
 
-reg2 &lt;- lm(gpa_year1 ~ ssp + sspany + factor(mtongue) + factor(hsgroup) + factor(numcourses_nov1) + 
-    factor(lastmin) + factor(mom_edn) + factor(dad_edn), data = filter(data.angrist, 
-    female == 1))
+reg2&lt;-lm(gpa_year1 ~ ssp + sspany+
+       factor(mtongue)+
+       factor(hsgroup)+
+       factor(numcourses_nov1)+
+       factor(lastmin)+
+       factor(mom_edn)+
+       factor(dad_edn),
+     data=filter(data.angrist,female==1))
 
-# Los coeficientes con los errores correctos son:
-coeftest(reg2, vcov = vcovHC(reg2, &quot;HC1&quot;))[1:3, ]
+#Los coeficientes con los errores correctos son:
+coeftest(reg2, vcov = vcovHC(reg2, &quot;HC1&quot;))[1:3,]
 ##              Estimate Std. Error  t value     Pr(&gt;|t|)
 ## (Intercept) 2.5333972 0.28335814 8.940619 3.428412e-18
 ## ssp         0.1162368 0.08199976 1.417526 1.567753e-01
 ## sspany      0.1468443 0.07291557 2.013895 4.440376e-02</code></pre>
 <p><em>No existe un efecto significativo del tratamiento SSP en las mujeres de la muestra. En cambio, las mujeres tratadas con SFP o SFSP tienen 0.15 puntos más en su calificación del primer año que las mujeres del grupo de control. Esta diferencia es estadísticamente significativa a un nivel de significacia del 5%.</em></p></li>
 </ol>
-</div>
 </div>
 <div class="footnotes">
 <hr />
