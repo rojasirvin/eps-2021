@@ -322,7 +322,7 @@ el coeficiente $\beta$ se interpreta como el efecto del tratamiento medido en de
 
 # Índice de Anderson
 
-- Anderson (2008) propone el siguiente índice, que puede verse como una generalización del de Kling:
+- [Anderson (2008)](https://are.berkeley.edu/~mlanderson/pdf/Anderson%202008a.pdf) propone el siguiente índice, que puede verse como una generalización del de Kling:
 
 $$\bar{s}_i=\frac{1}{W_{i}}\sum_{j\in J} w_j z_{ij}$$
 - $w_j$ es el peso para la variable $j$ y $W_i=\sum_{j\in J}w_{j}$
