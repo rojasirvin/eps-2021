@@ -92,7 +92,6 @@ table.efectos %>%
 ```
 
 **Esta pregunta estuvo basada en un experimento realizado en El Salvador y cuyos resultados se reportan en [Shoeing the Children : The Impact of the TOMS Shoe Donation Program in Rural El Salvador](https://academic.oup.com/wber/article/32/3/727/2669760). Uno de los autores, Bruce Wydick, estará en el seminario de la DE el 21 de octubre.**
-***
 
 a. [5 puntos] ¿Qué representan los valores $p$ reportados en la columna (3) en la tabla 1?
 
