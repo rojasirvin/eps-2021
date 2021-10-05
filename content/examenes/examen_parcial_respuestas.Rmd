@@ -1,0 +1,187 @@
+---
+title: "Respuestas al examen parcial"
+summary: " "
+weight: 2
+type: book
+toc: false
+---
+
+```{r setup, include=FALSE}
+options(scipen=999) # Prevenir notación científica
+
+library(tidyverse)
+library(janitor)
+library(sandwich)
+#library(nnet)
+#library(mlogit)
+library(lmtest)
+library(clubSandwich)
+#library(modelsummary)
+library(estimatr)
+library(AER)
+library(data.table)
+library(magick)
+library(reticulate)
+library(knitr)
+library(kableExtra)
+library(formatR)
+xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
+```
+
+## Pregunta 1
+
+Se diseñó una intervención que consistió en entregar zapatos a niños en cuatro áreas con altos niveles de pobreza de cierto país. Se sabe que los niños caminan bastante para ir a la escuela y realizan una serie de tareas domésticas después de la escuela. Por tanto, se tiene la hipótesis de que la entrega de zapatos tendrá impactos en el desarrollo de los niños. Se seleccionaron aleatoriamente localidades de control y localidades de tratamiento. Dentro de las localidades asignadas al tratamiento, todos los niños de entre 7 y 12 años de edad recibieron zapatos. Los investigadores deciden usar un $\alpha=0.10$ durante el estudio.
+
+La tabla 1 presenta información sobre una serie de características de los niños que participaron en el estudio en la línea base.
+
+```{r table.balance, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+variable <- c("Variables","Edad", "Sexo (masculino=1)","Jefe trabaja en agricultura", "Grado máximo de estudios en el hogar","Índice calidad de vivienda", "Índice de consumo de durables", "Número de pares de zapatos que posee","Horas que pasa sin zapatos","Días que no fue a la escuela", "Horas para dormir","Horas para comer","Horas para lavar", "Horas en escuela","Horas para trabajar","N")
+c <- c("Media control",9.486,0.545,0.462,5.836,0.492,0.441,2.060,2.090,0.701,10.68,1.931,0.732,4.613,0.409, 666)
+
+t <- c("Media tratamiento",9.332,0.497,0.522,5.346,0.593,0.467,1.825,1.963,0.886,9.98,1.934,0.835,4.154,0.572, 912)
+
+pvalue <- c("`p`","0.114","0.073*","0.435","0.406","0.447","0.829","0.213","0.917","0.465","0.388","0.986","0.228","0.168","0.082*", "1,578")
+
+table.balance <- data.frame(cbind(variable, c, t,pvalue))
+colnames(table.balance) = c(" ","$(1)$","$(2)$","$(3)$")
+
+table.balance %>%
+  kbl(align = "lccc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>% 
+  add_header_above(c("Tabla 1. Covariables entre grupos de tratamiento y control (datos en la línea base) " = 4 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+  footnote(general = "Los valores `p` son de una prueba `t` simple.",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
+
+```
+
+
+La tabla 2 muestra los resultados de estimar una regresión del tipo $$y_i=\alpha+X_i'\beta+\theta T_i+\varepsilon_i$$
+
+donde $T_i$ indica la pertenencia al grupo de tratamiento, $X_i$ es un vector de características observables usadas como controles y $y_i$ es cada una de las siguientes variables sobre las que se estima el impacto del programa: 1) número de zapatos que posee; 2) días que no fue a la escuela; y 3) horas para trabajar.
+
+
+```{r table.efectos, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+variable <- c("", "$\\hat{\\theta}$","(e.e)","N")
+
+zapatos <- c("Número de pares de zapatos que posee","0.075","(0.061)","1,302")
+dias <- c("Días que no fue a la escuela","-0.165**","(0.057)","664")
+trabajo <- c("Horas para trabajar","0.348","(0.243)","556")
+
+
+table.efectos <- data.frame(cbind(variable,zapatos,dias,trabajo))
+colnames(table.efectos) = c(" ","$(1)$","$(2)$","$(3)$")
+
+table.efectos %>%
+  kbl(align = "lccc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>% 
+  add_header_above(c("Tabla 2. Efectos del tratamiento en variables seleccionadas" = 4 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+  footnote(general = "* `p` <0.10, ** `p` <0.05, *** `p` <0.01. Todas las regresiones controlan por edad, sexo, ocupación del jefe del hogar y calidad de la vivienda. Errores estándar agrupados a nivel localidad entre paréntesis.",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
+```
+
+    **Esta pregunta estuvo basada en un experimento realizado en El Salvador y cuyos resultados se reportan en [Shoeing the Children : The Impact of the TOMS Shoe Donation Program in Rural El Salvador](https://academic.oup.com/wber/article/32/3/727/2669760). Uno de los autores, Bruce Wydick, estará en el seminario de la DE el 21 de octubre.**
+***
+
+a. [5 puntos] ¿Qué representan los valores $p$ reportados en la columna (3) en la tabla 1?
+
+    *Para cada característica, es el valor $p$ asociado al estadístico $t$ en la prueba de diferencia de medias. Indica la probabilidad de observar el estadístico $t$ bajo la $H_0$ de igualdad de medias. Por tanto, valores $p$ por debajo del nivel de significacia $\alpha$ indican que el estadístico asociado es poco probable de observar bajo la $H_0$.*
+
+b. [10 puntos] Un donante está preocupado por los resultados de la intervención porque considera que los niños que tenían más zapatos antes de que iniciara el programa tuvieron una menor probabilidad de estar en el grupo que recibió zapatos por parte del programa. ¿Considera esto una preocupación válida sobre la integridad del experimento?
+
+    *Si bien los niños que están en el grupo de control tienen en promedio 2.06 pares de zapatos y los que están en el de tratamiento tienen en promedio 1.825 pares de zapatos, esta diferencia no es estadísticamente significativa. Esto queda en evidencia por el valor $p=0.213$, por lo que la preocupación del donante no está justificada por los datos.*
+
+c. [5 puntos] ¿Cómo se interpreta el asterisco al lado del valor $p$ de 0.082 asociado a las horas para trabajar?
+
+    *Dado que se trabaja con un $\alpha=0.10$, los asteriscos denotan los casos en los que las diferencias de medias tiene un valor $p$ asociado menor a dicho $\alpha$. Es decir, el asterisco al lado del 0.082 indica que la diferencia en horas para trabajar entre los niños del grupo de tratamiento y de control es estadísticamente significativa.*
+
+d. [10 puntos] ¿Cuál es el impacto del programa en el número de pares zapatos que los niños en promedio poseen? Mencione la magnitud y significancia estadística de dicho impacto.
+
+    *De acuerdo a la columna (1) de la tabla 2, los niños que recibieron zapatos tienen en promedio 0.075 pares de zapatos más que los niños que no recibieron el programa. Sin embargo, esta diferencia no es estadísticamente significativa a los niveles de confianza típicamente usados en economía.*
+    
+e. [5 puntos] En columna (2) de la tabla 2, ¿qué interpretación tienen los dos asteriscos al lado de -0.165?
+
+    *Los asteriscos son una notación del nivel de confianza al que se rechaza la $H0$. En el caso de los dos asteriscos al lado del -0.165, significa que el programa tuvo un efecto de reducir los días en que los niños no van a la escuela de 0.165 días y que este efecto es estadísticamente significativo al 5\%.*
+
+f. [10 puntos] ¿Cuántos días sin ir a la escuela esperaríamos observar después de la intervención en los niños que recibieron zapatos?
+
+    *Simplemente sumamos el efecto estimado a la media del grupo de control. Es decir, esperamos que el número de días que no van a la escuela en el caso de los niños que recibieron los zapatos sea de $0.701-0.165=0.536$.*
+
+g. [5 puntos] La nota al pie de la tabla 2 indica que se reportan errores estándar agrupados? ¿Por qué los investigadores realizan la estimación de los errores estándar de esta manera?
+
+    *El programa fue aleatorizado a nivel localidad, por lo que existe una correlación entre las variables observadas y no observadas entre los individuos de los grupos de control y tratamiento. Los errores agrupados toman en cuenta esta correlación, asumiendo que existe una correlación arbitraria entre las observaciones de la misma localidad, pero independiencia entre observaciones de distintas localidades.*
+
+## Pregunta 2
+
+Un gobierno tiene recursos para analizar el impacto de un programa de transferencia de tecnología en las localidades rurales de un país. El programa consiste en enseñar talleres de buenas prácticas agrícolas a productores de maíz (desde el tratamiento de semillas, pasando por la preparación del suelo, hasta la cosecha). Se espera que este programa mejore los rendimientos (toneladas de maíz cosechado por hectárea). Se tiene la hipótesis de que el programa puede tener efectos de derramamiento o *spillover*, es decir, que los productores que no reciben el programa directamente se benefician de quienes sí lo hacen (por ejemplo, si los vecinos que sí recibieron el tratamiento le enseñan a quienes no las cosas que aprendieron en los talleres).
+
+a. [10 puntos] Describa cómo diseñaría un experimento para probar la hipótesis de spillovers.
+
+    *En el experimento ideal se asignarían localidades enteras a ser del grupo de tratamiento o de control, por medio de una lotería. En las localidades de control nadie recibe el programa. Por otro lado, en las localidades de tratamiento, se aleatoriza nuevamente a nivel individual el recibir los talleres o no. Entonces tendríamos tres grupos: 1) un control puro, formado por productores en las localidades de control; 2) productores que no reciben el programa, pero que viven en las localidades de tratamiento; y 3) productores que reciben el tratamiento en las localidades de tratamiento. Después de cierto tiempo posterior a los talleres, se recolectaría información sobre la productividad en los tres tipos de productores. Para probar la hipóesis de spillovers basta comparar los rendimientos de los productores que no recibieron el tratamiento y que viven en localidades tratadas con los productores de control puro. Las diferencias que surjan pueden ser atribuidas a los spillovers.*
+  
+a. [10 puntos] Escriba la regresión que emplearía para probar dicha la hipótesis. Indique qué coeficiente identifica el efecto de los spillovers.
+
+    *Para probar econométricamente la hipótesis de spillovers definamos las siguientes variables: $T_i$ es una dummy que toma el valor de 1 para los productores tratados, $TC_i$ es una dummy que toma el valor de 1 para productores que no recibieron el tratamiento y que viven en localidades tratadas. Siendo $y_i$ el rendimiento y $X_i$ un posible vector de controles, podemos estimar: $$y_i=a+bT_i+cTC_i+BX_i+e_i$$ El coeficiente $c$ mide la diferencia de rendimiento entre el grupo no tratado en localidades tratadas y el control puro. Un coeficiente estimado $\hat{c}$ estadísticamente significativo probaría la hipótesis del efecto de derramamiento.*
+
+## Pregunta 3
+
+En la pregunta 1 de la tarea 2 estimamos el LATE de ser cliente de microfinanzas sobre el gasto total para un grupo de hogares incluidos en un experimento en Marruecos. En esta pregunta usará la misma base de datos, *crepon_morocco_analysis.csv*. Al igual que en dicha tarea, use un indicador de ser cliente, **client** y un indicador de asignación aleatoria, **treatment**. Use también los mismos controles: **members_resid_bl**, **nadults_resid_bl**, **head_age_bl**, **act_livestock_bl**, **act_business_bl**, **borrowed_total_bl**, **members_resid_d_bl**, **nadults_resid_d_bl**, **head_age_d_bl**, **act_livestock_d_bl**, **act_business_d_bl**, **borrowed_total_d_bl**, **ccm_resp_activ**, **other_resp_activ**, **ccm_resp_activ_d** y **other_resp_activ_d**. Además, incluya efectos fijos por pareja introduciendo la variable **paire** como factor. Es decir, todo es exactamente igual a lo realizado en la tarea 2, salvo la variable dependiente, pues ahora nos ocuparemos del efecto sobre la probabilidad de estar autoempleado, **self_empl**.
+
+a. [10 puntos] Estime el LATE de ser cliente sobre la probabilidad de estar autoempleado, usando la misma especificación que en la tarea 2 y usando errores estándar agrupados a nivel de la variable **demi_paire**. ¿Es este efecto estadísticamente significaivo.
+
+    *Retomando las respuestas de la tarea 2, basta con sustituir **self_empl** en el lugar de la variable dependiente:*
+
+    ```{r tidy=TRUE, include=T,echo=T,warning=FALSE, message=FALSE}
+data.morocco<-read_csv("./crepon_morocco_analysis.csv")   %>% 
+  clean_names() 
+
+
+res_iv <- ivreg(self_empl ~ client + members_resid_bl + nadults_resid_bl
+     + head_age_bl + act_livestock_bl + act_business_bl 
+     + borrowed_total_bl + members_resid_d_bl + nadults_resid_d_bl
+     + head_age_d_bl + act_livestock_d_bl + act_business_d_bl 
+     + borrowed_total_d_bl + ccm_resp_activ + other_resp_activ 
+     + ccm_resp_activ_d  + other_resp_activ_d + factor(paire) |
+       treatment +  members_resid_bl + nadults_resid_bl
+     + head_age_bl + act_livestock_bl + act_business_bl 
+     + borrowed_total_bl + members_resid_d_bl + nadults_resid_d_bl
+     + head_age_d_bl + act_livestock_d_bl + act_business_d_bl 
+     + borrowed_total_d_bl + ccm_resp_activ + other_resp_activ 
+     + ccm_resp_activ_d  + other_resp_activ_d + factor(paire),
+     data=data.morocco)
+
+```
+
+    *Se obtiene un efecto estimado de -0.0911. El cálculo de los errores agrupadados arroja un error estándar estimado de 0.0598, con un valor $p$ de 0.1319. En este caso, se concluye que el ser cliente no tiene un efecto estadísticamente significativo sobre la probabilidad de ser autoempleado.*
+
+    ```{r tidy=TRUE, include=T,echo=T,warning=FALSE, message=FALSE}
+coef_test(res_iv,
+          vcov = "CR1S", 
+          cluster = data.morocco$demi_paire)[1:2,]
+```
+
+a. [10 puntos] Interprete el coeficiente asociado a la variable **client** en la regresión estimada en la parte a.
+
+    *Es el LATE de ser cliente de microfinanzas en la probabilidad de tener un autoempleo. Esto es, la asignación aleatoria incrementó en 9.1\% la probabilidad de tener un autoempleo en aquellos individuos que se convirieron en clientes de microfinanzas por haber sido asignados a dicho tratamiento. Sin embargo, como se encontró en la parte a., el efecto no es estadísticamente significativo.*
+
+a. [10 puntos] Ahora estime los errores estándar robustos, pero sin agrupar. En particular, calcule los errores estándar robustos del tipo *HC1*. Compare sus conclusiones con lo que encontró en la parte a.
+
+    *Basta con especificar una nueva forma de calcular los errores estándar. No tenemos que volver a estimar la regresión:*
+    
+    ```{r tidy=TRUE, include=T,echo=T,warning=FALSE, message=FALSE}
+coeftest(res_iv,
+         vcov = vcovHC(res_iv, "HC1"))[1:2,]
+```
+
+    *Si no tomamos en cuenta la correlación entre grupos, el error estándar robusto estimado es de 0.052, con un valor $p$ de 0.0803. En este caso, podríamos rechazar la $H0$ a un nivel de confianza del 10%. Este es un ejemplo de lo que hablamos en clase: la decisión de agrupar o no los errores puede llegar a cambiar las conclusiones de los estudios, en particular, podemos estar sobre rechanzando hipótesis nulas.*
