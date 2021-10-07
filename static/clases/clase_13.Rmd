@@ -1,0 +1,378 @@
+---
+title: "Diferencia en diferencias"
+author: "Irvin Rojas"
+institute: "CIDE"
+date: "7 de octubre de 2021"
+header-includes:
+  - \usepackage{tikz}
+  - \usetikzlibrary{shapes, shadows,arrows}
+output:
+  xaringan::moon_reader:
+    css: [default, "libs/cide.css", metropolis-fonts, "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css", "https://use.fontawesome.com/releases/v5.7.2/css/all.css", "https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css"]
+    seal: false
+    chakra: "https://remarkjs.com/downloads/remark-latest.min.js"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      titleSlideClass: ["middle", "center"]
+      ratio: "16:9"
+      beforeInit: ["https://platform.twitter.com/widgets.js", "libs/cols_macro.js"]
+      navigation:
+        scroll: false
+
+
+---
+class: title-slide
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.path = "figures/")
+
+library(tidyverse)
+library(janitor)
+library(sandwich)
+#library(nnet)
+#library(mlogit)
+library(readr)
+library(clubSandwich)
+library(modelsummary)
+library(estimatr)
+library(lubridate)
+library(ExPanDaR) #for describing panel data
+library(lfe)
+
+xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
+```
+
+```{css, echo = FALSE}
+.huge .remark-code { /*Change made here*/
+  font-size: 200% !important;
+}
+.tiny .remark-code { /*Change made here*/
+  font-size: 60% !important;
+}
+```
+
+.title[
+# Clase 13. Diferencia en diferencias en R
+]
+.subtitle[
+## Evaluación de Programas
+]
+.author[
+### Irvin Rojas <br> [rojasirvin.com](https://www.rojasirvin.com/) <br> [<i class="fab fa-github"></i>](https://github.com/rojasirvin) [<i class="fab fa-twitter"></i>](https://twitter.com/RojasIrvin) [<i class="ai ai-google-scholar"></i>](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas <br> División de Economía
+]
+
+---
+# Agenda
+
+1. Introduciremos conceptos básicos del estimador de efectos fijos para datos en panel
+
+1. Implementaremos diferencia en diferencias en R
+
+---
+
+class: inverse, middle, center
+
+# Efectos fijos
+
+---
+
+# Efectos fijos
+
+- En un panel tenemos datos para cada unidad en varios periodos
+
+- Además, en el caso de las leyes para el acceso a alcohol, hemos usado un estimador en particular para estimar el efecto del tratamiento, el **estimador de efectos fijos**
+
+- Consideremos el siguiente problema:
+
+  - Log de salarios: $y_{it}$
+  - Habilidad no observable y fija en el tiempo: $A_i$
+  - Regresores variantes en el tiempo: $X_{it}$
+  - Miembro de un sindicato: $T_{it}$
+
+- Supongamos que la asignación al tratamiento es aleatoria, por lo que $E(y_{0it}|A_i,X_{it},t,T_{it})=(y_{0it}|A_i,X_{it},t)$
+
+--
+
+- Supongamos la siguiente función lineal de salarios:
+
+$$E(y_{0it}|A_i,X_{it},t)=\alpha+\lambda_t+A_i'\gamma+X_{it}'\beta$$
+---
+
+# Efectos fijos
+
+- Supongamos también un efecto de tratamiento constante tal que:
+
+$$E(y_{1it}|A_i,X_{it},t)=E(y_{0it}|A_i,X_{it},t)+\rho$$
+
+
+- Entonces, la función de salarios es:
+
+$$E(y_{it}|A_i,X_{it},t)=\alpha+\lambda_t+A_i'\gamma+X_{it}'\beta+\rho T_{it}$$
+
+--
+
+- Si $A_i$ es no observable, un modelo de efectos fijos se especifica como sigue:
+
+$$y_{it}=\alpha_i+\lambda_t+X_{it}'\beta+\rho T_{it}+\varepsilon$$
+donde $\alpha_i=\alpha+A_i'\gamma$
+
+- Noten que este modelo tiene $((N-1)+(T-1)+K+1)$ parámetros a ser estimados
+
+- Tendríamos que incluir una regresión con $N-1$ variables dummy por cada individuo y $T-1$ variables dummy para cada periodo, además de los regresores y la dummy de tratamiento
+
+- Sin embargo, es posible modificar el modelo original para deshacernos de las $\alpha_i$
+
+---
+
+# Modelo en diferencias
+
+- Definamos $\Delta z_t=z_t-z_{t-1}$
+
+- Podemos entonces tomar diferencias al modelo de efectos fijos para obtener:
+
+$$\Delta y_{it}=\Delta\lambda_t+\rho\Delta T_{it}+\Delta X_{it}'\beta+\Delta\varepsilon_{it}$$
+
+--
+
+- El modelo puede estimarse sin tener que incluir las $N-1$ variables dummy individuales
+
+---
+
+# Modelo en desviaciones
+
+
+- Si tomamos la media a cada variable del modelo de efectos fijos tenemos:
+
+$$\bar{y_i}=\alpha_i+\bar{\lambda}+\rho\bar{T_i}+\bar{X}_i'\beta+\bar{\varepsilon}_i$$
+- Restando $\bar{y}_i$ a $y_{it}$:
+
+$$y_{it}-\bar{y}_i=\lambda_t-\bar{\lambda}+\rho(T_{it}-\bar{T}_i)+(X_{it}-\bar{X}_i)'\beta+(\varepsilon_{it}-\bar{\varepsilon}_i)$$
+--
+
+- Es decir, podemos despreocuparnos por estimar un modelo con muchas variables dummy, sobre todo si lo que nos importa es $\rho$
+
+---
+
+# Modelo en desviaciones 
+
+- Si $T=2$, el modelo de diferencias y el de desviaciones es numéricamente equivalente a estimar el modelo de efectos fijos, aunque con $T>2$, se prefiere el modelo de desviaciones
+
+- Al estimador de desviaciones se le conoce comúnmente como estimador *within*
+
+- $\hat{\beta}$ y $\hat{\rho}$ son consistentes cuando $N\to\infty$ y $T$ fijo
+
+- Para construir errores estándar tenemos que tomar en cuenta que estimamos $N$ medias (lo cual afecta los grados de libertad)
+
+---
+
+# ¿Qué tanto confiamos en DID?
+
+- Bertrarnd, Duflo & Mullainathan (2004), [How Much Should We Trust Differences-in-Differences Estimates](https://academic.oup.com/qje/article-abstract/119/1/249/1876068)
+
+- Por algún tiempo poco o nada de atención se le dió al hecho de que el uso de DID en muchas áreas (desarrollo, salud, laboral) implicaba análisis con variables con alta correlación serial
+
+- Bertrarnd, Duflo & Mullainathan reconocieron este hecho
+  - 69/92 artículos revisados usan más de dos periodos
+  - 16.5 periodos en promedio
+  - La gran mayoría no hace nada al respecto
+
+- Nosotros ya sabemos la implicación de esto, de forma análoga a lo que sucede con datos agrupados: subestimación de los errores estándar
+
+- Conclusiones equivocadas al rechazar $H_0$ que son ciertas
+
+- Solución: usemos errores agrupados a nivel individuo
+
+
+---
+
+class: inverse, middle, center
+
+# Divorcio unilateral
+
+---
+
+# Ejemplo: divorcio unilateral
+
+
+- Wolfers (2006), [Did Unilateral Divorce Laws Rase Divorce Rates?](https://www.aeaweb.org/articles?id=10.1257/aer.96.5.1802)
+
+- ¿Cambios en las leyes estatales que bajan el *costo* del divorcio incrementa la tasa de divoricios en la población casada?
+
+- Esta legislación se engloba en lo que se cooce como leyes *no-fault* en la que no se requiere el consentimiento de ambas partes
+
+- Al mismo tiempo que estas leyes fueron implantándose desde los años 70, las tasas de divorcio en todo EUA iban en aumento
+
+- El objetivo es estimar el efecto causal de los cambios en la legislación en las tasas de divorcio
+
+
+
+---
+
+# Punto de partida
+
+.pull-left[
+- Friedberg (1998) muestra que si solo hacemos DID parece no haber efecto alguno de la legislación
+
+- Y que si refinamos la estimación con tendencias específicas por estado, sí hay un efecto positivo en la tasa de divorcios
+
+- En este ejemplo estoy usando la librería *ExPanDaR* para explorar los datos en panel
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+wolfers.data <-read_csv("./wolfers_divorce.csv",
+                       locale = locale(encoding = "latin1")) %>% 
+  select(div_rate, unilateral, st, year, stpop, divx)  %>% 
+  filter(year>1967 & year<1989)
+
+#Esta es una de las funciones de ExPanDaR
+panel_missing <- prepare_missing_values_graph(wolfers.data, ts_id = "year")
+
+```
+]
+
+--
+
+.tiny[
+.pull-right[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+panel_missing
+```
+]
+]
+
+
+
+---
+
+# Algunas funciones de *ExPanDaR* 
+
+- Les recomiendo explorar las funciones para visualizar sus datos en panel usando [ExPanDaR](https://joachim-gassen.github.io/ExPanDaR/)
+
+- Por ejemplo, pueden crear una herramienta interactiva 
+
+```{r echo=T, include=T, eval=F, message=F, warning=F}
+ExPanD(df = wolfers.data,
+       ts_id="year",
+       cs_id="st",
+       title = "Wow, mis datos",
+       abstract = "Datos tomados de Wolfers (2006), Did Unilateral Divorce Laws Rase Divorce Rates?")
+```
+
+---
+
+# DID para el efecto sobre la tasa de divorcio
+
+- El tratamiento es tener una ley de divorcio unilateral
+
+- Definimos la dummy $UNILATERAL_{st}$ que toma el valor de 1 en el estado $s$ y en el periodo $t$ cuando está en vigor una ley unilateral
+
+- La especificación más simple de DID es:
+
+$$y_{st}=\alpha+\delta_{DID}UNILATERAL_{st}+\beta_{AK} S_{AK}+\ldots+\beta_{WY}S_{WY}+\gamma_{1967}A_{1967}+\ldots+\gamma_{1989}A_{1989}+\varepsilon_{st}$$
+- Wolfers añade una variable dummy que indica si hubo cambios en la forma de clasifiación (por ahora no nos interesa esta variable)
+
+---
+
+# DID asumiendo tendencias paralelas
+
+- Aquí estoy usando la función *felm* del paquete *lfe* que permite incluir efectos fijos de manera muy sencilla
+
+.tiny[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+modelo1 <- felm(div_rate ~unilateral | st + year+divx,
+                data = wolfers.data,
+                weights = wolfers.data$stpop)
+
+summary(modelo1)
+```
+]
+
+- El primer resultado parecía mostrar que no había efecto alguno de las leyes para facilitar el divorcio unilateral
+
+
+---
+
+# DID con tendecias específicas
+
+.tiny[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+modelo2 <- felm(div_rate ~unilateral | factor(st) + factor(year) + factor(st):year + factor(divx),
+                data = wolfers.data,
+                weights = wolfers.data$stpop)
+
+summary(modelo2)
+```
+]
+---
+
+# DID con tendecias específicas cuadráticas
+
+.tiny[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+wolfers.data<-wolfers.data %>%
+  mutate(t=year-1968+1) %>% 
+  mutate(tsq=t*t)
+
+modelo3 <- felm(div_rate ~unilateral |
+                  factor(st)+factor(t)+factor(st):t+factor(st):tsq+factor(divx),
+                data = wolfers.data,
+                weights = wolfers.data$stpop)
+
+summary(modelo3)
+```
+]
+---
+
+# DID con tendecias específicas cuadráticas y errores agrupados
+
+.tiny[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+modelo3a <- felm(div_rate ~unilateral |
+                   factor(st)+factor(t)+factor(st):t+factor(st):tsq+factor(divx) |
+                   0 |
+                   st,
+                 data = wolfers.data,
+                 weights = wolfers.data$stpop)
+
+summary(modelo3a)
+```
+]
+---
+
+# Próxima sesión
+
+- Tuve que rediseñar el calendario de presentaciones, por favor, revísenlo el viernes por la tarde
+
+- Voy a modificar el orden de las sesiones que **ya tuvimos** para reflejar el orden en que efectivamente ocurrieron
+
+- Veremos aplicaciones de DID:
+
+  + Gutiérrez Vázquez, E. Y., & Parrado, E. A. (2016). Abortion legalization and childbearing in Mexico. *Studies in family planning*, 47(2), 113-128.
+  
+  + Levasseur, P. (2019). Can social programs break the vicious cycle between poverty and obesity? Evidence from urban Mexico. *World Development*, 113, 143-156.  
+
+  + Rojas Valdes, R.I., Wydick, B., & Lybbert, T.J. (2021). Can Hope Elevate Microfinance? Evidence from Oaxaca, Mexico. *Oxford Economic Papers*.
+  
+- El jueves comenzaremos con estimadores de matching
+
+  - MHE, sección 3.3
+
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+
+
