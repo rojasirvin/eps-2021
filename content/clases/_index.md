@@ -40,3 +40,5 @@ Clase 8. Aplicaciones de métodos experimentales
 [Clase 12](https://eps-2021.netlify.app/clases/clase_12.html#1). Diferencia en diferencias
 
 [Clase 13](https://eps-2021.netlify.app/clases/clase_13.html#1). Diferencia en diferencias en R
+
+[Clase 17](https://eps-2021.netlify.app/clases/clase_13.html#1). Métodos de matching
