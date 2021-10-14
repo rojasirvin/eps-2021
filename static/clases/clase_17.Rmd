@@ -92,10 +92,10 @@ class: inverse, middle, center
 - Las razones que deteriminan la asignación del tratamiento determinen también el valor de $Y$
     
 $$
-\begin{aligned}
+\begin{align}
 E(Y(1)|D=1)&-E(Y(0)|D=1)=\\
 =&TOT+E(Y(0)|D=1)-E(Y(0)|D=0)
-\end{aligned}
+\end{align}
 $$
 
 - La diferencia $E(Y(0)|D=1)-E(Y(0)|D=0)$ es el **sesgo de selección**
@@ -116,11 +116,14 @@ $$
 
 - Podemos escribir
 
-$$\begin{align}
-E(Y(1)|D=1,X)=E(Y(1)|D=0,X) \\
-E(Y(0)|D=1,X)=E(Y(0)|D=0,X)
-\end{align}
 $$
+E(Y(1)|D=1,X)=E(Y(1)|D=0,X)
+$$
+
+$$
+E(Y(0)|D=1,X)=E(Y(0)|D=0,X)
+$$
+
 - Esto es, los valores esperados de $Y(1)$ y $Y(0)$ son iguales cuando nos fijamos en cada valor de $X$
 
 ---
