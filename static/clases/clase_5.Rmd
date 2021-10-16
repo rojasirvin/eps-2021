@@ -430,10 +430,6 @@ qnorm(1-(.1/2))
 
   - CT, Capítulo 25, Secciones 1 y 2
 
-- Veremos un ejemplo un tanto distinto: un proyecto a escala masiva
-
-  - Banerjee, A., Duflo, E., Goldberg, N., Karlan, D., Osei, R., Parienté, W., Shapiro, J., Thuysbaert, B. & Udry, C. (2015). A multifaceted program causes lasting progress for the very poor: Evidence from six countries. *Science*, 348(6236), 1260799.
-  
 ---
 
 class: center, middle

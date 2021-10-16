@@ -1,8 +1,8 @@
 ---
-title: "Errores estándar e inferencia"
+title: "LATE y variables instrumentales"
 author: "Irvin Rojas"
 institute: "CIDE"
-date: "23 de septiembre de 2021"
+date: "21 de septiembre de 2021"
 header-includes:
   - \usepackage{tikz}
   - \usetikzlibrary{shapes, shadows,arrows}
@@ -28,27 +28,17 @@ class: title-slide
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, fig.path = "figures/")
-
 library(tidyverse)
-library(janitor)
-library(sandwich)
-library(clubSandwich)
-library(modelsummary)
+library(magick)
+library(reticulate)
+library(knitr)
+library(kableExtra)
 
 xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
 
-```{css, echo = FALSE}
-.huge .remark-code { /*Change made here*/
-  font-size: 200% !important;
-}
-.tiny .remark-code { /*Change made here*/
-  font-size: 60% !important;
-}
-```
-
 .title[
-# Clase 10. Errores estándar e inferencia
+# Clase 10. LATE y variables instrumentales
 ]
 .subtitle[
 ## Evaluación de Programas
@@ -64,602 +54,761 @@ xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ---
 # Agenda
 
-1. En esta sesión nos concentraremos en la estimación de errores estándar
+1. Introduciremos problemas de evaluación cuando hay cumplimiento imperfecto
 
-1. Definiremos los estimadores de la matriz de varianzas robusta empleadas por los programas más usados
-
-1. Estudiaremos el uso de rutinas bootstrap para la estimación de errores estándar
-
-1. Estudiaremos las implicaciones de los datos agrupados en la estimación de errores estándar
+1. Derivaremos e interpretaremos el estimador de efecto local promedio de tratamiento (LATE)
 
 ---
 
 class: inverse, middle, center
 
-# Errores estándar no estándar
+# Cumplimiento no perfecto
 
 ---
 
-# Errores estándar robustos
+# ¿Fracasó el experimento?
 
-- Recordemos que con errores homocedásticos, la matriz de varianzas del estimador de MCO puede ser estimada como:
+- Frecuentemente nos encontraremos con intervenciones donde la aleatorización ocurre de manera íntegra, pero no todos aquellos asignados a cierto tratamiento efectivamente lo reciben
 
-$$\hat{V}(\beta_{MCO}^H)=\hat{\sigma}^2(X'X)^{-1}$$
-donde $\hat{\sigma}^2=\frac{1}{N-k}\hat{u}_i^2$ y $\hat{u}_i^2=(y_i-X_i'\hat{\beta}_{MCO})^2$
+- Nos tomaremos en serio la diferencia entre **ser asignado** al tratamiento y **recibir el tratamiento**
 
---
-
-- Una primera *desviación*  respecto a los errores clásicos ocurre cuando relajamos el supuesto de homocedasticidad
-
-- En la [clase 3](https://eps-2021.netlify.app/clases/clase_5.html#20) estudiamos de manera general las propiedades asintóticas del estimador de MCO
-
-- La varianza asintótica es:
-
-$$V(\hat{\beta}_{MCO}^{R})=(X'X)^{-1}X'\Omega X(X'X)^{-1}$$
-
-
+  - Al evaluar un programa que asigna aleatoriamente a niños a escuelas de prestigio, nos interesa el efecto de efectivamente asistir a dichas escuelas y, quizás no tanto, el efecto de haber sido sorteado para asistir a dichas escuelas
 
 ---
 
-# Errores robustos a la heterocedasticidad
+# ¿Fracasó el experimento?
 
-- Un estimador de la varianza del estimador de MCO que no asume homocedasticidad es el estimador propuesto por White (1980)
+- Usaremos un estimador de variables instrumentales (VI) para relacionar los efectos de la **asignación** con los efectos de la **adopción**
 
-- En la [clase 3](https://eps-2021.netlify.app/clases/clase_5.html#21) le dimos la forma de:
+- Llegaremos al siguiente resultado:
 
-$$\hat{V}(\beta_{MCO}^R)=(X'X)^{-1}\left(\sum_i\hat{u}_i^2x_ix_i'\right)(X'X)^{-1}$$
+$$\text{Efecto de la asignación en } Y=(\text{Efecto de la asignación en la adopción})\times (\text{Efecto de la adopción en }Y)$$
 
-- [Aquí un recordatorio](http://mlwiki.org/index.php/Matrix-Matrix_Multiplication) de por qué podemos escribir $X'uu'X$ como una sumatoria
+- Por tanto:
 
-- Consideremos la *carnita* del sándiwch
+$$\text{Efecto de la adopción en }Y=\frac{\text{Efecto de la asignación en }Y}{\text{Efecto de las asignación en la adopción}}$$
 
-$$\sum_i\hat{u}_i^2x_ix_i \equiv \sum_i \hat{\psi}_i x_ix_i'$$
-
-
----
-
-# Errores estándar robustos
-
-- Dependiendo de cómo se especifique $\hat{\psi}_i$, obtenemos distintas versiones del estimador de varianzas robusto
-
-- La propuesta de White original es:
-
-$$HC0:\quad\hat{\psi}_i=\hat{u}_i^2$$
-- Este estimador asintóticamente consistente
-
---
-
-- En muestras pequeñas, muchas veces se emplea la siguiente corrección:
-
-$$HC1:\quad\hat{\psi}_i=\frac{N}{N-k}\hat{u}_i^2$$
----
-
-# Desviación a la influencia
-
-- Un par de resultados nos ayudarán a entender qué hacen las otras correcciones a la matriz robusta en el software
-
-- Definimos la **influencia** de la observación $i$ como:
-
-$$h_{ii}=X_i'(X'X)^{-1}X_i$$
-
-- $h_{ii}$ nos dice qué tanto *jala* la observación $i$ a la línea de regresión
-
-- En una regresión con un solo regresor $x$, se puede mostrar que la influencia de la observación $i$ es:
-
-$$h_{ii}=\frac{1}{N}+\frac{(x_i-\bar{x})^2}{\sum(x_j-\bar{x})^2}$$
-es decir, que la influencia se incrementa cuando $x_i$ se aleja de la media
-
-- La influencia es un número entre 0 y 1 y además $\sum_i h_{ii}=k$, siendo $k$ el número de regresores
-
----
-
-# Errores estándar robustos
-
-- Algunos autores sugieren usar la influencia en la matriz de varianzas robusta
-
-- Se proponen algunas alternativas:
-
-$$HC2:\quad\hat{\psi}_i=\frac{1}{1-h_{ii}}\hat{u}_i^2$$
-
-$$HC3:\quad\hat{\psi}_i=\frac{1}{(1-h_{ii})^2}\hat{u}_i^2$$
-
---
-
-- Long & Ervin (2000) realizaron un experimento de simulación y recomendaron usar $HC3$ en muestras pequeñas, por lo que el paquete *sandwich* en R usa $HC3$ por default
-
-- Es importante tener en cuenta qué tipo de errores estándar piden que el software calcule
+- Ahora derivaremos formalmente este resultado, pero la intución es importante: el efecto causal de la adopción es el efecto de la asignación, *escalado* por el efecto de la asignación en la adopción
 
 ---
 
 class: inverse, middle, center
 
-# Errores agrupados
+# Efectos causales con cumplimiento imperfecto
 
 ---
 
-# Errores agrupados
+# Identificación de efectos causales usando VI
 
-- Surgen naturalmente cuando las observaciones están agrupadas
+- Angrist, Imbens & Rubin (1996)
 
-  - Niños en salones de clase
-  - Hogares en localidades
-  - Solicitudes de empleo en una empresa
-  - Ahorradoras en un banco
+- Asignación: $Z_i=\begin{cases} 1 \\0 \\ \end{cases}$
 
-- El supuesto de errores independientes claramente no se cumple
+- Cumplimiento: $D_i=\begin{cases} 1 \\0 \\ \end{cases}$
+
+- $Y_i$ variable de resultados
+
+- Nos importa el efecto de $D_i$ sobre $Y_i$
+
+---
+
+# Efectos causales y VI
+
+- $D_i(Z)$ es el indicador de cumplir, dada la asignación $Z$
+
+- Con cumplimiento perfecto tendríamos $D_i(Z)=Z_i$
+
+- En general, hay asignados que no cumplen y no asignados que cumplen
+
+- $Y_i(Z,D)$ es la variable de interés de $i$
+
+- $Y_i(Z,D)$ y $D_i(Z)$ son resultados potenciales
+
+---
+
+# Supuestos
+
+**Supuesto 1**: *Stable Unit Treatment Value Assumption (SUTVA)*
+
+- Este supuesto indica que los resultados potenciales de $i$ no están correlacionados con los de los otros individuos
+
+- Por tanto podemos escribir $Y_i(Z,D)=Y_i(Z_i,D_i)$ y $D_i(Z)=D_i(Z_i)$
+
+**Supuesto 2**: asignación aleatoria
+
+- La asignación de $Z_i$ es aleatoria, es decir, $P(Z=C)=P(Z=C')$ para todo $C$ y $C'$
 
 --
 
-- Pensemos en un problema simple para entender la intución:
+- Los supuestos 1 y 2 nos permiten identificar los efectos causales de $Z$ en $Y$ y de $Z$ en $D$ calculando diferencias de medias por grupos de $Z$:
 
-$$y_{ig}=\beta_0+\beta_1 x_g+e_{ig}$$
-
-- Aquí, $x_g$ es un regresor que es el mismo para todos los miembros del grupo $g$
-
-- Asumamos que todos los grupos tienen tamaño $n$
-
----
-
-# Errores agrupados
-
-- Podemos mostrar que la correlación de errores entre dos observaciones $i$ y $j$ que pertenecen a $g$ es $$E(e_{ig}e_{jg})=\overbrace{\rho_e}^{\substack{\text{coeficiente de correlación} \\ \text{intraclase residual}}} \underbrace{\sigma_e^2}_{\text{varianza residual}}$$
-
-- Le damos una estructura aditiva a los errores:
-
-$$e_{ig}=\nu_g+\eta_{ig}$$
-donde $\nu_g$ captura toda la correlación dentro del grupo
-
-- $\eta_{ig}$ es un error idiosincrático con media cero e independiente de cualquier otro $\eta_{jg}$
-
-- Como queremos analizar el problema del agrupamiento, asumimos que tanto $v_g$ y $\eta_{ig}$ son homocedásticos
-
+  - $ITT_Y$ comparar las medias de $y$ entre quienes $Z=1$ y quienes $Z=0$
+  
+  - $ITT_D$ comparar las medias de $D$ entre quienes $Z=1$ y quienes $Z=0$
+  
+- $ITT$ se conoce como **intención a tratar** o **intention to treat**
 
 ---
 
-# Errores agrupados
+# Parada para reflexionar
 
-- Con esta estructura de errores, el coeficiente de correlación intraclase es:
+- Hasta ahora el supuesto crítico es la asignación aleatoria de $Z$
 
-$$\rho_e=\frac{\sigma_{\nu}^2}{\sigma_{\nu}^2+\sigma_{\eta}^2}$$
-- Deberíamos calcular la matriz de varianzas $V_C(\hat{\beta})$ tomando en cuenta esta estructura
+- $D_i$ puede no serlo y, en general, no lo es
 
+- Por tanto, una comparación de $y$ entre grupos de $D$ es inapropiada
+
+- Necesitamos algunos supuestos para decir algo del efecto causal de $D$ sobre $Y$
+
+---
+
+# Más supuestos
+
+**Supuesto 3**: restricción de exclusión
+
+$$Y(Z,D)=Y(Z',D)\quad \forall \quad Z,Z',D$$
+
+- Este supuesto implica que podemos escribir:
+
+$$Y_i(1,d)=Y_i(0,d) \quad d=\{0,1\}$$
+- Es decir, resuleve el problema contrafactual
 
 --
 
-- ¿Qué pasa si hacemos MCO en el contexto de este problema?
+- Con el supuesto 3 podemos escribir:
 
+$$Y(D)=Y(Z,D)=Y(Z',D)\quad \forall \quad Z,Z',D$$
+--
 
-- Moulton (1984) muestra que:
+- Y por el supuesto 1:
 
-$$\frac{V_C(\hat{\beta})}{V_{MCO}(\hat{\beta})}=1+(n-1)\rho_e$$
-- A $\sqrt{\frac{V_C(\hat{\beta})}{V_{MCO}(\hat{\beta})}}$ se le conoce como el *factor de Moulton*
-
+$$Y_i(D_i)=Y_i(Z,D)$$
 ---
 
-# Factor de Moulton
+# Más supuestos
 
-- El factor de Moulton nos dice qué tanto sobreestimamos la precisión al ignorar la correlación intra clase
+**Supuesto 4**: el efecto causal promedio de $Z$ sobre $D$ es distinto de cero
 
-- Visto de otro modo:
+- Esto es, $E(D_i(1)-D_i(0))\neq0$
 
-$$V_C(\hat{\beta})=\left(1+(n-1)\rho_e\right)V_{MCO}(\hat{\beta})$$
-
-- Es decir entre más grande sea la correlación dentro de los grupos, más deberíamos *inflar* los errores de MCO
+- En otras palabras, la asignación tiene efecto sobre el cumplimiento
 
 --
 
-- Consideremos el caso extremo de que $\rho_e=1$, es decir, que todas las $y_{ig}$ dentro del mismo $g$ son iguales
+**Supuesto 5**: monotonicidad
 
-- Entonces el factor de Moulton es simplemente $\sqrt{n}$
+$$D_i(1)\geq D_i(0) \quad \forall\quad i=1,\ldots N$$
+- Este supuesto simplemente dice que no hay un individuo que:
 
-- Visto de otro modo, la matriz de varianzas correcta se obtendría multiplicando por $n$ la matriz $V_{MCO}(\hat{\beta})$
+  - Cuando se le asigna, no cumple
+  - Cuando no se le asigna, cumple
+  
+- Noten que este supuesto se debe pensar en términos contrafactuales
 
-$$V_C(\hat{\beta})=n V_{MCO}(\hat{\beta})$$
----
-
-# Errores agrupados en general
-
-- En general, $x_{ig}$ varía a nivel individual y tenemos grupos de tamaño $n_g$
-
-- En este caso, el factor de Moulton es la raíz cuadrada de:
-
-$$\frac{V_C(\hat{\beta})}{V_{MCO}(\hat{\beta})}=1+\left(\frac{V(n_g)}{\bar{n}}+\bar{n}-1\right)\rho_x\rho_e$$
-donde $\bar{n}$ es el tamaño promedio del grupo y $\rho_x$ es la correlación intraclase de $x_{ig}$
-
-- No es necesario asumir una forma para $\rho_x$ (se puede calcular)
-
---
-
-- Noten que el error que cometemos es más grande entre más heterogéneo es el tamaño de grupos y entre más grande es $\rho_x$
-
-- Por tanto, cuando el tratamiento no varía entre grupos, este error es grande
+- A un individuo que no cumple cuando se le asigna y cumple cuando no se le asigna se le conoce como **retador** o *defier*
 
 ---
 
-# Soluciones para errores agrupados
+# Variable instrumental
 
-- Solución paramétrica: calcular directamente el factor de Moulton e inflar los errores de MCO
-
-- Bootstrap por bloques: en vez de hacer muestras bootrstrap remuestreando individuos, se remuestrean grupos
-
-- Estimar los errores agrupados (*clustered standard errors*)
+- $Z$ es una **variable instrumental** para el efecto causal de $D$ sobre $Y$ si se cumplen los supuestos 1 al 5
 
 ---
 
-# Errores estándar agrupados
+# Interpretación del estimador de VI
 
-- Con errores agrupados podemos escribir el estimador de MCO como
+- Comencemos escribiendo el efecto causal de $Z$ en $Y$, que por el supuesto de exclusión de $Z$ es:
 
 $$
 \begin{aligned}
-\hat{\beta}&=\beta+(X'X)^{-1}X'u \\
-&=(X'X)^{-1}\left(\sum_{g=1}^G X_gu_g\right)
+Y_i(1,D_i(1))-Y_i(0,D_i(0))=\underbrace{Y_i(D_i(1))-Y_i(D_i(0))}_{A} \\
 \end{aligned}
 $$
-- Suponiendo independencia entre $g$ y correlación dentro de cada grupo:
-
-$$E(u_{ig}u_{jg'}|x_{ig}x_{jg'})=0$$
-excepto cuando $g=g'$
-
-
-- En este caso, el estimador de MCO tiene una varianza asintótica dada por
-
-$$V({\hat{\beta}}_{MCO})=(X'X)^{-1}\left(\sum_{g=1}^G X_g'u_gu_g'X\right)(X'X)^{-1}$$
----
-
-# Errores estándar agrupados
-
-- Con errores heterocedásticos, pero sin agrupamiento, la matriz de varianzas de White (1980) tiene una estructura como sigue:
-
-$$\hat{V}(\hat{\beta}_{R})=(X'X)^{-1}X'\hat{\Sigma} X (X'X)^{-1}$$
-
-- Donde
-
-$$\hat{\Sigma}=\left(\begin{matrix} \hat{u}_{1}^2 & 0  & 0  & \ldots & 0 \\ 0 & \hat{u}_{2}^2 & 0 & \ldots & 0 \\ \vdots & & & & \\ 0 & & &  \ldots & \hat{u}_{n}^2\end{matrix}\right)$$
----
-
-# Errores estándar agrupados
-
-- Para estimar la varianza con errores agrupados empleamos una generalización de la propuesta de White para errores robustos
-
-- Si $G\to\infty$, el estimador de la matriz de errores agrupados robusta (CRVE) es consistente para estimar $V(\hat{\beta})$:
-
-$$\hat{V}_{CR}(\hat{\beta})=(X'X)^{-1}\left(\sum_{g=1}^G X_g'\hat{u}_g\hat{u}_g'X_g\right)(X'X)^{-1}$$
-donde $\hat{u}_g\hat{u}_g'$ es la matriz de varianzas para los individuos del grupo $g$
-
-- De manera compacta
-
-$$\hat{V}_{CR}(\hat{\beta})=(X'X)^{-1}X'\hat{\Sigma} X(X'X)^{-1}$$
-
----
-
-# Errores estándar agrupados
-
-- Y en este caso la matriz $\hat{\Sigma}$ tiene una estructura agrupada
-
-$$\small \hat{\Sigma}=\left(\begin{matrix} \hat{u}_{1,1}^2 & \hat{u}_{1,1}\hat{u}_{2,1} & \ldots & \hat{u}_{1,1} \hat{u}_{n,1}& 0 & 0 & \ldots &  0 & \ldots & 0 & 0 & \ldots &  0 \\ \hat{u}_{2,1}\hat{u}_{1,1} & \hat{u}_{2,1}^2 & \ldots & \hat{u}_{2,1}\hat{u}_{n,1} & 0 & 0 & \ldots & 0 & \ldots  & 0 & 0 & \ldots &  0\\ 
-\vdots & \vdots  & & \vdots & \vdots & \vdots  & &  \vdots& & \vdots & \vdots &  &  \vdots \\ \hat{u}_{n,1}\hat{u}_{1,1} & \hat{u}_{n,1}\hat{u}_{2,1}& \ldots & \hat{u}_{n,1}^2& 0 & 0 &\ldots & 0 & \ldots & 0 & 0 & \ldots &  0 \\  0 & 0 & \ldots &  0 & \hat{u}_{1,2}^2 & \hat{u}_{1,2}\hat{u}_{2,2} & \ldots & \hat{u}_{1,2}\hat{u}_{n,2} &\ldots & 0 & 0 & \ldots &  0  \\ 0 & 0 & \ldots &  0 & \hat{u}_{2,2}\hat{u}_{1,2} & \hat{u}_{2,2}^2 & \ldots & \hat{u}_{2,2}\hat{u}_{n,2} &\ldots & 0 & 0 & \ldots &  0 \\ \vdots & \vdots  & & \vdots & \vdots & \vdots  & &  \vdots& & \vdots & \vdots &  &  \vdots  \\ 0 & 0 & \ldots &  0 & \hat{u}_{n,2}\hat{u}_{1,2} & \hat{u}_{n,2}\hat{u}_{2,2} & \ldots & \hat{u}_{n,2}^2 &\ldots & 0 & 0 & \ldots &  0 \\ \vdots & \vdots  & & \vdots & \vdots & \vdots  & &  \vdots& & \vdots & \vdots &  &  \vdots \\ 0 & 0 & \ldots &  0 & 0 &  0 & \ldots & 0 &\ldots & \hat{u}_{1,G}^2 & \hat{u}_{12,G}\hat{u}_{2,G} & \ldots &  \hat{u}_{1,G}\hat{u}_{n,G} \\  0 & 0 & \ldots &  0 & 0 &  0 & \ldots & 0 &\ldots & \hat{u}_{2,G}\hat{u}_{1,G} & \hat{u}_{2,G}^2 & \ldots &  \hat{u}_{2,G}\hat{u}_{n,G} \\ \vdots & \vdots  & & \vdots & \vdots & \vdots  & &  \vdots& & \vdots & \vdots &  &  \vdots \\  0 & 0 & \ldots &  0 & 0 &  0 & \ldots & 0 &\ldots & \hat{u}_{n,G}\hat{u}_{1,G} & \hat{u}_{n,G}\hat{u}_{2,G} & \ldots &  \hat{u}_{n,G}^2 \end{matrix}\right)$$
-
-
----
-
-# Errores estándar agrupados
-
-- El resultado asintótico de consistencia depende de que $G\to\infty$
-
-- Si $G$ está fijo, no importa qué tan grande sea $N$, $\hat{V}_{CRVE}(\hat{\beta})$ no será consistente
-
-- Algunos paquetes ajustan esta matriz de varianzas haciendo una corrección parecida a $HC1$, pero ahora tomando en cuanta también $G$ y no solo $N$ (ver por ejemplo, *vcovCR* en R)
 
 --
 
-- Con pocos grupos, subestimamos los errores estándar y rechazamos la $H_0$ más veces de lo que deberíamos (*over-rejection*)
+- Notemos que el lado derecho, $A$, puede calcularse siguiendo la notación de resultados potenciales:
 
-- Si tenemos pocos grupos, recurrimos a otras soluciones (ver Cameron y Miller, 2015)
-  - Inflar los errores con un corrector de sesgo
-  - Bootstrap agrupado con refinamiento asintótico
+$$
+\begin{aligned}
+Y(D)&=Y(0)+D(Z)(Y(1)-Y(0)) \\
+D(Z)&=D(0)+Z(D(1)-D(0))\\
+\end{aligned}
+$$
+--
+
+- Sustituyendo $D$ en $Y$:
+
+$$
+\begin{aligned}
+Y(D(Z))&=Y(0)+(D(0)+Z(D(1)-D(0)))(Y(1)-Y(0)) \\
+&=Y(0)D(0)(Y(1)-Y(0))+Z(D(1)-D(0))(Y(1)-Y(0))
+\end{aligned}
+$$
+
+---
+
+# Interpretación del estimador de VI
+
+- Podemos evaluar entonces los dos valores de $Z$ y obtener:
+
+$$
+\begin{aligned}
+Y(D(1))&=Y(0)+D(1)(Y(1)-Y(0)) \\
+Y(D(0))&=Y(0)+D(0)(Y(1))-Y(0) \\
+\end{aligned}
+$$
+--
+
+- Y entonces:
+
+$$
+\begin{aligned}
+A&=Y_i(D_i(1))-Y_i(D_i(0)) \\
+&=(Y_i(1)-Y_i(0))(D_i(1)-D_i(0))\\
+\end{aligned}
+$$
+
+--
+
+- Es decir, el efecto causal de $Z$ sobre $Y$ para $i$ es el producto del efecto causal de $D$ sobre $Y$ y del efecto causal de $Z$ sobre $D$:
+
+$$
+\underbrace{Y_i(1,D_i(1))-Y_i(0,D_i(0))}_B=(Y_i(1)-Y_i(0))(D_i(1)-D_i(0))
+$$
+
+---
+
+# Interpretación causal del estimador de VI
+
+- Consideremos ahora $B$ y obtengamos el valor esperado:
+
+$$
+\begin{aligned}
+E(Y_i(1,D_i(1))-Y_i(0,D_i(0)))&=E(Y_i(1)-Y_i(0))(D_i(1)-D_i(0))\\
+&=E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=1)P(D_i(1)-D_i(0)=1)\\
+&+E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=0)P(D_i(1)-D_i(0)=0)\\
+&+E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=-1)P(D_i(1)-D_i(0)=-1)\\
+\end{aligned}
+$$
+--
+
+- La intuición de este valor esperado es obtener el efecto en la variable de interés bajo los distintos posibles efectos de $Z$ sobre $D$
+
+- El segundo término de la suma es cero y corresponde a aquellos para quienes la asignación no modificó el cumplimento, por lo que $E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=0)=0$
+
+- Usando el supueto 5 de monotonicidad, sabemos $D_i(1)-D_i(0)$ es igual a uno o cero, es decir, $P(D_i(1)-D_i(0)=-1)=0$
+
+---
+
+# Interpretación causal del estimador de VI
+
+- Por tanto:
+
+$$
+\begin{aligned}
+E(Y_i(1,D_i(1))-Y_i(0,D_i(0)))=E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=1)P(D_i(1)-D_i(0)=1)
+\end{aligned}
+$$
+--
+
+- Es decir, el efecto causal promedio de $Z$ sobre $Y$ es igual al producto del efecto causal promedio de $D$ sobre $Y$ en aquellos individuos que cuando se les asigna cumplen y cuando no se les asigna no cumplen, $D_i(0)=0$ y $D_i(1)=1$, y la proporción de estos individuos en la población
+
+---
+
+# Interpretación causal del estimador de VI
+
+**Proposición 1 en Angrist, Imbens & Rubin (1996)**: interpretación causal del estimador de VI
+
+- Si los supuestos 1 a 5 se cumplen, el estimador de VI es:
+
+$$E(Y_i(1)-Y_i(0)|D_i(1)-D_i(0)=1)=\frac{E(Y_i(D_i(1),1))-Y_i(D_i(0),0)}{E(D_i(1)-D_i(0)}=\lambda_{LATE}$$
+
+- Angrist y coautores llaman a este parámetro el **efecto local promedio del tratamiento** o *LATE*
+
+- El LATE es el efecto causal promedio del tratamiento en un conjunto de individuos cuyo estatus de tratamiento puede ser modificado por la asignación aleatoria
+
+- A estos individuos se les conoce como **cumplidores** o *compliers*
+
+
+---
+
+# Tipos de individuos
+
+- Hay cuatro tipos de individuos:
+
+
+```{r tipologia, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+col1 <- c("","`D_i(1)=0`","","","","`D_i(1)=1`","")
+col2 <- c("`D_i(0)=0`","`Y_i(1,0)-Y_i(0,0)=0`","Nunca cumplidor","","","`Y_i(1,1)-Y_i(0,0)=Y_i(1)-Y_i(0)`","Cumplidor")
+col3 <- c("`D_i(0)=1`","`Y_i(1,0)-Y_i(0,1)=-(Y_i(1)-Y_i(0))`","Retador","","","`Y_i(1,1)-Y_i(0,1)=0`","Siempre adoptador")
+
+
+tipologia <- data.frame(cbind(col1, col2, col3))
+
+colnames(tipologia) = c("","","")
+
+t1 <- tipologia %>%
+  kbl(align = "lcc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>%
+      add_header_above(c("Tipos de individuos" = 3 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+  footnote(general = "Adaptado de la tabla 1 en Angrist, Imbens & Rubin (1996).",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
+
+scroll_box(t1, height="60%")
+
+```
+
+
+---
+
+# Tipos de individuos
+
+- Los cumplidores cumplen con el tratamiento si se les asigna y no lo cumplen si no se les asigna
+
+- $Z$ es independiente de $D$ para los nunca cumplidores y los siempre adoptadores y el efecto causal es 0 para ambos
+
+- Los retadores hacen lo contrario a lo que les es asignado
+
+  - El supuesto de monotonicidad descarta la existencia de retadores para la identificación del LATE
+  - En la práctica, esperamos que sean pocos tal que podamos ignorarlos
   
-- La recomendación práctica es que se tomen en serio el problema de los pocos clusters
 
-- ¿Cuánto es poco? Cameron y Miller (2015) citan 50. (¡Qué raro, el número de estados en EUA!)
+- A la suma de nunca cumplidores, siempre adoptadores y retadores se le conoce como **no cumplidores**
+
+---
+
+# LATE y TT
+
+- En general el LATE y el TT (TOT o ATET) difieren
+
+- Pero recordemos que $TT=E(y_{1i}-y_{0i}|D_i=1)$
+
+- Noten que en el conjunto con $D_i=1$ se encuentran los cumplidores y los siempre adoptadores
+
+- Si podemos asegurar que no hay siempre adoptadores, el LATE y el TT son iguales
+
+---
+
+# Resumiendo
+
+- Hemos mostrado que el efecto promedio de $Z$ sobre $Y$ es proporcional al efecto de $D$ sobre $Y$ para los cumplidores
+
+- Por el supuesto 4, sabemos que la proporción de cumplidores es igual al efecto de $Z$ sobre $D$
+
+- Dado que $Z$ se asigna aleatoriamente, podemos estimar los dos ITT por separado para obtener $\lambda=\frac{ITT_Y}{ITT_D}$
+
+--
+
+- En la práctica de evaluación recurrimos a la econometría con variables instrumentales
 
 
 ---
 
 class: inverse, middle, center
 
-# Bootstrap
+# Variables instrumentales y LATE
+---
+
+# Terminología
+
+- **Primera etapa**: es el efecto causal de la asignación sobre el cumplimento
+
+$$\phi=E(D_i|Z_i=1)-E(D_i|Z_i=0)$$
+- **Forma reducida**: es la diferencia en $y$ entre grupos de asignación
+
+$$\rho=E(y_i|Z_i=1)-E(y_i|Z_i=0)$$
+- **LATE**: es la diferencia en $y$ entre a quienes se les asigna el tratamiento y quienes no, dividida por la diferencia en cumplimiento entre a quienes se les asigna el tratamiento y quienes no
+
+$$\lambda_{LATE}=\frac{\rho}{\phi}$$
 
 ---
 
-# Bootstrap
+# Variables instrumentales en investigación criminológica
 
-- A veces es difícil encontrar una expresión analítica de los errores estándar
+- Angrist (2006) estudia un experimento bastante particular: aleatorizar la respuesta policíaca
 
-- La idea de las técnicas bootstrap es consutrir una distribución empírica del estimador de interés
-
-- Una muestra bootstrap es una muestra tomada de los mismos datos
+- ¿En qué consistió la intervención?
 
 --
 
-- En las rutinas para errores bootstrap, pensamos en $\{(y_1,x_1),\ldots,(y_N,X_n)\}$ como la población
+- $y_i$: tasa de reincidencia en conductas de violencia doméstica
 
-- Una muestra bootstrap es una muestra de tamaño $N$ tomada de la muestra original
+- $Z_i=\begin{cases} 1\quad \text{si apercibido} \\ 0\quad \text{otro caso}\ \end{cases}$
 
 --
 
-- El procedimiento bootstrap más usado es el bootstrap no paramétrico o boostrap en parejas (nos enfocaremos en este tipo de bootstrap en el curso)
-
-- La idea es remuestrear la pareja completa $(y_i,x_i)$
+- Se muestra como el ITT puede no reflejar la efectividad de la intervención debido al efecto de *dilusión* provocado, en este caso, por desviaciones con respecto a la forma de enfrentar un episodio policíaco
 
 ---
 
-# Algoritmo para errores estándar bootstrap
+# Diferencias en las respuestas efectivas
 
-1. Dada una muestra $W_1,\ldots,W_N$, obtener una muestra de tamaño $N$, remuestreando de la muestra original **con reemplazo**
 
-1. Calcular el estadístico $\hat{\theta}_b$ usado con la muestra bootstrap (coeficiente de regresión, diferencia de medias, función de coeficientes)
 
-1. Repetir los pasos 1 y 2 $B$ veces, donde $B$ es lo suficientemente grande (usualmente 1000 es suficiente)
+```{r asignacion, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 
-1. Usar las $B$ repeticiones para obtener el error estándar del estadístico como la raíz cuadrada de $s^2_{\hat{\theta},B}$:
+col1 <- c("","Tratamiento asignado:","Arrestar","Apercibir","Total")
+col2 <- c("Arrestado","","98.91 (91)","20.27 (45)","43.1 (136)")
+col3 <- c("Apercibido","", "1.09 (1)", "79.73 (177)", "56.69 (178)")
+col4 <- c("","Total", "29.3 (92)", "70.7 (222)", "100 (314)")
 
-$$s^2_{\hat{\theta},B}=\frac{1}{B-1}\sum_{b=1}^B(\hat{\theta}_{b}-\bar{\hat{\theta}})^2$$
-donde $\bar{\hat{\theta}}=\frac{1}{B}\sum_{b=1}^B\hat{\theta}_b$
 
----
+asignacion <- data.frame(cbind(col1, col2, col3, col4))
 
-# ¿Cómo hacer remuestreo en R?
+colnames(asignacion) = c("","","","")
 
-.pull-left[
-```{r tidy=TRUE, include=T,echo=T,warning=FALSE, message=FALSE}
-set.seed(927)
+t <- asignacion %>%
+  kbl(align = "lccc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>%
+        add_header_above(c(" ", "Tramiento recibido:"=2, " "),
+                   bold = TRUE,
+                   background = "white") %>% 
+      add_header_above(c("Tratamiento asignado y recibido en casos de violencia doméstica" = 4 ),
+                   bold = TRUE,
+                   background = "white") %>%
+  footnote(general = "Adaptado de la tabla 1 en Angrist (2006).",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
 
-data.morocco<- read.csv("./crepon_morocco_analysis.csv")%>%
-  select(treatment,client,expense_total )
+scroll_box(t, height="60%")
 
-obs <- nrow(data.morocco)
-obs
-
-#En la muestra original
-mean(data.morocco$expense_total)
 ```
-]
 
-.pull-right[
-```{r tidy=TRUE, include=T,echo=T,warning=FALSE, message=FALSE}
-#Una muestra bootstrap
-data.b <-data.morocco[sample(nrow(data.morocco),obs, replace = TRUE),]
 
-mean(data.b$expense_total)
+- En el estudio original, lo que llamamos *apercibir* tuvo en realidad dos componentes: *aconsejar* y *separar*, pero para facilitar el análisis usaremos solo *arrestar* por un lado y *apercibir* por el otro
 
-#Otra muestra bootstrap
-data.b <-data.morocco[sample(nrow(data.morocco),obs, replace = TRUE),]
+- ¿Qué observamos sobre a las desviaciones con respecto al tratamiento asignado?
 
-mean(data.b$expense_total)
-```
-]
 
 ---
 
-# Aplicaciones comunes de bootstrap
+# Diferencias en las respuestas efectivas
 
-- Métodos de varias etapas (por ejemplo, el estimador de dos etapas de Heckman)
+- Noten que cuando el tratamiento asignado era arrestar, efectivamente se arrestó al 98.91% de los individuos
 
-- Funciones de estimadores (aunque aquí el método Delta también podría ser usado)
+- En cambio, noten que 20.27 % de los 222 asignados a ser apercibidos fueron en efecto arrestados
 
-- Datos agrupados con pocos grupos
+- ¿Cómo ocurre el sesgo de selección en este caso?
+
+---
+
+# Sesgo de selección
+
+- Algunos individuos se comportaron violentos, por lo que fueron arrestados a pesar de ser asignados a apercibimiento
+
+- Por tanto, si comparamos $y$ entre aquellos individuos apercibidos y no apercibidos, no tomamos en cuenta que aquellos no apercibidos (por tanto, arrestados) pudieran ser más violentos, sobrestimando el efecto de la política de apercibimiento
+
+---
+
+# LATE
+
+- La primera etapa es el efecto causal en la probabilidad de recibir el tratamiento de apercibimiento por el hecho de haber sido asignado a ese tratamiento: $E(D_i|Z_i=1)-E(D_i|Z_i=0)=0.797-0.011=0.786$
+  
+- La forma reducida es el efecto causal de la asignación al tratamiento sobre la tasa de reincidencia: $E(y_i|Z_i=1)-E(y_i|Z_i=0)=0.211-0.097=0.114$
 
 --
 
-- El consejo práctico es usar resultados teóricos cuando se puede (por ejemplo, las matrices robustas descritas antes)
+- El ITT ignora el hecho de que algunos asignados a apercibimiento fueron arrestados
 
-- Pensemos siempre en la estructura de los datos antes de hacer boostrap
+- Sabemos que el LATE está dado por $\lambda_{LATE}=\frac{ITT_y}{ITT_D}=\frac{0.114}{0.786}=0.145$
 
-- Usar una semilla siempre para poder reproducir sus resultados
+- Los datos de los autores reportan que si nos fijáramos solo en las diferencias por tipo de tratamiento obtendríamos, $E(y_i|D_i=1)-E(y_i|D_i=0)=0.216-0.129=0.087$, es decir, casi la mitad del LATE
 
----
-
-# Bootstrap salvaje
-
-- En presencia de heterocedasticidad se prefiere usar bootstrap salvaje (*wild bootstrap*) ([MacKinnon, 2012](https://link.springer.com/chapter/10.1007%2F978-1-4614-1653-1_17#enumeration))
-
-- Propuesto originalmente por Liu (1988), cada muestra bootstrap tiene la siguiente forma:
-
-$$y_i^*=X_i\hat{\beta}+f(\hat{u}_i)v_i^*$$
-- Noten que mantiene fijos los $X_i$ en cada muestra bootstrap
-
---
-
-- Una especificación comúnmente usada es hacer es $f(\hat{u}_i)=\hat{u}_i$ y 
-$$v_i^*=\begin{cases} 1 \quad\text{con probabilidad 0.5} \\ -1 \quad\text{con probabilidad 0.5} \end{cases}$$
-
-- $\hat{\beta}$ y $\hat{u}_i$ son estimados con la muestra original
-
----
-
-# Bootstrap salvaje
-
-- En cada una de las $B$ muestras bootstrap, mantenemos a los mismos individuos (no hay remuestreo)
-
-- Tendremos $B$ muestras bootstrap, pero ahora la aleatoriedad viene por $f(\hat{u}_i)v_i^*$
-
-- Pueden usarse otras funciones más complicadas para $f(\hat{u}_i)$
-
-- La ventaja de este método es que conserva la relación entre las varianzas residuales y las $X_i$ observadas en los datos originales
-
-- [Davidson & Flachaire (2008)](https://www.sciencedirect.com/science/article/pii/S0304407608000833) utilizan simulaciones para mostrar que con esta forma para $f(\hat{u}_i)v_i^*$ la inferencia es más confiable que con otras especificaciones
-
-
----
-
-# Refinamiento asintótico
-
-- Una aplicación de las técnicas bootstrap es el *refinamiento asintótico* de la prueba $t$ de coeficientes de regresión
-
-- Supongamos que $H_0:\quad \beta=0$ y trabajamos con un nivel $\alpha$ 
-
---
-
-- En cada repetición bootstrap el estadístico calculado es $t_b$
-
-- Ordenamos los $B$ estadísticos obtenidos
-
-- Rechazamos $H_0$ si $|t|$ está por encima del $(1-\alpha)$ésimo percentil de los $|t_b|$ en la distribución bootstrap
-
---
-
-- A pesar de sus propiedades teóricas, el refinamiento asintótico es poco usado
-
----
-
-# Otras aplicaciones
-
-- Bootstrap jacknife (útil para problemas con errores agrupados y pocos grupos)
+- Pero como $D$ no es aleatoria, dicha comparación no es correcta
 
 ---
 
 class: inverse, middle, center
 
-# Inferencia por aleatorización
+# La econometría del LATE
 
 ---
 
-# Inferencia por aleatorización
+# Motivación con un estadístico de Wald
 
-- Pensemos en que situaciones en que tenemos el control sobre la variación experimental
+- Pensemos en un modelo con efectos constantes de tratamiento: $y_{1i}-y_{0i}=\lambda$
 
-- Además, supongamos que observamos a la población de estudio completa
+- La variable de resultados está determinada por $y_{0i}=\alpha+\varepsilon_i$, donde $\alpha=E(y_{0i})$
 
-- En este caso, la única variación viene de la asignación del tratamiento, es decir, no hay error muestral
+- Entonces, el modelo de resultados potenciales es:
 
-- Queremos entonces construir pruebas de hipótesis y valores $p$ que reflejen esta variación
-
----
-
-# Inferencia por aleatorización
-
-- Consideren cómo pensamos los desbalances en una prueba de balance en la línea base
-
-- Decimos que esperaríamos cierto porcentaje de hipótesis nulas rechazadas aún cuando todas fueran verdaderas por razones del azar
-
-- Esto solo tiene sentido cuando pensamos en muestras
-
-- Si tuviéramos acceso a toda la población, tenemos que pensar en que la única fuente de variación es la asignación aleatoria
+$$y_i=\alpha+\lambda D_i+\varepsilon_i$$
+- Si $D_i$ no es independiente de $y_{0i}$, es decir, $y_{0i}$ no es independiente del error, entonces una diferencia de medias entre grupos de $D$ no produce un estimador consistente de $\lambda$
 
 ---
 
-# Inferencia por aleatorización
+# Motivación con un estadístico de Wald
 
-- Nos preguntamos qué hubiera sucedido en todas las posibles formas en que el tratamiento pudo haber sido asignado: ¿qué tan probable es observar el efecto estimado con la asignación que efectivamente ocurrió?
-
-- Construímos una distribución de referencia bajo la hipótesis nula de que el tratamiento no tiene efecto para ninguna de las unidades
-
-- Si la hipótesis nula de efecto nulo fuera cierta, no importaría a qué grupo fue asignada cada unidad
-
-- Los valores $p$ calculados por IA capturan la variación que conocemos ocurre en la asignación de tratamiento, usando el mismo proceso de aleatorización 
-
----
-
-# Algoritmo
-
-1. Asignar aleatoriamente el tratamiento *falso* siguiendo las mismas reglas de como se asignó el tratamiento original
-
-1. Estimar el estadístico usado para probar la hipótesis nula con la asignación del tratamiento efectivamente realizada, pero usando la asignación *falsa* (lo cual puede ser un coeficiente de regresión, una diferencia de medias, un estadístico $t$, etc.)
-
-  - Por construcción, el tratamiento *falso* tiene efecto promedio cero
-  - Queremos ver cómo se compara el estadístico obtenido en los datos con la asignación verdadera en la distribución de estadísticos *falsos*
-  
-1. Coleccionar el estadístico obtenido y repetir $S$ veces, donde $S$ es lo suficientemente grande (1000 repeticiones suelen bastar)
-
-1. Buscar el estadístico obtenido con los datos y la asignación realizada en la distribución del estadístico *falso*
-
-1. Obtenemos el valor $p$ como el la fracción de repeticiones en las que el estadístico placebo es mayor que el estadístico obtenido con la asignación realizada: $p=I(T\geq t)$, donde $T$ y $t$ son estadísticos en general
-
----
-
-# Por qué inferencia por aleatorización
-
-- Muchos econometristas, entre ellos [Athey e Imbens (2017)](https://www.sciencedirect.com/science/article/pii/S2214658X16300174?casa_token=WwFxfaOGLBkAAAAA:U9C8v0znlLYG8UhqyiriU-GDtz2aSNm_sEFdBkPVfDurDq_yvpfhdUJfY_bBbEOc7h7jdylUNK-j) han propuesto recurrir a los métodos de inferencia basada en aleatorización para tomar en cuenta la incertidumbre que surge de la asignación aleatoria al tratamiento y no del muestreo
-
-- El procedimiento comienza a ser más usado en evaluaciones experimentales
-
-- Cada vez más revistas científicas consideran la inferencia por aleatorización como un requisito y no solo como una opción
-
-- **No confundir con técnicas bootstrap**, como bien diferencia Jason Kerwin en [esta entrada](https://jasonkerwin.com/nonparibus/2017/09/25/randomization-inference-vs-bootstrapping-p-values/)
-
----
-
-# Ejemplos experimentales
-
-- Kerwin y Thornton (2020) estudian la importancia de las complementariedades en insumos de programas de educación
-
-- Estudian una intervención con dos tipos de tratamientos
-
-  - Insumos de alta calidad
-  
-  - Versión ligera (60% más barata)
-  
-- $y_{is}$ es un test de lectura o escritura del alumno $i$ en la escuela $s$
-
-- Programa en 38 escuelas
-
----
-
-# Asignación del programa
-
-- La asignación aleatoria se llevó a cabo a nivel *celda de estratificación*
-
-- Una celda de estratificación consiste en tres escuelas que comparten características observables
-
-  - En este caso era el centro coordinador escolar, el número de alumnos en el primer año y la distancia a la coordinación
-  
-- Dentro de cada celda, una escuela se asigna a control, otra al tratamiento completo y otra al tratamiento ligero
-
-
----
-
-# Estimación
-
-- Se especifica el siguiente modelo:
-
-$$y_{is}=\beta_0+\beta_1 T_1+ \beta_2 T_2 + L_e'\gamma+\nu y_{is0}+\varepsilon_{is}$$
+- Ahora supongamos que tenemos un **instrumento** $z_i$ tal que $z_i\perp y_i$, es decir, $E(\varepsilon_i|z_i)=0$
 
 --
 
-- Cuando el diseño tiene estratificación, se incluye una dummy para cada celda 
+- Evaluemos la esperanza de $y_i$ cuando $z_i=1$ y cuando $z_i=0$:
 
-- Podemos estimar $\beta_1$ y $\beta_2$ por MCO
+$$
+\begin{aligned}
+E(y_i|z_i=1)&=\alpha+\lambda E(D_i| z_i=1) \\
+E(y_i|z_i=0)&=\alpha+\lambda E(D_i| z_i=0) \\
+\end{aligned}
+$$
+- Restando: 
+
+$$E(y_i|z_i=1)-E(y_i|z_i=0)=\lambda(E(D_i| z_i=1)-E(D_i| z_i=0))$$
+
+
+- Y despejando obtenemos
+
+$$\lambda=\frac{E(y_i|z_i=1)-E(y_i|z_i=0)}{E(D_i| z_i=1)-E(D_i| z_i=0)}$$
+
+que es conocido como un *estadístico de Wald*
 
 ---
 
-# Inferencia
+# Mínimos cuadrados en dos etapas (MC2E)
 
-- Los valores $p$ respectivos se calculan usando el mismo principio de inferencia por aleatorización:
+- En la práctica, podemos plantear un modelo econométrico en dos etapas:
 
-  1. Para cada una de las $j=1,\ldots,1000$ repeticiones, se reasignan $T_1$, $T_2$ y $C$ en las mismas celdas de estratificación
-  
-  1. Se estiman $\beta_1^j$ y $\beta_2^j$
-  
-  1. Se obtiene la distribución de los efectos de tratamiento que tienen tiene esperanza cero por construcción
-  
-  1. Para $\beta_1$, se calcula el valor $p$ como la fracción de las veces en que los $\beta_1^j$ son mayores que $\beta_1^{MCO}$
-  
+- **Modelo estructural**
+
+$$y_i=X_i'\beta+\lambda D_i+\varepsilon_i$$
+
+--
+
+- **Primera etapa**
+
+$$D_i=X_i'\phi_0+\phi_1z_i+\eta_i$$
+donde $\phi_i$ es el efecto causal de la asignación sobre el cumplimiento
+
+- Cuado $D_i$ y $z_i$ son ambas dicotómicas, $\phi_1$ da la proporción de la población que son cumplidores
+
 ---
 
-# Resultados
+# Mínimos cuadrados en dos etapas (MC2E)
+
+- Podemos concebir el problema como uno en el que primero se estima la primera etapa y se sustituyen los valores ajustados de $D_i$ en el modelo estructural
+
+- Sustituyendo la primera etapa en el modelo estructural
+
+$$y_i=X_i'\beta+\lambda \hat{D}_i+\varepsilon_i$$
+--
+
+- Esta es la forma de pensar el procedimiento, pero en la práctica nunca hacemos esto manualmente
+
+  - Noten que $\hat{D}_i$ es estimada, por lo cual se ignora la variabilidad muestral de la primera etapa y los errores estándar serían inconsistentes
+
+--
+
+- Nota: el estimador de Wald es igual al estimador de MC2E cuando no hay $X$ y cuando $Z$ y $D$ son binarias
+
+---
+
+# Mínimos cuadrados en dos etapas (MC2E)
+
+
+- **Forma reducida**
+
+$$
+\begin{aligned}
+y_i&=X_i'\beta+\lambda(X_i'\phi_0+\phi_1z_1+\eta_i)+\varepsilon_i \\
+&=X_i'\rho_0+\rho_1z_i+\nu_i
+\end{aligned}
+$$
+donde $\rho_1=\lambda\phi_1$ es el coeficiente de forma reducida sobre la variable de asignación
+
+--
+
+- Noten que esto implica que $\lambda=\rho_1/\phi_1$
+
+- Es decir, $\lambda_{MC2E}$ puede interpretarse como la versión reescalada del coeficiente de forma reducida usando el efecto causal de la primera etapa para reescalar
+
+
+---
+
+# Efectos estimados
+
+- Regresando a los resultados del experimento, ahora con econometría
+
+
+**Primera etapa**
+
+
+- Versión corta:
+
+$$apercibido_i=\phi_0+\phi_1T_i+\eta_i$$
+
+- Con controles:
+$$apercibido_i=\phi_0+\phi_1T_i+X_i'\Phi +\eta_i$$
+- Noten que el 0.786 es exactamente lo que se encontraba al hacer las diferencias de medias
+
+
+**Forma reducida**
+
+- También conocido como ITT
+
+$$reincidencia_i=\rho_0+\rho_1T_i+\nu_i$$
+
+
+
+---
+
+# Efectos estimados
+
+
+```{r primera.etapa, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+variable <- c("Asignado a ser apercibido (`T`)", "Arma", "Influencia químicos","Media variable dep.")
+fs1 <- c("0.786 (0.043)","","","0.567")
+fs2 <- c("0.733 (0.043)","-0.064 (0.045)","-0.088 (0.040)","0.567")
+rf1 <- c("0.114 (0.047)","","","0.178")
+rf2 <- c("0.108 (0.041)","-0.004 (0.042)","0.052 (0.038)","0.178")
+
+primera.etapa <- data.frame(cbind(variable, fs1, fs2, rf1, rf2))
+
+colnames(primera.etapa) = c("","(1)","(2)*","(3)","(4)*")
+
+t <- primera.etapa %>%
+  kbl(align = "lcccc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>%
+        add_header_above(c(" "=1, "Variable dep.: fue apercibido"=2,"Variable dep.: reincidencia"=2),
+                   bold = TRUE,
+                   background = "white") %>%
+      add_header_above(c(" "=1, "Primera etapa"=2,"Forma reducida"=2),
+                   bold = TRUE,
+                   background = "white") %>% 
+      add_header_above(c("Primera etapa y forma reducida" = 5 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+  footnote(general = "Tabla 2 en Angrist (2006). * Indica que se incluyen como variables de control indicadoras para año, trimestre, raza no blanca y raza mixta.",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
+
+scroll_box(t, height="60%")
+
+```
+
+- Habíamos obtenido antes la columna (1), pero como una diferencia de medias: $E(D_i|Z_i=1)-E(D_i|Z_i=0)=0.797-0.011=0.786$
+
+- Mientras que también habíamos encontrado (3): $E(y_i|Z_i=1)-E(y_i|Z_i=0)=0.211-0.097=0.0.114$
+
+---
+
+#Efectos estimados
+
+**Efecto del tratamiento**
+
+- Noten que con nuestro estimador de MC2E obtenemos exactamente lo que antes habíamos calculado como $\lambda_{LATE}=\frac{ITT_y}{ITT_D}=\frac{E(y_i|Z_i=1)-E(y_i|Z_i=0)}{E(D_i|Z_i=1)-E(D_i|Z_i=0)}=0.145$
+
+
+
+- Vean que al estimar la ecuación estructural por MCO obtenemos un coeficiente cercano a 0.070
+
+- Más aún, sabemos que el coeficiente de MCO es inconsistente
+
+---
+
+#Efectos estimados
+
+
+```{r estructural, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+variable <- c("Apercibido","Arma","Influencia químicos")
+mco1 <- c("0.087 (0.044)","","")
+mco2 <- c("0.070 (0.038)", "0.010 (0.043)", "0.057 (0.039)")
+iv1 <- c("0.145 (0.060)", "", "")
+iv2 <- c("0.140 (0.053)","0.005 (0.043)","0.064 (0.039)")
+
+estructural <- data.frame(cbind(variable, mco1, mco2, iv1, iv2))
+
+colnames(estructural) = c("","(1)","(2)*","(3)","(4)*")
+
+t <- estructural %>%
+  kbl(align = "lcccc",
+      escape = FALSE,
+      full_width = FALSE) %>%
+  kable_paper(c("hover", "condensed", "responsive")) %>%
+        add_header_above(c(" "=1, "Variable dep.: reincidencia"=4),
+                   bold = TRUE,
+                   background = "white") %>%
+      add_header_above(c(" "=1, "MCO"=2,"VI/MC2E"=2),
+                   bold = TRUE,
+                   background = "white") %>% 
+      add_header_above(c("Impactos de ser apercibido en la reincidencia (MCO y LATE)" = 5 ),
+                   bold = TRUE,
+                   background = "white") %>% 
+  footnote(general = "Tabla 3 en Angrist (2006). * Indica que se incluyen como variables de control indicadoras para año, trimestre, raza no blanca y raza mixta.",
+           general_title = "Nota:",
+           footnote_as_chunk = T)
+
+scroll_box(t, height="50%")
+
+```
+
+- Usando el estimador de MC2E obtenemos exactamente lo que antes habíamos calculado como $\lambda_{LATE}=\frac{ITT_y}{ITT_D}=\frac{E(y_i|Z_i=1)-E(y_i|Z_i=0)}{E(D_i|Z_i=1)-E(D_i|Z_i=0)}=0.145$
+
+- Al estimar la ecuación estructural por MCO obtenemos un coeficiente cercano a 0.070
+
+- Pero sabemos que el coeficiente de MCO es inconsistente
+
+
+---
+
+# LATE es igual ATET en este caso
+
+- Noten que este estudio tiene lo que se conoce como *no cumplidores de un solo lado*
+
+
+```{r tipologia1, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+
+scroll_box(t1, height="50%")
+
+```
+
+- Cuando la asignación es **apercibir**, en el 20.27% de los casos la acción fue arrestar y en el 79.73% efectivamente fue apercibir
+
+- En cambio, cuando se indica **no apercibir**, es decir, arrestar, la adopción es casi perfecto (salvo un caso)
+
+--
+
+- En otras palabras, en este caso no hay **siempre cumplidores**
+
+- No hay individuos que hayan sido *apercibidos* independientemente de la asignación
+
+
+---
+
+# LATE es igual ATET en este caso
+
+- Recordemos que el grupo de quienes reciben el tratamiento está compuesto de los cumplidores y los siempre adoptadores
+
+- En este caso en particular:
+
+$$\lambda_{LATE}=E(y_{1i}-y_{0i}|C_i=1)=E(y_{1i}-y_{0i}|D_i=1)=ATET$$
+--
+
+- Esto ocurre en los casos en que:
+
+  - Algunos de los asignados al tratmiento, $z_i=1$ lo reciben mientras otros no
   
-- Los autores concluyen que, como posiblemente hubiéramos esperado, solo la versión completa del programa tiene efectos significativos
-
-- El punto principal de la conclusión de los autores es sobre cómo se escalan los programas
-
-- Los pilotos pueden (suelen) ser exitosos, pero si al escalarlos no se otorgan los beneficios completos, no se obtendrán los mismos resultados que en el piloto
+  - Nadie de los asignados al control, $z_i=0$ tiene acceso al tratamiento
 
 ---
 
 # Próxima sesión
 
-- Hablaremos sobre los problemas que surgen cuando probamos múltiples hipótesis y cómo solucionamos estos problemas
+- El jueves hablaremos sobre detalles respecto a errores estándar
+
+  - MHE, Capítulo 8
 
 ---
 

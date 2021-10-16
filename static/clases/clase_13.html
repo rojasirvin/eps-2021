@@ -29,7 +29,7 @@ class: title-slide
 &lt;/style&gt;
 
 .title[
-# Clase 13. Diferencia en diferencias en R
+# Clase 13. Diferencia en diferencias
 ]
 .subtitle[
 ## Evaluación de Programas
@@ -45,399 +45,478 @@ class: title-slide
 ---
 # Agenda
 
-1. Introduciremos conceptos básicos del estimador de efectos fijos para datos en panel
+1. Comenzaremos a estudiar situaciones en las que es imposible generar variación experimental
 
-1. Implementaremos diferencia en diferencias en R
+1. Veremos los supuestos sobre los que recae el uso de diferencia en diferencias en los casos más simples
+
+1. Introduciremos el uso de regresión para la implementación del estimador
+
+
+---
+
+# Motivación 
+
+- La estrategia de diferencia en diferencias especifica las condiciones bajo las cuales es posible identificar el efecto del tratamiento al comparar unidades tratadas y no tratadas, cuando se dispone de información antes y después de la intervención
+
+- Esta estrategia es ampliamente utilizada para analizar el efecto de leyes y políticas que afectan a un grupo de individuos al mismo tiempo
+
+- Además, constituye el fundamento para otro de los métodos en donde la investigación actual es muy activa, el control sintético
 
 ---
 
 class: inverse, middle, center
 
-# Efectos fijos
+# Diferencia en diferencias
 
 ---
 
-# Efectos fijos
-
-- En un panel tenemos datos para cada unidad en varios periodos
-
-- Además, en el caso de las leyes para el acceso a alcohol, hemos usado un estimador en particular para estimar el efecto del tratamiento, el **estimador de efectos fijos**
-
-- Consideremos el siguiente problema:
-
-  - Log de salarios: `\(y_{it}\)`
-  - Habilidad no observable y fija en el tiempo: `\(A_i\)`
-  - Regresores variantes en el tiempo: `\(X_{it}\)`
-  - Miembro de un sindicato: `\(T_{it}\)`
-
-- Supongamos que la asignación al tratamiento es aleatoria, por lo que `\(E(y_{0it}|A_i,X_{it},t,T_{it})=(y_{0it}|A_i,X_{it},t)\)`
-
---
-
-- Supongamos la siguiente función lineal de salarios:
-
-`$$E(y_{0it}|A_i,X_{it},t)=\alpha+\lambda_t+A_i'\gamma+X_{it}'\beta$$`
----
-
-# Efectos fijos
-
-- Supongamos también un efecto de tratamiento constante tal que:
-
-`$$E(y_{1it}|A_i,X_{it},t)=E(y_{0it}|A_i,X_{it},t)+\rho$$`
-
-
-- Entonces, la función de salarios es:
-
-`$$E(y_{it}|A_i,X_{it},t)=\alpha+\lambda_t+A_i'\gamma+X_{it}'\beta+\rho T_{it}$$`
-
---
-
-- Si `\(A_i\)` es no observable, un modelo de efectos fijos se especifica como sigue:
-
-`$$y_{it}=\alpha_i+\lambda_t+X_{it}'\beta+\rho T_{it}+\varepsilon$$`
-donde `\(\alpha_i=\alpha+A_i'\gamma\)`
-
-- Noten que este modelo tiene `\(((N-1)+(T-1)+K+1)\)` parámetros a ser estimados
-
-- Tendríamos que incluir una regresión con `\(N-1\)` variables dummy por cada individuo y `\(T-1\)` variables dummy para cada periodo, además de los regresores y la dummy de tratamiento
-
-- Sin embargo, es posible modificar el modelo original para deshacernos de las `\(\alpha_i\)`
-
----
-
-# Modelo en diferencias
-
-- Definamos `\(\Delta z_t=z_t-z_{t-1}\)`
-
-- Podemos entonces tomar diferencias al modelo de efectos fijos para obtener:
-
-`$$\Delta y_{it}=\Delta\lambda_t+\rho\Delta T_{it}+\Delta X_{it}'\beta+\Delta\varepsilon_{it}$$`
-
---
-
-- El modelo puede estimarse sin tener que incluir las `\(N-1\)` variables dummy individuales
-
----
-
-# Modelo en desviaciones
-
-
-- Si tomamos la media a cada variable del modelo de efectos fijos tenemos:
-
-`$$\bar{y_i}=\alpha_i+\bar{\lambda}+\rho\bar{T_i}+\bar{X}_i'\beta+\bar{\varepsilon}_i$$`
-- Restando `\(\bar{y}_i\)` a `\(y_{it}\)`:
-
-`$$y_{it}-\bar{y}_i=\lambda_t-\bar{\lambda}+\rho(T_{it}-\bar{T}_i)+(X_{it}-\bar{X}_i)'\beta+(\varepsilon_{it}-\bar{\varepsilon}_i)$$`
---
-
-- Es decir, podemos despreocuparnos por estimar un modelo con muchas variables dummy, sobre todo si lo que nos importa es `\(\rho\)`
-
----
-
-# Modelo en desviaciones 
-
-- Si `\(T=2\)`, el modelo de diferencias y el de desviaciones es numéricamente equivalente a estimar el modelo de efectos fijos, aunque con `\(T&gt;2\)`, se prefiere el modelo de desviaciones
-
-- Al estimador de desviaciones se le conoce comúnmente como estimador *within*
-
-- `\(\hat{\beta}\)` y `\(\hat{\rho}\)` son consistentes cuando `\(N\to\infty\)` y `\(T\)` fijo
-
-- Para construir errores estándar tenemos que tomar en cuenta que estimamos `\(N\)` medias (lo cual afecta los grados de libertad)
-
----
-
-# ¿Qué tanto confiamos en DID?
-
-- Bertrarnd, Duflo &amp; Mullainathan (2004), [How Much Should We Trust Differences-in-Differences Estimates](https://academic.oup.com/qje/article-abstract/119/1/249/1876068)
-
-- Por algún tiempo poco o nada de atención se le dió al hecho de que el uso de DID en muchas áreas (desarrollo, salud, laboral) implicaba análisis con variables con alta correlación serial
-
-- Bertrarnd, Duflo &amp; Mullainathan reconocieron este hecho
-  - 69/92 artículos revisados usan más de dos periodos
-  - 16.5 periodos en promedio
-  - La gran mayoría no hace nada al respecto
-
-- Nosotros ya sabemos la implicación de esto, de forma análoga a lo que sucede con datos agrupados: subestimación de los errores estándar
-
-- Conclusiones equivocadas al rechazar `\(H_0\)` que son ciertas
-
-- Solución: usemos errores agrupados a nivel individuo
-
-
----
-
-class: inverse, middle, center
-
-# Divorcio unilateral
-
----
-
-# Ejemplo: divorcio unilateral
-
-
-- Wolfers (2006), [Did Unilateral Divorce Laws Rase Divorce Rates?](https://www.aeaweb.org/articles?id=10.1257/aer.96.5.1802)
-
-- ¿Cambios en las leyes estatales que bajan el *costo* del divorcio incrementa la tasa de divoricios en la población casada?
-
-- Esta legislación se engloba en lo que se cooce como leyes *no-fault* en la que no se requiere el consentimiento de ambas partes
-
-- Al mismo tiempo que estas leyes fueron implantándose desde los años 70, las tasas de divorcio en todo EUA iban en aumento
-
-- El objetivo es estimar el efecto causal de los cambios en la legislación en las tasas de divorcio
-
-
-
----
-
-# Punto de partida
+# Diferencia en diferencias
 
 .pull-left[
-- Friedberg (1998) muestra que si solo hacemos DID parece no haber efecto alguno de la legislación
+- Angrist &amp; Pischke (2014) describen lo sucedido con el sector bancario en Mississippi durante la Gran Depresión
 
-- Y que si refinamos la estimación con tendencias específicas por estado, sí hay un efecto positivo en la tasa de divorcios
+- En EUA, la FED tiene 12 bancos regionales y cada uno tiene autonomía para tomar ciertas decisiones de política monetaria
 
-- En este ejemplo estoy usando la librería *ExPanDaR* para explorar los datos en panel
+- En particular, Mississippi tiene una parte del estado bajo el mando del distrito 6 (Atlanta) y la otra mitad en el distrito 8 (San Luis)
+]
+
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/banks_map.png" alt="Fuente: Richardson &amp;amp; Troost (2009)" width="75%" /&gt;
+&lt;p class="caption"&gt;Fuente: Richardson &amp; Troost (2009)&lt;/p&gt;
+&lt;/div&gt;
+
+]
+
+---
+
+# Diferencia en diferencias
+
+
+- Como respuesta a las corridas bancarias que caracterizaron la crisis de 1929, los bancos comerciales en Mississippi se vieron expuestos a dos políticas distintas
+
+$$
+T=
+`\begin{cases}
+1\quad\quad \text{proveer liquidez adicional (distrito 6)} \\
+0\quad\quad \text{dar igual o menos liquidez (distrito 8)} \\
+\end{cases}`
+$$
+
+
+- Si estamos interesados en la cantidad de bancos que sobrevivieron y decir algo sobre qué política es más efectiva, ¿qué podemos hacer?
+
+- Una primera respuesta sería contar la diferencia después de la crisis:
+
+| Distrito 8 | Distrito 6 | Diferencia |
+|:---:|:---:|:---:|
+| `\(T=0\)` | `\(T=1\)` | |
+| 132 bancos | 121 bancos | 11 bancos
+
+--
+
+- Pareciera que la política de proveer liquidez, *easy money*, **causó** que quebraran más bancos
+
+- Sin embargo, esta comparación claramente ignora las condiciones iniciales
+
+---
+
+# Diferencia en diferencias
+
+.pull-left[
+
+- Gráficamente observamos
+
+
+
+
+&lt;img src="figures/unnamed-chunk-4-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+- Del distrito 8 (no tratado) podemos obtener la pendiente:
+
+`$$m_{NT}=\frac{Y_{8,post}-Y_{8,pre}}{X_{8,post}-X_{8,pre}}=\frac{132-165}{1931-1930}=-33$$`
+- Y entonces, podemos encontrar cuál hubiera sido el número de bancos en el distrio 6 (tratado) si hubiera seguido la pendiente del distrito 8:
+
+`$$m_T=\frac{\tilde{Y}_{6,post}-Y_{6,pre}}{X_{6,post}-X_{6,pre}}=\frac{\tilde{Y}_{6,post}-135}{1931-1930}=-33$$`
+- Por tanto, `\(\tilde{Y}_{6,post}=102\)` es el número de bancos que el distrito 6 hubiera tenido si hubiera seguido una tendencia paralela a la del distrito 8 ]
+
+---
+
+# Diferencia en diferencias
+
+.pull-left[
+- Podemos contruir el contrafactual para el distrito 6 observando la pendiente del distrito 8
+
+
 
 
 ```r
-wolfers.data &lt;-read_csv("./wolfers_divorce.csv",
-                       locale = locale(encoding = "latin1")) %&gt;% 
-  select(div_rate, unilateral, st, year, stpop, divx)  %&gt;% 
-  filter(year&gt;1967 &amp; year&lt;1989)
-
-#Esta es una de las funciones de ExPanDaR
-panel_missing &lt;- prepare_missing_values_graph(wolfers.data, ts_id = "year")
+dd_grafica &lt;- banks_contrafactual %&gt;% 
+  ggplot(aes(x=year, y=banks, color=distrito, linetype=tipo))+
+  geom_line(size=2) +
+  scale_linetype_manual(values=c("dashed", "solid")) +
+  scale_y_continuous(limits=c(100,180))+
+  geom_brace(aes(c(1931.1,1931.3), c(121,102), label="Efecto del\ntratamiento"), inherit.data=F, labelsize=3, rotate = 90)
 ```
 ]
 
---
+.pull-right[
+
+```r
+dd_grafica
+```
+
+![](figures/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Diferencia en diferencias
+
+- Podemos dar así una primera definición de lo que es la diferencia en diferencias del número de bancos que sobrevivieron a la Gran Depresión en Mississippi
+
+$$
+`\begin{aligned}
+\delta_{DID}&amp;=(Y_{6,post}-Y_{6,pre})-(Y_{8,post}-Y_{8,pre}) \\
+&amp;=(Y_{6,1931}-Y_{6,1931})-(Y_{8,1930}-Y_{8,1930}) \\
+&amp;=(121-135)-(132-165) \\
+&amp;=-14+33 = 19
+\end{aligned}`
+$$
+
+- El estimador de DID toma en cuenta las diferencias inciales
+
+- En este caso, el distrito 8 ya tenía más bancos abiertos que el 6 antes de la crisis
+
+- DID construye un contrafactual para las unidades tratadas usando la pendiente de las unidades no tratadas
+
+---
+
+# Diferencia en diferencias
+
+- El supuesto fundamental es el de **tendencias comunes**, es decir, que en ausencia del tratamiento, el grupo de tratamiento se hubiera comportado igual al grupo de control
+
+- Si hay varios puntos pre intervención, el supuesto de tendencias comunes puede probarse empíricamente
+
+---
+
+# Regresión en DID
+
+- El método puede generalizarse a más periodos de tiempo 
+
+- Aquí, una regresión nos permite identificar el efecto del tratamiento
+
+- Tenemos datos sobre el número de bancos en cada distrito en cada año (1929-1934)
+
+`$$y_{dt}=\alpha+\beta T_d+\gamma POST_t + \delta_{r,DID}(T_d\times POST_t)+e_{dt}$$`
+- `\(T_d\)` es una dummy para los distritos tratados (distrito 6 en este caso)
+  
+  - Les llamamos **efectos fijos individuales** y sirven para controlar diferencias entre distritos que no cambian en el tiempo
+  
+- `\(POST_t\)` es una dummy para los periodos post tratamiento (1931 en adelante)
+
+- Al término `\(T_d\times POST_t\)` se le conoce como el **término de interacción**, que es una dummy igual a 1 para los distritos tratados en los años post intervención
+
+- `\(\delta_{r,DID}\)` es el estimador de DID del efecto del tratamiento
+
+
+---
+
+# Regresión en DID
+
+
+.pull-left[
+
+```r
+did_bank &lt;- lm(banks ~ treatment + post+ treatment*post,
+               data=banks)
+```
+]
+
 
 .tiny[
 .pull-right[
 
 ```r
-panel_missing
+banks
 ```
 
-![](figures/unnamed-chunk-3-1.png)&lt;!-- --&gt;
-]
-]
-
-
-
----
-
-# Algunas funciones de *ExPanDaR* 
-
-- Les recomiendo explorar las funciones para visualizar sus datos en panel usando [ExPanDaR](https://joachim-gassen.github.io/ExPanDaR/)
-
-- Por ejemplo, pueden crear una herramienta interactiva 
-
-
-```r
-ExPanD(df = wolfers.data,
-       ts_id="year",
-       cs_id="st",
-       title = "Wow, mis datos",
-       abstract = "Datos tomados de Wolfers (2006), Did Unilateral Divorce Laws Rase Divorce Rates?")
 ```
-
+## # A tibble: 12 x 5
+##     year distrito banks treatment  post
+##    &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
+##  1  1929 bib6       141         1     0
+##  2  1930 bib6       135         1     0
+##  3  1931 bib6       121         1     1
+##  4  1932 bib6       113         1     1
+##  5  1933 bib6       102         1     1
+##  6  1934 bib6       102         1     1
+##  7  1929 bib8       169         0     0
+##  8  1930 bib8       165         0     0
+##  9  1931 bib8       132         0     1
+## 10  1932 bib8       120         0     1
+## 11  1933 bib8       111         0     1
+## 12  1934 bib8       109         0     1
+```
+]
+]
 ---
 
-# DID para el efecto sobre la tasa de divorcio
-
-- El tratamiento es tener una ley de divorcio unilateral
-
-- Definimos la dummy `\(UNILATERAL_{st}\)` que toma el valor de 1 en el estado `\(s\)` y en el periodo `\(t\)` cuando está en vigor una ley unilateral
-
-- La especificación más simple de DID es:
-
-`$$y_{st}=\alpha+\delta_{DID}UNILATERAL_{st}+\beta_{AK} S_{AK}+\ldots+\beta_{WY}S_{WY}+\gamma_{1967}A_{1967}+\ldots+\gamma_{1989}A_{1989}+\varepsilon_{st}$$`
-- Wolfers añade una variable dummy que indica si hubo cambios en la forma de clasifiación (por ahora no nos interesa esta variable)
-
----
-
-# DID asumiendo tendencias paralelas
-
-- Aquí estoy usando la función *felm* del paquete *lfe* que permite incluir efectos fijos de manera muy sencilla
+# Regresión en DID
 
 .tiny[
 
 ```r
-modelo1 &lt;- felm(div_rate ~unilateral | st + year+divx,
-                data = wolfers.data,
-                weights = wolfers.data$stpop)
-
-summary(modelo1)
+summary(did_bank)
 ```
 
 ```
 ## 
 ## Call:
-##    felm(formula = div_rate ~ unilateral | st + year + divx, data = wolfers.data,      weights = wolfers.data$stpop) 
+## lm(formula = banks ~ treatment + post + treatment * post, data = banks)
 ## 
-## Weighted Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -3438.2  -328.0   -19.3   316.6  6293.9 
-## 
-## Coefficients:
-##              Estimate Std. Error t value Pr(&gt;|t|)
-## unilateral -0.0003248  0.0570256  -0.006    0.995
-## 
-## Residual standard error: 792.9 on 955 degrees of freedom
-##   (28 observations deleted due to missingness)
-## Multiple R-squared(full model): 0.9502   Adjusted R-squared: 0.9457 
-## Multiple R-squared(proj model): 3.397e-08   Adjusted R-squared: -0.0911 
-## F-statistic(full model):209.6 on 87 and 955 DF, p-value: &lt; 2.2e-16 
-## F-statistic(proj model): 3.244e-05 on 1 and 955 DF, p-value: 0.9955 
-## *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
-```
-]
-
-- El primer resultado parecía mostrar que no había efecto alguno de las leyes para facilitar el divorcio unilateral
-
-
----
-
-# DID con tendecias específicas
-
-.tiny[
-
-```r
-modelo2 &lt;- felm(div_rate ~unilateral | factor(st) + factor(year) + factor(st):year + factor(divx),
-                data = wolfers.data,
-                weights = wolfers.data$stpop)
-
-summary(modelo2)
-```
-
-```
-## 
-## Call:
-##    felm(formula = div_rate ~ unilateral | factor(st) + factor(year) +      factor(st):year + factor(divx), data = wolfers.data, weights = wolfers.data$stpop) 
-## 
-## Weighted Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -2175.50  -248.84    -6.91   230.06  3038.03 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -9.000 -7.125  0.000  3.125 14.000 
 ## 
 ## Coefficients:
-##            Estimate Std. Error t value Pr(&gt;|t|)    
-## unilateral  0.43302    0.05061   8.556   &lt;2e-16 ***
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     167.000      6.190  26.980 3.83e-09 ***
+## treatment       -29.000      8.754  -3.313 0.010652 *  
+## post            -49.000      7.581  -6.464 0.000195 ***
+## treatment:post   20.500     10.721   1.912 0.092224 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 531.7 on 904 degrees of freedom
-##   (28 observations deleted due to missingness)
-## Multiple R-squared(full model): 0.9788   Adjusted R-squared: 0.9756 
-## Multiple R-squared(proj model): 0.07492   Adjusted R-squared: -0.0663 
-## F-statistic(full model):302.7 on 138 and 904 DF, p-value: &lt; 2.2e-16 
-## F-statistic(proj model): 73.21 on 1 and 904 DF, p-value: &lt; 2.2e-16 
-## *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
+## Residual standard error: 8.754 on 8 degrees of freedom
+## Multiple R-squared:  0.8906,	Adjusted R-squared:  0.8496 
+## F-statistic: 21.71 on 3 and 8 DF,  p-value: 0.0003369
 ```
 ]
+
 ---
 
-# DID con tendecias específicas cuadráticas
+# Regresión en DID
 
-.tiny[
+.pull-left[
+- Noten que si solo usamos dos años, obtenemos exactamente lo que obtendríamos haciendo las diferencias *a mano*
+
+`$$\delta_{DiD}=(Y_{6,1931}-Y_{6,1931})-(Y_{8,1930}-Y_{8,1930})=19$$`
+
 
 ```r
-wolfers.data&lt;-wolfers.data %&gt;%
-  mutate(t=year-1968+1) %&gt;% 
-  mutate(tsq=t*t)
+did_bank2 &lt;- lm(banks ~ treatment + post+ treatment*post,
+               data=filter(banks,year==1930 | year==1931))
+```
+]
 
-modelo3 &lt;- felm(div_rate ~unilateral |
-                  factor(st)+factor(t)+factor(st):t+factor(st):tsq+factor(divx),
-                data = wolfers.data,
-                weights = wolfers.data$stpop)
+.tiny[
+.pull-right[
 
-summary(modelo3)
+```r
+summary(did_bank2)
 ```
 
 ```
 ## 
 ## Call:
-##    felm(formula = div_rate ~ unilateral | factor(st) + factor(t) +      factor(st):t + factor(st):tsq + factor(divx), data = wolfers.data,      weights = wolfers.data$stpop) 
+## lm(formula = banks ~ treatment + post + treatment * post, data = filter(banks, 
+##     year == 1930 | year == 1931))
 ## 
-## Weighted Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -1680.8  -188.2     0.0   177.0  2705.5 
+## Residuals:
+## ALL 4 residuals are 0: no residual degrees of freedom!
 ## 
 ## Coefficients:
-##            Estimate Std. Error t value Pr(&gt;|t|)    
-## unilateral   0.4338     0.0553   7.844  1.3e-14 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+##                Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)         165        NaN     NaN      NaN
+## treatment           -30        NaN     NaN      NaN
+## post                -33        NaN     NaN      NaN
+## treatment:post       19        NaN     NaN      NaN
 ## 
-## Residual standard error: 463.1 on 853 degrees of freedom
-##   (28 observations deleted due to missingness)
-## Multiple R-squared(full model): 0.9848   Adjusted R-squared: 0.9815 
-## Multiple R-squared(proj model): 0.06728   Adjusted R-squared: -0.1394 
-## F-statistic(full model):293.1 on 189 and 853 DF, p-value: &lt; 2.2e-16 
-## F-statistic(proj model): 61.53 on 1 and 853 DF, p-value: 1.303e-14 
-## *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
+## Residual standard error: NaN on 0 degrees of freedom
+## Multiple R-squared:      1,	Adjusted R-squared:    NaN 
+## F-statistic:   NaN on 3 and 0 DF,  p-value: NA
 ```
+]
 ]
 ---
 
-# DID con tendecias específicas cuadráticas y errores agrupados
+class: inverse, middle, center
 
-.tiny[
+# Diferencias en la edad legal para beber
 
-```r
-modelo3a &lt;- felm(div_rate ~unilateral |
-                   factor(st)+factor(t)+factor(st):t+factor(st):tsq+factor(divx) |
-                   0 |
-                   st,
-                 data = wolfers.data,
-                 weights = wolfers.data$stpop)
 
-summary(modelo3a)
-```
+---
 
-```
-## 
-## Call:
-##    felm(formula = div_rate ~ unilateral | factor(st) + factor(t) +      factor(st):t + factor(st):tsq + factor(divx) | 0 | st, data = wolfers.data,      weights = wolfers.data$stpop) 
-## 
-## Weighted Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -1680.8  -188.2     0.0   177.0  2705.5 
-## 
-## Coefficients:
-##            Estimate Cluster s.e. t value Pr(&gt;|t|)  
-## unilateral   0.4338       0.1734   2.501   0.0157 *
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 463.1 on 853 degrees of freedom
-##   (28 observations deleted due to missingness)
-## Multiple R-squared(full model): 0.9848   Adjusted R-squared: 0.9815 
-## Multiple R-squared(proj model): 0.06728   Adjusted R-squared: -0.1394 
-## F-statistic(full model, *iid*):293.1 on 189 and 853 DF, p-value: &lt; 2.2e-16 
-## F-statistic(proj model): 6.255 on 1 and 50 DF, p-value: 0.0157 
-## *** Standard errors may be too high due to more than 2 groups and exactDOF=FALSE
-```
+# Diferencias en la edad legal para beber
+
+- ¿Las restricciones a la edad mínima para comprar alcohol tienen un impacto en la mortalidad?
+
+- Alabama redujo la edad legal a 19 en 1975, mientras que, por ejemplo, Arkansas mantuvo la edad en 21
+
+- Tenemos datos de mortalidad de 1970 a 1983 para personas de entre 18 y 20 años
+
+--
+
+- Lo que hemos aprendido hasta ahora nos sugiere estimar el impacto por DID comos sigue
+
+`$$y_{st}=\alpha+\beta T_s+\gamma POST_t+\delta_{DID}(T_s\times POST_t)+e_{st}$$`
+- `\(T_s\)` es una dummy igual a 0 para Arkansas en todos los periodos e igual a 1 para Alabama en todos los periodos
+
+- `\(POST_t\)` es igual a cero para el periodo 1970-1975 e igual a 1 para el periodo 1976-1983
+
+- `\(T_s\times POST_t\)` es igual a 1 para las observaciones de Alabama en los años en los que la nueva política ya está en vigor
+
+
+---
+
+# Más de un estado
+
+- ¿Por qué quedarnos solo con la comparación con Arkansas?
+
+- Podemos incluir más unidades que implementen cambios en la política en distintos momentos
+
+- En vez de `\(POST_t\)` usamos efectos fijos por año
+
+- Y en vez de una dummy de tratamiento, incluimos efectos fijos por unidad
+
+- Además, en el cambio en la ley podría no ser el mismo
+
+  - Algunos estados mueven la edad a 18, otros a 19 y otros a 20
+  
+  - Podemos definir `\(LEGAL_{st}\)` como la proporción de individuos de entre 18 y 20 años autorizados para beber en el estado `\(s\)` y en el año `\(t\)`
+
+--
+
+`$$y_{st}=\alpha+\delta_{DID}LEGAL_{st}+\sum_k\beta_k STATE_{ks}+\sum_j \gamma_j YEAR_{jt}+e_{st}$$`
+---
+
+# Estructura de datos en panel
+
+- Los datos que acabamos de describir tienen una estructura de panel
+
+- La variable de panel es el estado `\(s\)` y la variable de tiempo es el año `\(t\)`
+
+- En nuestros datos, cada estado se encuentra presente en varios años, y para cada estado y año sabemos la mortalidad y la fracción de personas de 18 a 20 años que pueden beber
+
+- **Efectos fijos** `\(STATE_{ks}\)`: diferencias entre estados que no cambian con el tiempo
+
+- **Efectos año** `\(YEAR_{jt}\)`: factores que afectan a todas las unidades por igual en un momento del tiempo
+
+
+
+---
+
+# Interpretación
+
+| Muertes por 100,000 habs.: | `\(\hat{\delta}_{DID}\)` |
+|:--- | :---: |
+| Todas | 10.80 |
+| | (4.59)|
+| Accidentes en vehículos | 7.59 |
+| | (2.50) |
+| Suicidio | 0.59|
+| | (0.59) |
+| Causas internas | 1.33 |
+| | (1.59)    |
+
+
+- La interpretación de los resultados es directa
+
+- El acceso a alcohol causa un incremento de casi 11 muertes adicionales por cada 100,000 habitantes y este efecto es estadísticamente significativo
+
+- No hay efectos donde no esperaríamos tenerlos
+
+---
+
+class: inverse, middle, center
+
+# Violación a los supuestos
+
+---
+
+# Violación a los supuestos
+
+.pull-left[
+- Consideremos cosas que podrían salir mal con respecto al supuesto de tendencias paralelas
+
+- En este ejemplo estilizado algo sucedió en Allatsea que produjo un cambio en la trayectoria de mortalidad antes del cambio en la legislación
+
+- El supuesto de tendencias paralelas sí se sostenía hasta antes de este cambio
+
+- Sin embargo, nuestra estrategia de DID atribuiría el efecto al cambio en la legislación
 ]
+
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/trends_1.png" alt="Fuente: Angrist &amp;amp; Pischke (2014)" width="100%" /&gt;
+&lt;p class="caption"&gt;Fuente: Angrist &amp; Pischke (2014)&lt;/p&gt;
+&lt;/div&gt;
+]
+---
+
+# Violación a los supuestos
+
+.pull-left[
+- En este segundo ejemplo, el supuesto de tendencias paralelas pre intervención se viola
+
+- Aunque en el momento del cambio de la política, la línea de Allatsea es más inclinada, estimar esta relación por DID de nuevo atribuiría a la política diferencias que ya existían antes de la intervención
+
+]
+
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/trends_2.png" alt="Fuente: Angrist &amp;amp; Pischke (2014)" width="100%" /&gt;
+&lt;p class="caption"&gt;Fuente: Angrist &amp; Pischke (2014)&lt;/p&gt;
+&lt;/div&gt;
+]
+
+---
+
+# Violación a los supuestos
+
+.pull-left[
+- En este tercer ejemplo hay tendencias que no son paralelas pre intervención
+
+- Sin embargo, después de la intervención, la trayectoria de Allatsea tiene una pendiente claramente más inclinada que antes de la intervención
+
+- Quisiéramos incorporar esta posibilidad en la estimación
+
+]
+
+.pull-right[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/trends_3.png" alt="Fuente: Angrist &amp;amp; Pischke (2014)" width="100%" /&gt;
+&lt;p class="caption"&gt;Fuente: Angrist &amp; Pischke (2014)&lt;/p&gt;
+&lt;/div&gt;
+]
+
+---
+
+# Relajación de supuestos
+
+- Cuando tenemos datos en panel con varios periodos pre y post intervención podemos relajar el supuesto de tendencias paralelas
+
+- Podemos estimar un modelo con tendencias específicas por estado:
+
+`$$y_{st}=\alpha+\delta_{DID}LEGAL_{st}+\sum_k\beta_k STATE_{ks}+\sum_j \gamma_j YEAR_{jt}+\sum_k\theta_k(STATE_{ks}\times t)+ e_{st}$$`
+- `\(\theta_k\)` captura tendencias específicas por cada estado
+
+- `\(\delta_{DID}\)` captura las desviaciones respecto a una tendencia suave, aún cuando las tendencias no sean comúnes
+
 ---
 
 # Próxima sesión
 
-- Tuve que rediseñar el calendario de presentaciones, por favor, revísenlo el viernes por la tarde
-
-- Voy a modificar el orden de las sesiones que **ya tuvimos** para reflejar el orden en que efectivamente ocurrieron
-
-- Veremos aplicaciones de DID:
-
-  + Gutiérrez Vázquez, E. Y., &amp; Parrado, E. A. (2016). Abortion legalization and childbearing in Mexico. *Studies in family planning*, 47(2), 113-128.
-  
-  + Levasseur, P. (2019). Can social programs break the vicious cycle between poverty and obesity? Evidence from urban Mexico. *World Development*, 113, 143-156.  
-
-  + Rojas Valdes, R.I., Wydick, B., &amp; Lybbert, T.J. (2021). Can Hope Elevate Microfinance? Evidence from Oaxaca, Mexico. *Oxford Economic Papers*.
-  
-- El jueves comenzaremos con estimadores de matching
-
-  - MHE, sección 3.3
+- Examen parcial
+  - Durante la hora de clase
+  - Muy similar a las tareas
+  - Pueden usar sus notas y otros recursos
+  - Pueden usar los códigos que ya elaboraron y los que les he dado yo
+  - Si trabajan con programas que compilen .tex o Markdown, les recomiendo que se preparen con una plantilla mínima para que no pierdan tiempo haciéndola desde cero
 
 ---
 

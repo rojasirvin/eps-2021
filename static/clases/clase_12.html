@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Diferencia en diferencias</title>
+    <title>Hipótesis múltiples</title>
     <meta charset="utf-8" />
     <meta name="author" content="Irvin Rojas" />
     <script src="libs/header-attrs-2.11/header-attrs.js"></script>
@@ -29,7 +29,7 @@ class: title-slide
 &lt;/style&gt;
 
 .title[
-# Clase 12. Diferencia en diferencias
+# Clase 12. Hipótesis múltiples
 ]
 .subtitle[
 ## Evaluación de Programas
@@ -45,271 +45,203 @@ class: title-slide
 ---
 # Agenda
 
-1. Comenzaremos a estudiar situaciones en las que es imposible generar variación experimental
+1. Discutir sobre métodos para solucinar el problema de la prueba de múltiples hipótesis
 
-1. Veremos los supuestos sobre los que recae el uso de diferencia en diferencias en los casos más simples
-
-1. Introduciremos el uso de regresión para la implementación del estimador
-
-
----
-
-# Motivación 
-
-- La estrategia de diferencia en diferencias especifica las condiciones bajo las cuales es posible identificar el efecto del tratamiento al comparar unidades tratadas y no tratadas, cuando se dispone de información antes y después de la intervención
-
-- Esta estrategia es ampliamente utilizada para analizar el efecto de leyes y políticas que afectan a un grupo de individuos al mismo tiempo
-
-- Además, constituye el fundamento para otro de los métodos en donde la investigación actual es muy activa, el control sintético
+1. Discutir sobre la definición de las variables dependientes para evitar el problema de las múltiples hipótesis
 
 ---
 
 class: inverse, middle, center
 
-# Diferencia en diferencias
+# Hipótesis múltiples
 
 ---
 
-# Diferencia en diferencias
+# Hipótesis múltiples
 
-.pull-left[
-- Angrist &amp; Pischke (2014) describen lo sucedido con el sector bancario en Mississippi durante la Gran Depresión
+- **Error tipo I**: concluir que hay un efecto de tratamiento cuando la `\(H_0\)` es verdadera, es decir, cuando `\(H_0:\;\beta_i=0\)`
 
-- En EUA, la FED tiene 12 bancos regionales y cada uno tiene autonomía para tomar ciertas decisiones de política monetaria
+- En una investigación fijamos `\(\alpha\)`, la probabilidad de rechazar `\(H_0\)` cuando `\(H_0\)` es cierto
 
-- En particular, Mississippi tiene una parte del estado bajo el mando del distrito 6 (Atlanta) y la otra mitad en el distrito 8 (San Luis)
-]
+- En economía trabajamos con `\(\alpha=0.05\)` o `\(\alpha=0.01\)`
 
-.pull-right[
-&lt;div class="figure" style="text-align: center"&gt;
-&lt;img src="figures/banks_map.png" alt="Fuente: Richardson &amp;amp; Troost (2009)" width="75%" /&gt;
-&lt;p class="caption"&gt;Fuente: Richardson &amp; Troost (2009)&lt;/p&gt;
-&lt;/div&gt;
-
-]
-
----
-
-# Diferencia en diferencias
-
-
-- Como respuesta a las corridas bancarias que caracterizaron la crisis de 1929, los bancos comerciales en Mississippi se vieron expuestos a dos políticas distintas
-
-$$
-T=
-`\begin{cases}
-1\quad\quad \text{proveer liquidez adicional (distrito 6)} \\
-0\quad\quad \text{dar igual o menos liquidez (distrito 8)} \\
-\end{cases}`
-$$
-
-
-- Si estamos interesados en la cantidad de bancos que sobrevivieron y decir algo sobre qué política es más efectiva, ¿qué podemos hacer?
-
-- Una primera respuesta sería contar la diferencia después de la crisis:
-
-| Distrito 8 | Distrito 6 | Diferencia |
-|:---:|:---:|:---:|
-| `\(T=0\)` | `\(T=1\)` | |
-| 132 bancos | 121 bancos | 11 bancos
+- El problema con probar múltiples hipótesis es que inflamos la tasa de error tipo I
 
 --
 
-- Pareciera que la política de proveer liquidez, *easy money*, **causó** que quebraran más bancos
+- Por ejemplo, si tenemos 100 hipótesis y si usamos un valor estándar de `\(\alpha=0.05\)`, esperaríamos rechazar 5 hipótesis *por suerte*
 
-- Sin embargo, esta comparación claramente ignora las condiciones iniciales
 
 ---
 
-# Diferencia en diferencias
+# Hipótesis múltiples
 
 .pull-left[
+- Si realizamos una prueba, la probabilidad de cometer un error es `\(\alpha\)` y la de no cometer un error es `\(1-\alpha\)`
 
-- Gráficamente observamos
+- Si realizamos `\(n\)` pruebas, la probabilidad de no cometer un error es `\((1-\alpha)^n\)` y la probabilidad de cometer al menos un error es `\(1-(1-\alpha)^n\)`
 
-
-
-
-&lt;img src="figures/unnamed-chunk-4-1.png" width="90%" style="display: block; margin: auto;" /&gt;
-]
-
-.pull-right[
-
-- Del distrito 8 (no tratado) podemos obtener la pendiente:
-
-`$$m_{NT}=\frac{Y_{8,post}-Y_{8,pre}}{X_{8,post}-X_{8,pre}}=\frac{132-165}{1931-1930}=-33$$`
-- Y entonces, podemos encontrar cuál hubiera sido el número de bancos en el distrio 6 (tratado) si hubiera seguido la pendiente del distrito 8:
-
-`$$m_T=\frac{Y_{6,post}-Y_{6,pre}}{X_{6,post}-X_{6,pre}}=\frac{Y_{8,post}-135}{1931-1930}=-33$$`
-- Por tanto, `\(Y_{8,post}=102\)` es el número de bancos que el distrito 6 hubiera tendio si hubiera seguido una tendencia paralela a la del distrito 8 ]
-
----
-
-# Diferencia en diferencias
-
-.pull-left[
-- Podemos contruir el contrafactual para el distrito 6 observando la pendiente del distrito 8
-
-
-
-
-```r
-dd_grafica &lt;- banks_contrafactual %&gt;% 
-  ggplot(aes(x=year, y=banks, color=distrito, linetype=tipo))+
-  geom_line(size=2) +
-  scale_linetype_manual(values=c("dashed", "solid")) +
-  scale_y_continuous(limits=c(100,180))+
-  geom_brace(aes(c(1931.1,1931.3), c(121,102), label="Efecto del\ntratamiento"), inherit.data=F, labelsize=3, rotate = 90)
-```
+- Es decir, la probabilidad de cometer al menos un error se incrementa exponencialmente
 ]
 
 .pull-right[
 
 ```r
-dd_grafica
+alpha=0.05
+n &lt;- 1:1000
+p &lt;- 1-(1-alpha)^n
+
+plot(p,n, xlab="n", ylab="1-(1-alpha)^n")
 ```
 
-![](figures/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+![](figures/unnamed-chunk-2-1.png)&lt;!-- --&gt;
 ]
 
----
-
-# Diferencia en diferencias
-
-- Podemos dar así una primera definición de lo que es la diferencia en diferencias del número de bancos que sobrevivieron a la Gran Depresión en Mississippi
-
-$$
-`\begin{aligned}
-\delta_{DID}&amp;=(Y_{6,post}-Y_{6,pre})-(Y_{8,post}-Y_{8,pre}) \\
-&amp;=(Y_{6,1931}-Y_{6,1931})-(Y_{8,1930}-Y_{8,1930}) \\
-&amp;=(121-135)-(132-165) \\
-&amp;-14+33 = 19
-\end{aligned}`
-$$
-
-- El estimador de DID toma en cuenta las diferencias inciales
-
-- En este caso, el distrito 8 ya tenía más bancos abiertos que el 6 antes de la crisis
-
-- DID construye un contrafactual para las unidades tratadas usando la pendiente de las unidades no tratadas
 
 ---
 
-# Diferencia en diferencias
+# Hipótesis múltiples
 
-- El supuesto fundamental es el de **tendencias comunes**, es decir, que en ausencia del tratamiento, el grupo de tratamiento se hubiera comportado igual al grupo de control
 
-- Si hay varios puntos pre intervención, el supuesto de tendencias comunes puede probarse empíricamente
+- Dos estrategias que abordaremos son:
 
----
-
-# Regresión en DID
-
-- El método puede generalizarse a más periodos de tiempo 
-
-- Aquí, una regresión nos permite identificar el efecto del tratamiento
-
-- Tenemos datos sobre el número de bancos en cada distrito en cada año (1929-1934)
-
-`$$y_{dt}=\alpha+\beta T_d+\gamma POST_t + \delta_{r,DID}(T_d\times POST_t)+e_{dt}$$`
-- `\(T_d\)` es una dummy para los distritos tratados (distrito 6 en este caso)
+  - Controlar o ajustar `\(\alpha\)`
   
-  - Les llamamos **efectos fijos individuales** y sirven para controlar diferencias entre distritos que no cambian en el tiempo
+  - Crear índices que agreguen varias variables
   
-- `\(POST_t\)` es una dummy para los periodos post tratamiento (1931 en adelante)
+---
 
-- Al término `\(T_d\times POST_t\)` se le conoce como el **término de interacción**, que es una dummy igual a 1 para los distritos tratados en los años post intervención
+class: inverse, middle, center
 
-- `\(\delta_{r,DID}\)` es el estimador de DID del efecto del tratamiento
+# Control del error tipo I
+
+---
+
+# Control del error tipo I
+
+- Popper (1995), Multiple Hypothesis Testing
+
+- Definimos *familias* de variables
+
+- Haremos el ajuste *hacia adentro* de estas familias
+
+- Antes habíamos estudiado de Banerjee et al. (2015)
+
+  - Seguridad alimentaria
+  - Consumo
+  - Activos
+  - Salud mental
+  
+- Dentro de cada familia tenemos `\(n\)` hipótesis `\(H_i\)`, con un valor `\(p\)` asociado `\(p_i\)`
+
+- Recordemos que `\(p_i\)` es la probabilidad de que el estadístico `\(T_i\)` exceda el valor teórico `\(t_i\)`
+
+- Ordenamos las hipótesis de menor a mayor,con `\(p_1\)` siendo el valor más pequeño: `\(p_1\leq p_2\ldots \leq p_n\)`
 
 
 ---
 
-# Regresión en DID
+# Método de Bonferroni
 
+- El método propuesto por Bonferroni controla la **tasa de error por familia** (FEWR por *family-wise error rate*) definida como la probabilidad de cometer al menos un error tipo I
+
+--
+
+- Consiste en rechazar `\(H_i\)` si `\(p_i\leq \alpha_i\)`, donde `\(\alpha_i\)` se escoge de forma que `\(\sum_i\alpha_i=\alpha\)`
+
+- Usualmente se hace `\(\alpha_i=\frac{\alpha}{n}\)`
+
+--
+
+- Por ejemplo, con dos tests y `\(\alpha=0.05\)`, `\(\alpha_i^B=0.025\)`
+
+--
+
+- Noten que esta corrección es bastante conservadora
+
+- También podemos ver este test como crear unos valores `\(p^B\)` ajustados: `\(p_i^B=p_i\times n\)`
+
+---
+
+# ¿Por qué preocuparnos por la FWER?
+
+- La idea de la FWER tiene sentido si nos preocupa tener incluso un solo falso positivo
+
+- En la práctica, podemos vivir con algunos falsos positivos
+
+---
+
+# Método de Benjamini y Hochberg
+
+- Este método controla la tasa de falso descubrimiento
+
+- Si `\(V\)` es el número de falsos rechazos (cuando rechazamos la `\(H_0\)` que es verdadera) y si `\(R\)` es el número total de rechazos, entonces `\(Q=V/R\)` es la proporción de falsos rechazos
+
+- Al valor esperado de `\(Q\)` se le conoce como **tasa de falsos rechazos** (FDR por *false discovery rate*)
+
+--
+
+- Sea `\(k\)` el más grande de los `\(i\)` tal que
+`$$p_i\leq\frac{i}{n}\alpha$$`
+entonces rechar todos los `\(H_i\)` para `\(i=1,2,\ldots,k\)`
+
+- En la práctica usamos R
+
+
+---
+
+# Ejemplo: Benjamini &amp; Hochberg (1995)
 
 .pull-left[
 
 ```r
-did_bank &lt;- lm(banks ~ treatment + post+ treatment*post,
-               data=banks)
+data.pvalues&lt;-read_csv("./data_benjamini_hochberg.csv",
+                       locale = locale(encoding = "latin1"))  
+n &lt;- 15
+alpha &lt;- 0.05
 ```
 ]
 
-
-.tiny[
 .pull-right[
 
 ```r
-banks
+data.pvalues
 ```
 
 ```
-## # A tibble: 12 x 5
-##     year distrito banks treatment  post
-##    &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
-##  1  1929 bib6       141         1     0
-##  2  1930 bib6       135         1     0
-##  3  1931 bib6       121         1     1
-##  4  1932 bib6       113         1     1
-##  5  1933 bib6       102         1     1
-##  6  1934 bib6       102         1     1
-##  7  1929 bib8       169         0     0
-##  8  1930 bib8       165         0     0
-##  9  1931 bib8       132         0     1
-## 10  1932 bib8       120         0     1
-## 11  1933 bib8       111         0     1
-## 12  1934 bib8       109         0     1
+## # A tibble: 15 x 2
+##    poriginal hipotesis
+##        &lt;dbl&gt;     &lt;dbl&gt;
+##  1    0.0001         1
+##  2    0.0004         2
+##  3    0.0019         3
+##  4    0.0095         4
+##  5    0.0201         5
+##  6    0.0278         6
+##  7    0.0298         7
+##  8    0.0344         8
+##  9    0.0459         9
+## 10    0.324         10
+## 11    0.426         11
+## 12    0.572         12
+## 13    0.653         13
+## 14    0.759         14
+## 15    1             15
 ```
 ]
-]
----
 
-# Regresión en DID
-
-.tiny[
-
-```r
-summary(did_bank)
-```
-
-```
-## 
-## Call:
-## lm(formula = banks ~ treatment + post + treatment * post, data = banks)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -9.000 -7.125  0.000  3.125 14.000 
-## 
-## Coefficients:
-##                Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)     167.000      6.190  26.980 3.83e-09 ***
-## treatment       -29.000      8.754  -3.313 0.010652 *  
-## post            -49.000      7.581  -6.464 0.000195 ***
-## treatment:post   20.500     10.721   1.912 0.092224 .  
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 8.754 on 8 degrees of freedom
-## Multiple R-squared:  0.8906,	Adjusted R-squared:  0.8496 
-## F-statistic: 21.71 on 3 and 8 DF,  p-value: 0.0003369
-```
-]
 
 ---
 
-# Regresión en DID
+# Ejemplo: Bonferroni
 
 .pull-left[
-- Noten que si solo usamos dos años, obtenemos exactamente lo que obtendríamos haciendo las diferencias *a mano*
-
-`$$\delta_{DiD}=(Y_{6,1931}-Y_{6,1931})-(Y_{8,1930}-Y_{8,1930})=19$$`
-
 
 ```r
-did_bank2 &lt;- lm(banks ~ treatment + post+ treatment*post,
-               data=filter(banks,year==1930 | year==1931))
+#Bonferroni
+data.bonferroni &lt;- data.pvalues %&gt;% 
+  mutate(bonferroni_alpha=alpha/n) %&gt;% 
+  mutate(bonferrini_rechazar=ifelse(poriginal&lt;=bonferroni_alpha,1,0))
 ```
 ]
 
@@ -317,206 +249,138 @@ did_bank2 &lt;- lm(banks ~ treatment + post+ treatment*post,
 .pull-right[
 
 ```r
-summary(did_bank2)
+data.bonferroni
 ```
 
 ```
-## 
-## Call:
-## lm(formula = banks ~ treatment + post + treatment * post, data = filter(banks, 
-##     year == 1930 | year == 1931))
-## 
-## Residuals:
-## ALL 4 residuals are 0: no residual degrees of freedom!
-## 
-## Coefficients:
-##                Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept)         165        NaN     NaN      NaN
-## treatment           -30        NaN     NaN      NaN
-## post                -33        NaN     NaN      NaN
-## treatment:post       19        NaN     NaN      NaN
-## 
-## Residual standard error: NaN on 0 degrees of freedom
-## Multiple R-squared:      1,	Adjusted R-squared:    NaN 
-## F-statistic:   NaN on 3 and 0 DF,  p-value: NA
+## # A tibble: 15 x 4
+##    poriginal hipotesis bonferroni_alpha bonferrini_rechazar
+##        &lt;dbl&gt;     &lt;dbl&gt;            &lt;dbl&gt;               &lt;dbl&gt;
+##  1    0.0001         1          0.00333                   1
+##  2    0.0004         2          0.00333                   1
+##  3    0.0019         3          0.00333                   1
+##  4    0.0095         4          0.00333                   0
+##  5    0.0201         5          0.00333                   0
+##  6    0.0278         6          0.00333                   0
+##  7    0.0298         7          0.00333                   0
+##  8    0.0344         8          0.00333                   0
+##  9    0.0459         9          0.00333                   0
+## 10    0.324         10          0.00333                   0
+## 11    0.426         11          0.00333                   0
+## 12    0.572         12          0.00333                   0
+## 13    0.653         13          0.00333                   0
+## 14    0.759         14          0.00333                   0
+## 15    1             15          0.00333                   0
 ```
 ]
 ]
+
+
+---
+
+# Ejemplo: Benjamini &amp; Hochberg
+
+.pull-left[
+
+```r
+#Benjamini &amp; Hochberg
+data.bh &lt;- data.pvalues %&gt;% 
+  mutate(bh_alpha=alpha*hipotesis/n) %&gt;% 
+  mutate(bh_rechazar=ifelse(poriginal&lt;=bh_alpha,1,0))
+```
+]
+
+.tiny[
+.pull-right[
+
+```r
+data.bh
+```
+
+```
+## # A tibble: 15 x 4
+##    poriginal hipotesis bh_alpha bh_rechazar
+##        &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;       &lt;dbl&gt;
+##  1    0.0001         1  0.00333           1
+##  2    0.0004         2  0.00667           1
+##  3    0.0019         3  0.01              1
+##  4    0.0095         4  0.0133            1
+##  5    0.0201         5  0.0167            0
+##  6    0.0278         6  0.02              0
+##  7    0.0298         7  0.0233            0
+##  8    0.0344         8  0.0267            0
+##  9    0.0459         9  0.03              0
+## 10    0.324         10  0.0333            0
+## 11    0.426         11  0.0367            0
+## 12    0.572         12  0.04              0
+## 13    0.653         13  0.0433            0
+## 14    0.759         14  0.0467            0
+## 15    1             15  0.05              0
+```
+]
+]
+
 ---
 
 class: inverse, middle, center
 
-# Diferencias en la edad legal para beber
-
-
----
-
-# Diferencias en la edad legal para beber
-
-- ¿Las restricciones a la edad mínima para comprar alcohol tienen un impacto en la mortalidad?
-
-- Alabama redujo la edad legal a 19 en 1975, mientras que, por ejemplo, Arkansas mantuvo la edad en 21
-
-- Tenemos datos de mortalidad de 1970 a 1983 para personas de entre 18 y 20 años
-
---
-
-- Lo que hemos aprendido hasta ahora nos sugiere estimar el impacto por DID comos sigue
-
-`$$y_{st}=\alpha+\beta T_s+\gamma POST_t+\delta_{DID}(T_s\times POST_t)+e_{st}$$`
-- `\(T_s\)` es una dummy igual a 0 para Arkansas en todos los periodos e igual a 1 para Alabama en todos los periodos
-
-- `\(POST_t\)` es igual a cero para el periodo 1970-1975 e igual a 1 para el periodo 1976-1983
-
-- `\(T_s\times POST_t\)` es igual a 1 para las observaciones de Alabama en los años en los que la nueva política ya está en vigor
-
+# Índices
 
 ---
 
-# Más de un estado
+# Creación de `\(z\)`-scores
 
-- ¿Por qué quedarnos solo con la comparación con Arkansas?
+- Otra forma comúnmente usada de evitar el problema de las múltiples hipótesis es crear índices
 
-- Podemos incluir más unidades que implementen cambios en la política en distintos momentos
+- Kling, Liebmand y Katz (2007) proponen el siguiente promedio de los `\(z\)`-score para generar un solo índice
 
-- En vez de `\(POST_t\)` usamos efectos fijos por año
-
-- Y en vez de una dummy de tratamiento, incluimos efectos fijos por unidad
-
-- Además, en el cambio en la ley podría no ser el mismo
-
-  - Algunos estados mueven la edad a 18, otros a 19 y otros a 20
+  1. Definir las familias y las variables que componen cada familia, donde `\(y_{ij}\)` es la `\(j\)`ésima variable en la familia con `\(J\)` variables
   
-  - Podemos definir `\(LEGAL_{st}\)` como la proporción de individuos de entre 18 y 20 años autorizados para beber en el estado `\(s\)` y en el año `\(t\)`
+  1. Definir las varibles `\(y_{ij}\)` de tal forma que mayores valores se interpreten como *mejora*
+  
+  1. Crear `\(z_{ij}\)` como `\(z_{ij}=\frac{y_{ij}-\bar{y_j}^C}{sd(y_j)^C}\sim(0,1)\)`, es decir, estandarizar cada una de las `\(J\)` variables usando al grupo de control como referencia
+  
+  1. Crear `\(z_i\)`, un solo índice para cada individuo que agregue los `\(J\)` índices creados antes
+
+- El procedimiento descrito en Banerjee et al. (2015) es bastante general, pues incluye el caso donde hay varias rondas de seguimiento y varios países
+  
+---
+
+# Creación de `\(z\)`-scores
+
+- Podemos escribir el índice descrito como
+
+  `$$z_i=\frac{(\frac{1}{J}\sum_j z_{ij})-\bar{z}_j^C}{sd(z_j^C)}$$`
+
+- Esta transformación tiene la ventaja de que en la siguiente regresión de efecto de tratamiento
+
+`$$z_i=\alpha+\beta T_i + X_i'\gamma+\varepsilon_i$$`
+
+el coeficiente `\(\beta\)` se interpreta como el efecto del tratamiento medido en desviaciones estándar con respecto a la media del grupo de control
 
 --
 
-`$$y_{st}=\alpha+\delta_{DID}LEGAL_{st}+\sum_k\beta_k STATE_{ks}+\sum_j \gamma_j YEAR_{jt}+e_{st}$$`
----
+- Noten que todos las variables dentro de la familia *pesan* igual
 
-# Estructura de datos en panel
-
-- Los datos que acabamos de describir tienen una estructura de panel
-
-- La variable de panel es el estado `\(s\)` y la variable de tiempo es el año `\(t\)`
-
-- En nuestros datos, cada estado se encuentra presente en varios años, y para cada estado y año sabemos la mortalidad y la fracción de personas de 18 a 20 años que pueden beber
-
-- **Efectos fijos** `\(STATE_{ks}\)`: diferencias entre estados que no cambian con el tiempo
-
-- **Efectos año** `\(YEAR_{jt}\)`: factores que afectan a todas las unidades por igual en un momento del tiempo
-
-
+- Quizás nos gustaría tomar en cuenta la correlación entre las variables dentro del índice
 
 ---
 
-# Interpretación
+# Índice de Anderson
 
-| Muertes por 100,000 habs.: | `\(\hat{\delta}_{DID}\)` |
-|:--- | :---: |
-| Todas | 10.80 |
-| | (4.59)|
-| Accidentes en vehículos | 7.59 |
-| | (2.50) |
-| Suicidio | 0.59|
-| | (0.59) |
-| Causas internas | 1.33 |
-| | (1.59)    |
+- [Anderson (2008)](https://are.berkeley.edu/~mlanderson/pdf/Anderson%202008a.pdf) propone el siguiente índice, que puede verse como una generalización del de Kling:
 
+`$$\bar{s}_i=\frac{1}{W_{i}}\sum_{j\in J} w_j z_{ij}$$`
+- `\(w_j\)` es el peso para la variable `\(j\)` y `\(W_i=\sum_{j\in J}w_{j}\)`
 
-- La interpretación de los resultados es directa
-
-- El acceso a alcohol causa un incremento de casi 11 muertes adicionales por cada 100,000 habitantes y este efecto es estadísticamente significativo
-
-- No hay efectos donde no esperaríamos tenerlos
-
----
-
-class: inverse, middle, center
-
-# Violación a los supuestos
-
----
-
-# Violación a los supuestos
-
-.pull-left[
-- Consideremos cosas que podrían salir mal con respecto al supuesto de tendencias paralelas
-
-- En este ejemplo estilizado algo sucedió en Allatsea que produjo un cambio en la trayectoria de mortalidad antes del cambio en la legislación
-
-- El supuesto de tendencias paralelas sí se sostenía hasta antes de este cambio
-
-- Sin embargo, nuestra estrategia de DID atribuiría el efecto al cambio en la legislación
-]
-
-.pull-right[
-&lt;div class="figure" style="text-align: center"&gt;
-&lt;img src="figures/trends_1.png" alt="Fuente: Angrist &amp;amp; Pischke (2014)" width="100%" /&gt;
-&lt;p class="caption"&gt;Fuente: Angrist &amp; Pischke (2014)&lt;/p&gt;
-&lt;/div&gt;
-]
----
-
-# Violación a los supuestos
-
-.pull-left[
-- En este segundo ejemplo, el supuesto de tendencias paralelas pre intervención se viola
-
-- Aunque en el momento del cambio de la política, la línea de Allatsea es más inclinada, estimar esta relación por DID de nuevo atribuiría a la política diferencias que ya existían antes de la intervención
-
-]
-
-.pull-right[
-&lt;div class="figure" style="text-align: center"&gt;
-&lt;img src="figures/trends_2.png" alt="Fuente: Angrist &amp;amp; Pischke (2014)" width="100%" /&gt;
-&lt;p class="caption"&gt;Fuente: Angrist &amp; Pischke (2014)&lt;/p&gt;
-&lt;/div&gt;
-]
-
----
-
-# Violación a los supuestos
-
-.pull-left[
-- En este tercer ejemplo hay tendencias que no son paralelas pre intervención
-
-- Sin embargo, después de la intervención, la trayectoria de Allatsea tiene una pendiente claramente más inclinada que antes de la intervención
-
-- Quisiéramos incorporar esta posibilidad en la estimación
-
-]
-
-.pull-right[
-&lt;div class="figure" style="text-align: center"&gt;
-&lt;img src="figures/trends_3.png" alt="Fuente: Angrist &amp;amp; Pischke (2014)" width="100%" /&gt;
-&lt;p class="caption"&gt;Fuente: Angrist &amp; Pischke (2014)&lt;/p&gt;
-&lt;/div&gt;
-]
-
----
-
-# Relajación de supuestos
-
-- Cuando tenemos datos en panel con varios periodos pre y post intervención podemos relajar el supuesto de tendencias paralelas
-
-- Podemos estimar un modelo con tendencias específicas por estado:
-
-`$$y_{st}=\alpha+\delta_{DID}LEGAL_{st}+\sum_k\beta_k STATE_{ks}+\sum_j \gamma_j YEAR_{jt}+\sum_k\theta_k(STATE_{ks}\times t)+ e_{st}$$`
-- `\(\theta_k\)` captura tendencias específicas por cada estado
-
-- `\(\delta_{DID}\)` captura las desviaciones respecto a una tendencia suave, aún cuando las tendencias no sean comúnes
+- Los pesos son una función de la matriz de covarianzas entre las variables que conforman la familia
 
 ---
 
 # Próxima sesión
 
-- Examen parcial
-  - Durante la hora de clase
-  - Muy similar a las tareas
-  - Pueden usar sus notas y otros recursos
-  - Pueden usar los códigos que ya elaboraron y los que les he dado yo
-  - Si trabajan con programas que compilen .tex o Markdown, les recomiendo que se preparen con una plantilla mínima para que no pierdan tiempo haciéndola desde cero
+- Hablaremos sobre diferencia en diferencias
+
 
 ---
 
