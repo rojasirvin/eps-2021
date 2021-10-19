@@ -1,0 +1,637 @@
+---
+title: "Métodos de matching en R"
+author: "Irvin Rojas"
+institute: "CIDE"
+date: "6 de octubre"
+header-includes:
+  - \usepackage{tikz}
+  - \usetikzlibrary{shapes, shadows,arrows}
+output:
+  xaringan::moon_reader:
+    css: [default, "libs/cide.css", metropolis-fonts, "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css", "https://use.fontawesome.com/releases/v5.7.2/css/all.css", "https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css"]
+    seal: false
+    chakra: "https://remarkjs.com/downloads/remark-latest.min.js"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      titleSlideClass: ["middle", "center"]
+      ratio: "16:9"
+      beforeInit: ["https://platform.twitter.com/widgets.js", "libs/cols_macro.js"]
+      navigation:
+        scroll: false
+
+
+---
+class: title-slide
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.path = "figures/")
+
+library(tidyverse)
+library(pacman)
+library(janitor)
+library(sandwich)
+#library(nnet)
+#library(mlogit)
+library(readr)
+library(clubSandwich)
+library(modelsummary)
+library(estimatr)
+library(lubridate)
+library(ExPanDaR) #for describing panel data
+library(lfe)
+library(MatchIt)
+library(Zelig)
+
+xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
+```
+
+```{css, echo = FALSE}
+.huge .remark-code { /*Change made here*/
+  font-size: 200% !important;
+}
+.tiny .remark-code { /*Change made here*/
+  font-size: 60% !important;
+}
+```
+
+.title[
+# Sesión 16. Métodos de matching en R
+]
+.subtitle[
+## Evaluación de Programas
+]
+.author[
+### Irvin Rojas <br> [rojasirvin.com](https://www.rojasirvin.com/) <br> [<i class="fab fa-github"></i>](https://github.com/rojasirvin) [<i class="fab fa-twitter"></i>](https://twitter.com/RojasIrvin) [<i class="ai ai-google-scholar"></i>](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas <br> División de Economía
+]
+
+---
+
+# Agenda
+
+- Estudiaremos los algoritmos de matching más usados
+
+- Veremos una aplicación del PSM en R
+
+
+
+---
+
+# El propensity score
+
+- El **supuesto de independencia condicional** implica que, condicional en una serie de características $X_i$, la asignación del tratamiento es *como* si hubiera sido aleatoria
+
+-  El teorema del PS (Rosenbaum y Rubin, 1983) nos permite usar el *propensity score* (PS) en vez de las características $X_i$
+ 
+$$
+Y(0), Y(1) \perp  D|P(X)
+$$
+ 
+- $P(X)=P(D=1|X)$ es el PS y se interpreta como la probabilidad de ser tratado dado un conjunto de covariables $X$
+
+
+- Los algoritmos de matching buscan construir el contrafactual para el grupo tratado basándose en alguna noción de distancia con respecto al PS
+
+---
+
+# Algoritmos de matching más populares
+  
+1. Vecino más cercano
+ 
+1. Caliper
+ 
+1. Estratificación
+ 
+---
+
+# Vecino más cercano
+ 
+- A cada individuo del grupo tratado se le asigna uno del grupo de comparación en términos del PS
+ 
+- Puede hacerse con remplazo o sin remplazo
+ 
+- Puede emplearse también sobremuestreo (*oversampling*), es decir, asignar más de un individuo del grupo de comparación
+
+- Por ejemplo NN 5 significa que a cada individuo tratado se le asignan los cinco individuos del grupo no tratado con los PS estimados más cercanos
+  
+  
+---
+
+# Vecino más cercano
+
+.pull-left[
+| Tratados | $\hat{p}$ |
+|:---: |:---:|
+| a | 0.031 |
+| b | 0.042 |
+| c | 0.07 |
+| $\vdots$ | $\vdots$ |
+]
+
+
+.pull-rights[
+| No tratados | $\hat{p}$ |
+|:---: |:---:|
+| A | 0.034 |
+| B | 0.068 |
+| C | 0.21 |
+| $\vdots$ | $\vdots$ |
+]
+
+
+- Con vecino más cercano, el individuo $a$ tratado estaría emparejado con el $A$ no tratado
+
+- Si el emparejamiento es con reemplazo, $A$ podría ser usado otra vez
+y $b$ también sería emparejado con $A$
+
+- Pero si el emparejamiento es sin reemplazo, $A$ ya no puede ser usado y a $b$ se le emparejaría con $B$
+
+- Cuando hacemos el pareamiento sin reemplazo, debemos tener una muestra lo suficientemente grande
+
+- El pareamiento sin reemplazo depende del orden en que se realice el procedimiento
+
+---
+
+# Caliper y radio
+ 
+- El método de vecino más cercano puede generar malos emparejamientos si el vecino más cercano está muy lejos en términos del PS
+  
+- Especificar un *caliper* consiste en definir una vecindad aceptable de matching (el caliper) y elegir solo el vecino más cercano dentro del caliper
+ 
+- Con las funciones de R que usaremos más adelante, el *radio* consiste en definir cuántos individuos deberán ser apareados dado que están dentro del caliper
+  
+---
+
+# Caliper
+
+.pull-left[
+| Tratados | $\hat{p}$ |
+|:---: |:---:|
+| a | 0.031 |
+| b | 0.042 |
+| c | 0.07 |
+| d | 0.11 |
+| $\vdots$ | $\vdots$ |
+]
+
+.pull-rights[
+| No tratados | $\hat{p}$ |
+|:---: |:---:|
+| A | 0.034 |
+| B | 0.068 |
+| C | 0.21 |
+| D | 0.40 |
+| $\vdots$ | $\vdots$ |
+] 
+
+- El primer paso es fijar el caliper, por ejemplo, de 0.1
+
+- El caliper implica buscar al vecino más cercano dentro de una vecindad de 0.1
+
+- En este ejemplo $c$ podría ser solo emparejado con $B$ si $B$ aún está disponible (porque no ha sido emparejado con nadie o porque aunque haya sido emparejado, el procedimiento se hace con reemplazo)
+
+---
+
+# Caliper con sobremuestreo
+
+.pull-left[
+| Tratados | $\hat{p}$ |
+|:---: |:---:|
+| d | 0.31 |
+| e | 0.39 |
+| f | 0.44 |
+| g | 0.52 |
+| h | 0.55 |
+| i | 0.62 |
+| $\vdots$ | $\vdots$ |
+]
+
+.pull-rights[
+| No tratados | $\hat{p}$ |
+|:---: |:---:|
+| R | 0.27 |
+| S | 0.29 |
+| T | 0.33 |
+| U | 0.49 |
+| V | 0.57 |
+| W | 0.61 |
+| $\vdots$ | $\vdots$ |
+] 
+
+- Si el caliper se realiza con sobremuestreo, con un caliper de 0.10 y 2 vecinos a $g$ se le asignarían $U$ y $V$ (si estuvieran disponibles)
+
+- Es decir, dentro del caliper, los dos individuos con el PS más cercano
+
+---
+
+# Radio
+
+.pull-left[
+| Tratados | $\hat{p}$ |
+|:---: |:---:|
+| d | 0.31 |
+| e | 0.39 |
+| f | 0.44 |
+| g | 0.52 |
+| h | 0.55 |
+| i | 0.62 |
+| $\vdots$ | $\vdots$ |
+]
+
+.pull-rights[
+| No tratados | $\hat{p}$ |
+|:---: |:---:|
+| R | 0.27 |
+| S | 0.29 |
+| T | 0.33 |
+| U | 0.49 |
+| V | 0.57 |
+| W | 0.61 |
+| $\vdots$ | $\vdots$ |
+] 
+
+- Pero si ahora implementamos radio con un caliper de 0.10, a $g$ se le asignarían $U$, $V$ y $W$ (si estuvieran disponibles)
+
+- Es decir, todos los individuos dentro del caliper
+
+
+---
+
+# Estratificación
+ 
+- Partir la región de soporte común en bloques de acuerdo al PS
+ 
+- Estimar el efecto de tratamiento dentro de cada bloque
+ 
+- No hay una regla sobre cuántos estratos usar. Se aconsajan generalmente cinco
+ 
+- Dentro de cada estrato debe haber balance de los covariables
+
+  
+---
+
+# Kernel y métodos no paramétricos
+ 
+- Los métodos anteriores escogen solo unas cuantas unidades del grupo de comparación 
+ 
+- Podemos escoger usar muchas o incluso todas las observaciones del grupo de comparación y pesarlas apropiadamente
+ 
+- Se reduce la varianza pues usamos más información, pero se sacrifica precisión pues se usan observaciones potencialmente muy distantes
+ 
+- Se le otorga más peso a las observaciones más cercanas y menos a las más distantes
+  
+---
+
+# Kernel
+
+.pull-left[
+| Tratados | $\hat{p}$ |
+|:---: |:---:|
+| d | 0.31 |
+| e | 0.39 |
+| f | 0.44 |
+| g | 0.52 |
+| h | 0.55 |
+| i | 0.62 |
+]
+
+.pull-rights[
+| No tratados | $\hat{p}$ |
+|:---: |:---:|
+| R | 0.27 |
+| S | 0.29 |
+| T | 0.33 |
+| U | 0.49 |
+| V | 0.57 |
+| W | 0.61 |
+] 
+
+- Supongamos que estos son todos nuestros datos
+
+- Con un emparejamiento por kernel, a $d$ lo compararemos con todos los individuos, desde $R$ hasta $W$
+
+- La función kernel le dará más peso a $R$, un poco menos a $S$ y así hasta darle muy poco o casi nada de peso a $W$
+
+---
+
+# ¿Qué método usar?
+ 
+- No hay un método claramente superior a todos los demás
+ 
+- Más aún, el desempeño de cada método depende de cada aplicación
+ 
+- La ruta más seguida es usar varios algoritmos y mostrar la robustez de los resultados a esta elección
+  
+---
+
+# Comprobar empíricamente los supuestos
+ 
+- El parámetro $TOT$ solo se calcula sobre la región de sporte común por lo que se debe verificar el traslape del PS calculado para los tratados y no tratados
+ 
+- Otro de los teoremas de Rosenbaum y Rubin (1983) implica que
+
+$$
+X \perp  D|P(X)
+$$
+ 
+- Esto es, que al controlar por el PS, las variables $X$ no deben proveer información sobre $D$
+   
+- Se recomienda también hacer una prueba de estratificación
+
+  1. Dividir el rango del soporte común en bloques 
+ 
+  1. Hacer una prueba de medias del PS entre grupos dentro de cada bloque
+ 
+  1. Hacer una prueba de medias de cada variable en $X_i$  entre grupos dentro de cada bloque
+
+---
+
+# Ilustración del soporte común
+
+```{r, out.width="70%", fig.cap='Fuente: Gertler et al. (2017)', fig.align='center'}
+knitr::include_graphics("figures/Gertler_PSOverlap.png")
+```
+---
+
+class: inverse, middle, center
+
+# Ejemplo en R
+
+---
+
+# Datos no experimentales de una muestra de mujeres
+ 
+- Usamos los datos en *cattaneo_smoking.csv* (Cattaneo, 2010)
+ 
+- Crearemos la variable de tratamiento **smoke** que es un indicador de si la madre fumó durante el embarazo
+ 
+- El 19% de los mujeres reportaron fumar
+ 
+- Usaremos un subconjunto de las $X$ disponibles para modelar el PS
+
+---
+
+# *MatchIt*
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+data.smoking<-read_csv(
+  "./cattaneo_smoking.csv",
+  locale = locale(encoding = "latin1")) %>% 
+  clean_names() %>% 
+  mutate(smoke=ifelse(mbsmoke=="smoker",1,0)) %>% 
+  mutate(married=ifelse(mmarried=="married",1,0)) %>% 
+  mutate(firstbaby=ifelse(fbaby=="Yes",1,0))
+
+
+#Asegurarse que no hay NA, MatchIt no corre con NA
+data.smoking <- data.smoking[complete.cases(data.smoking), ] 
+
+set.seed(1021)
+
+```
+
+---
+
+# Diferencias simples
+
+- Notemos que, si solo comparamos a las mujeres que fuman con las que no fuman, estamos comparando personas muy diferentes
+
+```{r echo=T, include=T, eval=F, message=F, warning=F}
+
+zelig(bweight ~ smoke, model="ls", data=data.smoking)
+
+zelig(married ~ smoke, model="ls", data=data.smoking)
+
+zelig(medu ~ smoke, model="ls", data=data.smoking)
+
+
+```
+
+---
+
+# Especificamos el PS
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+binaria <- "smoke"
+variables <- c("married", "firstbaby", "medu", "nprenatal", "foreign", "mhisp", "fage")
+
+ps <- as.formula(paste(binaria,
+                         paste(variables,
+                               collapse ="+"),
+                         sep= " ~ "))
+print(ps)
+
+```
+
+---
+
+# Efectuamos el matching
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+
+
+m.out <- matchit(formula=ps,
+                 method = "nearest",
+                 ratio = 1,
+                 distance= "logit",
+                 replace = FALSE,
+                 data = data.smoking)
+
+```
+
+- El resumen del procedimiento da bastante información sobre el pareamiento:
+
+```{r echo=T, include=T, eval=T, message=F, warning=F, results=F}
+summary(m.out)
+
+```
+
+---
+
+# Gráfico del traslape
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+plot(m.out, type = "jitter")
+```
+
+
+---
+
+# Histograma
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+plot(m.out, type = "hist")
+```
+
+---
+
+# Muestra emparejada
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+m.data <- match.data(m.out)
+
+#Esta matriz nos dice quién es el match de quién
+head(m.out$match.matrix)
+```
+
+---
+
+# Efecto de tratamiento
+
+.tiny[
+.pull-left[
+```{r echo=T, include=T, eval=T, message=F, warning=F, results=T}
+z.out <- zelig(bweight~smoke,
+               data = m.data,
+               model = "ls")
+
+z.out
+```
+]
+]
+
+---
+
+# Inferencia
+
+.pull-left[
+
+- Algunas simulaciones han mostrado que bootstrap no funciona muy bien para los métodos de matching
+
+- Se propone hacer inferencia con simulaciones, basadas en [King, Tomz y Wittenberg (2000)](https://gking.harvard.edu/files/gking/files/making.pdf)
+
+.tiny[
+```{r echo=T, include=T, eval=T, message=F, warning=F, results=T}
+#Creamos dos objetos con las dos situaciones que queremos simular
+x.out <- setx(z.out, smoke=0)
+
+x1.out <- setx1(z.out, smoke=1)
+
+#Corremos la simulación
+sim.out <- sim(z.out, x=x.out, x1=x1.out)
+
+```
+]
+]
+
+
+
+.pull-right[
+- ev son los valores esperados
+
+- pv son los valores ajustados
+.tiny[
+```{r echo=T, include=T, eval=T, message=F, warning=F, results=T}
+summary(sim.out)
+```
+]
+]
+
+
+---
+
+# Caliper
+.tiny[
+.pull-left[
+```{r echo=T, include=T, eval=T, message=F, warning=F, results=F}
+
+m.out <- matchit(formula=ps,
+                 method = "nearest",
+                 distance= "logit",
+                 replace = FALSE,
+                 ratio = 2,
+                 caliper = .1,
+                 data = data.smoking)
+
+
+```
+]
+]
+
+.tiny[
+.pull-right[
+```{r echo=T, include=T, eval=T, message=F, warning=F, results=T}
+zelig(bweight~smoke,
+               data = match.data(m.out),
+               model = "ls")
+```
+]
+]
+
+---
+
+# Estratificación
+
+.tiny[
+.pull-left[
+```{r echo=T, include=T, eval=T, message=F, warning=F, results=F}
+m.out <- matchit(formula=ps,
+                 method = "subclass",
+                 subclass = 5,
+                 distance= "logit",
+                 data = data.smoking)
+```
+]
+]
+
+.tiny[
+.pull-right[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+zelig(bweight~smoke,
+               data = match.data(m.out),
+               model = "ls")
+```
+]
+]
+
+---
+
+# Conclusión
+
+- Las técnicas de PSM dependen de varios supuestos téoricos fuertes
+
+- La implementación implica que las variables en $X$ son aquellas que permiten hacer los supuestos de inconfundibilidad dado el PS
+
+- En la estimación del PS se toma la decisión sobre la forma funcional
+
+- Los efectos de tratamiento pueden ser distintos entre diferentes algoritmos de emparejamiento y la especificación del PS
+
+- La crítica más importante es que la mayoría de las veces nos preocupa más la autoselección basada en no observables que en observables
+
+- Pero muchas veces es todo lo que tenemos a la mano
+
+- Hay que hacer análisis de sensibilidad a las distintas decisiones
+
+- Presentar resultados transparentes
+
+---
+
+# Próxima sesión
+
+- Veremos ejemplos típicos de PSM
+
+  + Espinosa, V., & Rubin, D. B. (2015). Did the military interventions in the Mexican drug war increase violence?. *The American Statistician*, 69(1), 17-27
+
+  + Chang, A., Miranda-Moreno, L., Cao, J., & Welle, B. (2017). The effect of BRT implementation and streetscape redesign on physical activity: A case study of Mexico City. *Transportation Research Part A: Policy and Practice*, 100, 337-347.
+
+  + García-Díaz, R., Sosa-Rubí, S. G., Serván-Mori, E., & Nigenda, G. (2018). Welfare effects of health insurance in Mexico: The case of Seguro Popular de Salud. PloS one, 13(7), e0199876.
+  
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+
+

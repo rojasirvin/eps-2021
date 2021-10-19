@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Métodos de matching en R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Irvin Rojas" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="libs/cide.css" type="text/css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: title-slide
+
+
+
+&lt;style type="text/css"&gt;
+.huge .remark-code { /*Change made here*/
+  font-size: 200% !important;
+}
+.tiny .remark-code { /*Change made here*/
+  font-size: 60% !important;
+}
+&lt;/style&gt;
+
+.title[
+# Sesión 16. Métodos de matching en R
+]
+.subtitle[
+## Evaluación de Programas
+]
+.author[
+### Irvin Rojas &lt;br&gt; [rojasirvin.com](https://www.rojasirvin.com/) &lt;br&gt; [&lt;i class="fab fa-github"&gt;&lt;/i&gt;](https://github.com/rojasirvin) [&lt;i class="fab fa-twitter"&gt;&lt;/i&gt;](https://twitter.com/RojasIrvin) [&lt;i class="ai ai-google-scholar"&gt;&lt;/i&gt;](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&amp;hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas &lt;br&gt; División de Economía
+]
+
+---
+
+# Agenda
+
+- Estudiaremos los algoritmos de matching más usados
+
+- Veremos una aplicación del PSM en R
+
+
+
+---
+
+# El propensity score
+
+- El **supuesto de independencia condicional** implica que, condicional en una serie de características `\(X_i\)`, la asignación del tratamiento es *como* si hubiera sido aleatoria
+
+-  El teorema del PS (Rosenbaum y Rubin, 1983) nos permite usar el *propensity score* (PS) en vez de las características `\(X_i\)`
+ 
+$$
+Y(0), Y(1) \perp  D|P(X)
+$$
+ 
+- `\(P(X)=P(D=1|X)\)` es el PS y se interpreta como la probabilidad de ser tratado dado un conjunto de covariables `\(X\)`
+
+
+- Los algoritmos de matching buscan construir el contrafactual para el grupo tratado basándose en alguna noción de distancia con respecto al PS
+
+---
+
+# Algoritmos de matching más populares
+  
+1. Vecino más cercano
+ 
+1. Caliper
+ 
+1. Estratificación
+ 
+---
+
+# Vecino más cercano
+ 
+- A cada individuo del grupo tratado se le asigna uno del grupo de comparación en términos del PS
+ 
+- Puede hacerse con remplazo o sin remplazo
+ 
+- Puede emplearse también sobremuestreo (*oversampling*), es decir, asignar más de un individuo del grupo de comparación
+
+- Por ejemplo NN 5 significa que a cada individuo tratado se le asignan los cinco individuos del grupo no tratado con los PS estimados más cercanos
+  
+  
+---
+
+# Vecino más cercano
+
+.pull-left[
+| Tratados | `\(\hat{p}\)` |
+|:---: |:---:|
+| a | 0.031 |
+| b | 0.042 |
+| c | 0.07 |
+| `\(\vdots\)` | `\(\vdots\)` |
+]
+
+
+.pull-rights[
+| No tratados | `\(\hat{p}\)` |
+|:---: |:---:|
+| A | 0.034 |
+| B | 0.068 |
+| C | 0.21 |
+| `\(\vdots\)` | `\(\vdots\)` |
+]
+
+
+- Con vecino más cercano, el individuo `\(a\)` tratado estaría emparejado con el `\(A\)` no tratado
+
+- Si el emparejamiento es con reemplazo, `\(A\)` podría ser usado otra vez
+y `\(b\)` también sería emparejado con `\(A\)`
+
+- Pero si el emparejamiento es sin reemplazo, `\(A\)` ya no puede ser usado y a `\(b\)` se le emparejaría con `\(B\)`
+
+- Cuando hacemos el pareamiento sin reemplazo, debemos tener una muestra lo suficientemente grande
+
+- El pareamiento sin reemplazo depende del orden en que se realice el procedimiento
+
+---
+
+# Caliper y radio
+ 
+- El método de vecino más cercano puede generar malos emparejamientos si el vecino más cercano está muy lejos en términos del PS
+  
+- Especificar un *caliper* consiste en definir una vecindad aceptable de matching (el caliper) y elegir solo el vecino más cercano dentro del caliper
+ 
+- Con las funciones de R que usaremos más adelante, el *radio* consiste en definir cuántos individuos deberán ser apareados dado que están dentro del caliper
+  
+---
+
+# Caliper
+
+.pull-left[
+| Tratados | `\(\hat{p}\)` |
+|:---: |:---:|
+| a | 0.031 |
+| b | 0.042 |
+| c | 0.07 |
+| d | 0.11 |
+| `\(\vdots\)` | `\(\vdots\)` |
+]
+
+.pull-rights[
+| No tratados | `\(\hat{p}\)` |
+|:---: |:---:|
+| A | 0.034 |
+| B | 0.068 |
+| C | 0.21 |
+| D | 0.40 |
+| `\(\vdots\)` | `\(\vdots\)` |
+] 
+
+- El primer paso es fijar el caliper, por ejemplo, de 0.1
+
+- El caliper implica buscar al vecino más cercano dentro de una vecindad de 0.1
+
+- En este ejemplo `\(c\)` podría ser solo emparejado con `\(B\)` si `\(B\)` aún está disponible (porque no ha sido emparejado con nadie o porque aunque haya sido emparejado, el procedimiento se hace con reemplazo)
+
+---
+
+# Caliper con sobremuestreo
+
+.pull-left[
+| Tratados | `\(\hat{p}\)` |
+|:---: |:---:|
+| d | 0.31 |
+| e | 0.39 |
+| f | 0.44 |
+| g | 0.52 |
+| h | 0.55 |
+| i | 0.62 |
+| `\(\vdots\)` | `\(\vdots\)` |
+]
+
+.pull-rights[
+| No tratados | `\(\hat{p}\)` |
+|:---: |:---:|
+| R | 0.27 |
+| S | 0.29 |
+| T | 0.33 |
+| U | 0.49 |
+| V | 0.57 |
+| W | 0.61 |
+| `\(\vdots\)` | `\(\vdots\)` |
+] 
+
+- Si el caliper se realiza con sobremuestreo, con un caliper de 0.10 y 2 vecinos a `\(g\)` se le asignarían `\(U\)` y `\(V\)` (si estuvieran disponibles)
+
+- Es decir, dentro del caliper, los dos individuos con el PS más cercano
+
+---
+
+# Radio
+
+.pull-left[
+| Tratados | `\(\hat{p}\)` |
+|:---: |:---:|
+| d | 0.31 |
+| e | 0.39 |
+| f | 0.44 |
+| g | 0.52 |
+| h | 0.55 |
+| i | 0.62 |
+| `\(\vdots\)` | `\(\vdots\)` |
+]
+
+.pull-rights[
+| No tratados | `\(\hat{p}\)` |
+|:---: |:---:|
+| R | 0.27 |
+| S | 0.29 |
+| T | 0.33 |
+| U | 0.49 |
+| V | 0.57 |
+| W | 0.61 |
+| `\(\vdots\)` | `\(\vdots\)` |
+] 
+
+- Pero si ahora implementamos radio con un caliper de 0.10, a `\(g\)` se le asignarían `\(U\)`, `\(V\)` y `\(W\)` (si estuvieran disponibles)
+
+- Es decir, todos los individuos dentro del caliper
+
+
+---
+
+# Estratificación
+ 
+- Partir la región de soporte común en bloques de acuerdo al PS
+ 
+- Estimar el efecto de tratamiento dentro de cada bloque
+ 
+- No hay una regla sobre cuántos estratos usar. Se aconsajan generalmente cinco
+ 
+- Dentro de cada estrato debe haber balance de los covariables
+
+  
+---
+
+# Kernel y métodos no paramétricos
+ 
+- Los métodos anteriores escogen solo unas cuantas unidades del grupo de comparación 
+ 
+- Podemos escoger usar muchas o incluso todas las observaciones del grupo de comparación y pesarlas apropiadamente
+ 
+- Se reduce la varianza pues usamos más información, pero se sacrifica precisión pues se usan observaciones potencialmente muy distantes
+ 
+- Se le otorga más peso a las observaciones más cercanas y menos a las más distantes
+  
+---
+
+# Kernel
+
+.pull-left[
+| Tratados | `\(\hat{p}\)` |
+|:---: |:---:|
+| d | 0.31 |
+| e | 0.39 |
+| f | 0.44 |
+| g | 0.52 |
+| h | 0.55 |
+| i | 0.62 |
+]
+
+.pull-rights[
+| No tratados | `\(\hat{p}\)` |
+|:---: |:---:|
+| R | 0.27 |
+| S | 0.29 |
+| T | 0.33 |
+| U | 0.49 |
+| V | 0.57 |
+| W | 0.61 |
+] 
+
+- Supongamos que estos son todos nuestros datos
+
+- Con un emparejamiento por kernel, a `\(d\)` lo compararemos con todos los individuos, desde `\(R\)` hasta `\(W\)`
+
+- La función kernel le dará más peso a `\(R\)`, un poco menos a `\(S\)` y así hasta darle muy poco o casi nada de peso a `\(W\)`
+
+---
+
+# ¿Qué método usar?
+ 
+- No hay un método claramente superior a todos los demás
+ 
+- Más aún, el desempeño de cada método depende de cada aplicación
+ 
+- La ruta más seguida es usar varios algoritmos y mostrar la robustez de los resultados a esta elección
+  
+---
+
+# Comprobar empíricamente los supuestos
+ 
+- El parámetro `\(TOT\)` solo se calcula sobre la región de sporte común por lo que se debe verificar el traslape del PS calculado para los tratados y no tratados
+ 
+- Otro de los teoremas de Rosenbaum y Rubin (1983) implica que
+
+$$
+X \perp  D|P(X)
+$$
+ 
+- Esto es, que al controlar por el PS, las variables `\(X\)` no deben proveer información sobre `\(D\)`
+   
+- Se recomienda también hacer una prueba de estratificación
+
+  1. Dividir el rango del soporte común en bloques 
+ 
+  1. Hacer una prueba de medias del PS entre grupos dentro de cada bloque
+ 
+  1. Hacer una prueba de medias de cada variable en `\(X_i\)`  entre grupos dentro de cada bloque
+
+---
+
+# Ilustración del soporte común
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/Gertler_PSOverlap.png" alt="Fuente: Gertler et al. (2017)" width="70%" /&gt;
+&lt;p class="caption"&gt;Fuente: Gertler et al. (2017)&lt;/p&gt;
+&lt;/div&gt;
+---
+
+class: inverse, middle, center
+
+# Ejemplo en R
+
+---
+
+# Datos no experimentales de una muestra de mujeres
+ 
+- Usamos los datos en *cattaneo_smoking.csv* (Cattaneo, 2010)
+ 
+- Crearemos la variable de tratamiento **smoke** que es un indicador de si la madre fumó durante el embarazo
+ 
+- El 19% de los mujeres reportaron fumar
+ 
+- Usaremos un subconjunto de las `\(X\)` disponibles para modelar el PS
+
+---
+
+# *MatchIt*
+
+
+```r
+data.smoking&lt;-read_csv(
+  "./cattaneo_smoking.csv",
+  locale = locale(encoding = "latin1")) %&gt;% 
+  clean_names() %&gt;% 
+  mutate(smoke=ifelse(mbsmoke=="smoker",1,0)) %&gt;% 
+  mutate(married=ifelse(mmarried=="married",1,0)) %&gt;% 
+  mutate(firstbaby=ifelse(fbaby=="Yes",1,0))
+
+
+#Asegurarse que no hay NA, MatchIt no corre con NA
+data.smoking &lt;- data.smoking[complete.cases(data.smoking), ] 
+
+set.seed(1021)
+```
+
+---
+
+# Diferencias simples
+
+- Notemos que, si solo comparamos a las mujeres que fuman con las que no fuman, estamos comparando personas muy diferentes
+
+
+```r
+zelig(bweight ~ smoke, model="ls", data=data.smoking)
+
+zelig(married ~ smoke, model="ls", data=data.smoking)
+
+zelig(medu ~ smoke, model="ls", data=data.smoking)
+```
+
+---
+
+# Especificamos el PS
+
+
+```r
+binaria &lt;- "smoke"
+variables &lt;- c("married", "firstbaby", "medu", "nprenatal", "foreign", "mhisp", "fage")
+
+ps &lt;- as.formula(paste(binaria,
+                         paste(variables,
+                               collapse ="+"),
+                         sep= " ~ "))
+print(ps)
+```
+
+```
+## smoke ~ married + firstbaby + medu + nprenatal + foreign + mhisp + 
+##     fage
+```
+
+---
+
+# Efectuamos el matching
+
+
+```r
+m.out &lt;- matchit(formula=ps,
+                 method = "nearest",
+                 ratio = 1,
+                 distance= "logit",
+                 replace = FALSE,
+                 data = data.smoking)
+```
+
+- El resumen del procedimiento da bastante información sobre el pareamiento:
+
+
+```r
+summary(m.out)
+```
+
+---
+
+# Gráfico del traslape
+
+
+```r
+plot(m.out, type = "jitter")
+```
+
+![](figures/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+```
+## [1] "To identify the units, use first mouse button; to stop, use second."
+```
+
+```
+## integer(0)
+```
+
+
+---
+
+# Histograma
+
+
+```r
+plot(m.out, type = "hist")
+```
+
+![](figures/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+---
+
+# Muestra emparejada
+
+
+```r
+m.data &lt;- match.data(m.out)
+
+#Esta matriz nos dice quién es el match de quién
+head(m.out$match.matrix)
+```
+
+```
+##    [,1]  
+## 11 "4130"
+## 20 "2234"
+## 25 "1740"
+## 43 "2857"
+## 47 "305" 
+## 49 "1442"
+```
+
+---
+
+# Efecto de tratamiento
+
+.tiny[
+.pull-left[
+
+```r
+z.out &lt;- zelig(bweight~smoke,
+               data = m.data,
+               model = "ls")
+```
+
+```
+## How to cite this model in Zelig:
+##   R Core Team. 2007.
+##   ls: Least Squares Regression for Continuous Dependent Variables
+##   in Christine Choirat, Christopher Gandrud, James Honaker, Kosuke Imai, Gary King, and Olivia Lau,
+##   "Zelig: Everyone's Statistical Software," https://zeligproject.org/
+```
+
+```r
+z.out
+```
+
+```
+## Model: 
+## 
+## Call:
+## z5$zelig(formula = bweight ~ smoke, data = m.data)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2740.66  -330.66    41.95   381.95  1880.34 
+## 
+## Coefficients:
+##             Estimate Std. Error t value
+## (Intercept)  3332.05      20.37 163.588
+## smoke        -194.39      28.81  -6.749
+##             Pr(&gt;|t|)
+## (Intercept)  &lt; 2e-16
+## smoke       2.03e-11
+## 
+## Residual standard error: 598.7 on 1726 degrees of freedom
+## Multiple R-squared:  0.02571,	Adjusted R-squared:  0.02514 
+## F-statistic: 45.54 on 1 and 1726 DF,  p-value: 2.033e-11
+## 
+## Next step: Use 'setx' method
+```
+]
+]
+
+---
+
+# Inferencia
+
+.pull-left[
+
+- Algunas simulaciones han mostrado que bootstrap no funciona muy bien para los métodos de matching
+
+- Se propone hacer inferencia con simulaciones, basadas en [King, Tomz y Wittenberg (2000)](https://gking.harvard.edu/files/gking/files/making.pdf)
+
+.tiny[
+
+```r
+#Creamos dos objetos con las dos situaciones que queremos simular
+x.out &lt;- setx(z.out, smoke=0)
+
+x1.out &lt;- setx1(z.out, smoke=1)
+
+#Corremos la simulación
+sim.out &lt;- sim(z.out, x=x.out, x1=x1.out)
+```
+]
+]
+
+
+
+.pull-right[
+- ev son los valores esperados
+
+- pv son los valores ajustados
+.tiny[
+
+```r
+summary(sim.out)
+```
+
+```
+## 
+##  sim x :
+##  -----
+## ev
+##       mean       sd      50%     2.5%    97.5%
+## 1 3332.685 20.20435 3333.638 3292.651 3369.488
+## pv
+##          mean       sd     50%     2.5%
+## [1,] 3335.587 596.3476 3336.73 2181.144
+##         97.5%
+## [1,] 4496.132
+## 
+##  sim x1 :
+##  -----
+## ev
+##       mean       sd      50%     2.5%    97.5%
+## 1 3137.666 20.92856 3137.659 3096.175 3178.721
+## pv
+##          mean       sd      50%     2.5%
+## [1,] 3101.832 605.6893 3090.697 1809.471
+##         97.5%
+## [1,] 4360.722
+## fd
+##        mean       sd       50%     2.5%
+## 1 -195.0192 29.14914 -195.8494 -253.593
+##       97.5%
+## 1 -137.2439
+```
+]
+]
+
+
+---
+
+# Caliper
+.tiny[
+.pull-left[
+
+```r
+m.out &lt;- matchit(formula=ps,
+                 method = "nearest",
+                 distance= "logit",
+                 replace = FALSE,
+                 ratio = 2,
+                 caliper = .1,
+                 data = data.smoking)
+```
+]
+]
+
+.tiny[
+.pull-right[
+
+```r
+zelig(bweight~smoke,
+               data = match.data(m.out),
+               model = "ls")
+```
+
+```
+## How to cite this model in Zelig:
+##   R Core Team. 2007.
+##   ls: Least Squares Regression for Continuous Dependent Variables
+##   in Christine Choirat, Christopher Gandrud, James Honaker, Kosuke Imai, Gary King, and Olivia Lau,
+##   "Zelig: Everyone's Statistical Software," https://zeligproject.org/
+```
+
+```
+## Model: 
+## 
+## Call:
+## z5$zelig(formula = bweight ~ smoke, data = match.data(m.out))
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2907.56  -328.56    38.44   387.76  1880.76 
+## 
+## Coefficients:
+##             Estimate Std. Error t value
+## (Intercept)  3361.56      14.94 225.048
+## smoke        -224.31      25.21  -8.899
+##             Pr(&gt;|t|)
+## (Intercept)   &lt;2e-16
+## smoke         &lt;2e-16
+## 
+## Residual standard error: 596.2 on 2453 degrees of freedom
+## Multiple R-squared:  0.03127,	Adjusted R-squared:  0.03088 
+## F-statistic: 79.18 on 1 and 2453 DF,  p-value: &lt; 2.2e-16
+## 
+## Next step: Use 'setx' method
+```
+]
+]
+
+---
+
+# Estratificación
+
+.tiny[
+.pull-left[
+
+```r
+m.out &lt;- matchit(formula=ps,
+                 method = "subclass",
+                 subclass = 5,
+                 distance= "logit",
+                 data = data.smoking)
+```
+]
+]
+
+.tiny[
+.pull-right[
+
+```r
+zelig(bweight~smoke,
+               data = match.data(m.out),
+               model = "ls")
+```
+
+```
+## How to cite this model in Zelig:
+##   R Core Team. 2007.
+##   ls: Least Squares Regression for Continuous Dependent Variables
+##   in Christine Choirat, Christopher Gandrud, James Honaker, Kosuke Imai, Gary King, and Olivia Lau,
+##   "Zelig: Everyone's Statistical Software," https://zeligproject.org/
+```
+
+```
+## Model: 
+## 
+## Call:
+## z5$zelig(formula = bweight ~ smoke, data = match.data(m.out))
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -3072.91  -306.47    37.34   358.09  2087.09 
+## 
+## Coefficients:
+##             Estimate Std. Error t value
+## (Intercept) 3412.912      9.255  368.75
+## smoke       -275.252     21.453  -12.83
+##             Pr(&gt;|t|)
+## (Intercept)   &lt;2e-16
+## smoke         &lt;2e-16
+## 
+## Residual standard error: 568.9 on 4640 degrees of freedom
+## Multiple R-squared:  0.03426,	Adjusted R-squared:  0.03406 
+## F-statistic: 164.6 on 1 and 4640 DF,  p-value: &lt; 2.2e-16
+## 
+## Next step: Use 'setx' method
+```
+]
+]
+
+---
+
+# Conclusión
+
+- Las técnicas de PSM dependen de varios supuestos téoricos fuertes
+
+- La implementación implica que las variables en `\(X\)` son aquellas que permiten hacer los supuestos de inconfundibilidad dado el PS
+
+- En la estimación del PS se toma la decisión sobre la forma funcional
+
+- Los efectos de tratamiento pueden ser distintos entre diferentes algoritmos de emparejamiento y la especificación del PS
+
+- La crítica más importante es que la mayoría de las veces nos preocupa más la autoselección basada en no observables que en observables
+
+- Pero muchas veces es todo lo que tenemos a la mano
+
+- Hay que hacer análisis de sensibilidad a las distintas decisiones
+
+- Presentar resultados transparentes
+
+---
+
+# Próxima sesión
+
+- Veremos ejemplos típicos de PSM
+
+  + Espinosa, V., &amp; Rubin, D. B. (2015). Did the military interventions in the Mexican drug war increase violence?. *The American Statistician*, 69(1), 17-27
+
+  + Chang, A., Miranda-Moreno, L., Cao, J., &amp; Welle, B. (2017). The effect of BRT implementation and streetscape redesign on physical activity: A case study of Mexico City. *Transportation Research Part A: Policy and Practice*, 100, 337-347.
+
+  + García-Díaz, R., Sosa-Rubí, S. G., Serván-Mori, E., &amp; Nigenda, G. (2018). Welfare effects of health insurance in Mexico: The case of Seguro Popular de Salud. PloS one, 13(7), e0199876.
+  
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script src="libs/cols_macro.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -48,3 +48,5 @@ Clase 14. Examen parcial
 Clase 16. Aplicaciones de diferencia en diferencias
 
 [Clase 17](https://eps-2021.netlify.app/clases/clase_17.html#1). Métodos de matching
+
+[Clase 18](https://eps-2021.netlify.app/clases/clase_18.html#1). Métodos de matching en R
