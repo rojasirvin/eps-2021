@@ -514,12 +514,9 @@ z.out
 ## -2740.66  -330.66    41.95   381.95  1880.34 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value
-## (Intercept)  3332.05      20.37 163.588
-## smoke        -194.39      28.81  -6.749
-##             Pr(&gt;|t|)
-## (Intercept)  &lt; 2e-16
-## smoke       2.03e-11
+##             Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)  3332.05      20.37 163.588  &lt; 2e-16
+## smoke        -194.39      28.81  -6.749 2.03e-11
 ## 
 ## Residual standard error: 598.7 on 1726 degrees of freedom
 ## Multiple R-squared:  0.02571,	Adjusted R-squared:  0.02514 
@@ -534,12 +531,28 @@ z.out
 
 # Inferencia
 
-.pull-left[
-
-- Algunas simulaciones han mostrado que bootstrap no funciona muy bien para los métodos de matching
+- En el contexto de matching, bootstrap no funciona bien
 
 - Se propone hacer inferencia con simulaciones, basadas en [King, Tomz y Wittenberg (2000)](https://gking.harvard.edu/files/gking/files/making.pdf)
 
+- Por teoría asintótica podemos saber que nuestro parámetro de interés tiene una distribución `\(\mathcal{N}(\hat{\theta}, \hat{V}(\theta))\)`
+
+---
+
+# Simulación de la distribución de `\(\theta\)` 
+
+- Podemos obtener una representación de lo que sabemos del parámetro de interés con el procedimiento estadístico que usamos
+
+- Obtenemos una colección de tamaño `\(M\)` de `\(\tilde{\theta}\)`, obtenidas de la distribución `\(\mathcal{N}(\hat{\theta}, \hat{V}(\theta))\)`
+
+
+- Usando la colección de `\(M\)` `\(\tilde{\theta}\)`s, podemos simular *bases de datos*
+
+---
+
+# Inferencia
+
+.pull-left[
 .tiny[
 
 ```r
@@ -574,10 +587,8 @@ summary(sim.out)
 ##       mean       sd      50%     2.5%    97.5%
 ## 1 3332.685 20.20435 3333.638 3292.651 3369.488
 ## pv
-##          mean       sd     50%     2.5%
-## [1,] 3335.587 596.3476 3336.73 2181.144
-##         97.5%
-## [1,] 4496.132
+##          mean       sd     50%     2.5%    97.5%
+## [1,] 3335.587 596.3476 3336.73 2181.144 4496.132
 ## 
 ##  sim x1 :
 ##  -----
@@ -585,15 +596,11 @@ summary(sim.out)
 ##       mean       sd      50%     2.5%    97.5%
 ## 1 3137.666 20.92856 3137.659 3096.175 3178.721
 ## pv
-##          mean       sd      50%     2.5%
-## [1,] 3101.832 605.6893 3090.697 1809.471
-##         97.5%
-## [1,] 4360.722
+##          mean       sd      50%     2.5%    97.5%
+## [1,] 3101.832 605.6893 3090.697 1809.471 4360.722
 ## fd
-##        mean       sd       50%     2.5%
-## 1 -195.0192 29.14914 -195.8494 -253.593
-##       97.5%
-## 1 -137.2439
+##        mean       sd       50%     2.5%     97.5%
+## 1 -195.0192 29.14914 -195.8494 -253.593 -137.2439
 ```
 ]
 ]
@@ -645,12 +652,9 @@ zelig(bweight~smoke,
 ## -2907.56  -328.56    38.44   387.76  1880.76 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value
-## (Intercept)  3361.56      14.94 225.048
-## smoke        -224.31      25.21  -8.899
-##             Pr(&gt;|t|)
-## (Intercept)   &lt;2e-16
-## smoke         &lt;2e-16
+##             Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)  3361.56      14.94 225.048   &lt;2e-16
+## smoke        -224.31      25.21  -8.899   &lt;2e-16
 ## 
 ## Residual standard error: 596.2 on 2453 degrees of freedom
 ## Multiple R-squared:  0.03127,	Adjusted R-squared:  0.03088 
@@ -706,12 +710,9 @@ zelig(bweight~smoke,
 ## -3072.91  -306.47    37.34   358.09  2087.09 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value
-## (Intercept) 3412.912      9.255  368.75
-## smoke       -275.252     21.453  -12.83
-##             Pr(&gt;|t|)
-## (Intercept)   &lt;2e-16
-## smoke         &lt;2e-16
+##             Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 3412.912      9.255  368.75   &lt;2e-16
+## smoke       -275.252     21.453  -12.83   &lt;2e-16
 ## 
 ## Residual standard error: 568.9 on 4640 degrees of freedom
 ## Multiple R-squared:  0.03426,	Adjusted R-squared:  0.03406 
