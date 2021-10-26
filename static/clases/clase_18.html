@@ -535,7 +535,7 @@ z.out
 
 - Se propone hacer inferencia con simulaciones, basadas en [King, Tomz y Wittenberg (2000)](https://gking.harvard.edu/files/gking/files/making.pdf)
 
-- Por teoría asintótica podemos saber que nuestro parámetro de interés tiene una distribución `\(\mathcal{N}(\hat{\theta}, \hat{V}(\theta))\)`
+- Supongamos que podemos saber que nuestro parámetro de interés tiene una distribución `\(\mathcal{N}(\hat{\theta}, \hat{V}(\hat{\theta}))\)`
 
 ---
 
@@ -543,10 +543,27 @@ z.out
 
 - Podemos obtener una representación de lo que sabemos del parámetro de interés con el procedimiento estadístico que usamos
 
-- Obtenemos una colección de tamaño `\(M\)` de `\(\tilde{\theta}\)`, obtenidas de la distribución `\(\mathcal{N}(\hat{\theta}, \hat{V}(\theta))\)`
+
+- King, Tomz y Wittenberg (2000) proveen una forma de presentar e interpretar análisis estadístico de una forma más intuitiva
+
+- Obtenemos una colección de tamaño `\(M\)` de `\(\theta_m\)`, obtenidas de la distribución `\(\mathcal{N}(\hat{\theta}, \hat{V}(\theta))\)`
 
 
-- Usando la colección de `\(M\)` `\(\tilde{\theta}\)`s, podemos simular *bases de datos*
+- Usando la colección de estos `\(\theta_m\)`, podemos simular el valor esperado de la variable de resultados bajo distintos valores de los regresores
+
+---
+
+# Algoritmo de King, Tomz y Wittenberg (2000)
+
+- Para simular el valor esperado de `\(Y\)`, para cada `\(\tilde{\theta}\)` y un `\(X_c\)`:
+
+1. Obtenga la parte sistemática del modelo dada por el valor de `\(X_c\)` y `\(\theta_m\)`
+
+1. Genere `\(J\)` realizaciones de la variable `\(Y_c^j\)` usando la matriz de varianzas `\(\hat{V}_m(\theta)\)`. Este paso simula la incertidumbre fundamental
+
+1. Obtenga el promedio `\(E_m(Y_c)=\frac{1}{J}\sum_j Y_c^j\)`
+
+- Repita el algoritmo anterior para cada `\(m\)`, lo que permite obtener la distribución de `\(E(Y_c)=\frac{1}{M}\sum_m E_m(Y_c)\)`
 
 ---
 
