@@ -1,6 +1,6 @@
 ---
 title: "Tarea 3"
-summary: "Martes de noviembre a las 20:00"
+summary: "Martes 16 de noviembre a las 20:00"
 weight: 1
 type: book
 toc: false
@@ -29,7 +29,7 @@ Martes 16 de noviembre a las 20:00.
 
 ## Nota
 
-Esta tarea tendrá solo tres preguntas. La pregunta 3,sobre diseños con discontinuidad, será añadida pronto.
+Esta tarea tendrá solo tres preguntas. La pregunta 3, sobre diseños con discontinuidad, será añadida pronto.
 
 ## Archivos
 
@@ -56,7 +56,7 @@ a. [5 puntos] Evalúe qué tan bueno es el procedimiento de la parte c. en balan
 
 a. [5 puntos] Estime ahora el TOT en el ingreso trimestral, como en la parte a., pero usando un caliper de 0.1 y 3 vecinos a ser emparejados. ¿Cómo cambian sus resultados respecto a los de la parte a.?
 
-a. [15 puntos] Proponga una estrategia de PSM para evaluar el efecto del programa en la probabilidad de encontrar empleo, superior a la de las partes b. y c. Para ello, puede escoger un modelo para el PS y un algoritmo de emparejamiento. El modelo del PS puede modificarse de diversas maneras: añadiendo polinomios de las variables continuas, incluyendo interacciones, agregando variables disponibles en los datos, o construyendo nuevas variables a partir de los datos en bruto, modificando el script *limpiar_jcf_analisis.r*. Reporte qué tan bueno es su procedimiento para construir grupos balanceados y compare los resultados que obtiene con los de las partes b. y c.
+a. [15 puntos] Proponga una estrategia de PSM para evaluar el efecto del programa en la probabilidad de encontrar empleo, superior a la de las partes b. y c. Para ello, escoja un modelo para el PS y un algoritmo de emparejamiento. El modelo del PS puede modificarse de diversas maneras: añadiendo polinomios de las variables continuas, incluyendo interacciones, agregando variables disponibles en los datos, o construyendo nuevas variables a partir de los datos en bruto, modificando el script *limpiar_jcf_analisis.r*. Reporte qué tan bueno es su procedimiento para construir grupos balanceados y compare los resultados que obtiene con los de las partes b. y c.
 
 
 ## Pregunta 2
