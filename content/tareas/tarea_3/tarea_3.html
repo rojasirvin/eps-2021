@@ -1,0 +1,64 @@
+---
+title: "Tarea 3"
+summary: "Martes de noviembre a las 20:00"
+weight: 1
+type: book
+toc: false
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="instrucciones" class="section level2">
+<h2>Instrucciones</h2>
+<p>Las tareas deben entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Para evitar confusiones, escriban en su tarea con quiénes colaboraron. Las tareas deberán entregarse en Teams antes de la fecha y hora señalada. No se aceptarán tareas fuera de tiempo. Por favor, <strong>no comprima los archivos</strong> en carpetas comprimidas. Las tareas deberán contener dos archivos:</p>
+<p>Un primer documento de respuestas donde se incluyan las respuestas a las preguntas teóricas y conceptuales. Este documento puede ser redactado en Word o cualquier otro software, o si lo prefiere, a mano, pero deberá estar impreso en .pdf. En este documento también se deben incluir las respuestas a preguntas sobre conclusiones que se desprenden de las secciones prácticas. Por ejemplo, si una pregunta pide obtener la media de la variable x en cierta base de datos, entonces el documento de respuestas debe incluir la pregunta y respuesta correspondiente: “la media de la variable x es 32.6”. En este documento también deberán incluirse las tablas y gráficas que se soliciten.</p>
+<p>Un segundo archivo deberá contener el código replicable usado para generar los resultados de la sección práctica. El código debe también crear las tablas y gráficas solicitadas. Los archivos de código se verificarán para comprobar su replicabilidad.</p>
+<p>Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.</p>
+</div>
+<div id="fecha-de-entrega" class="section level2">
+<h2>Fecha de entrega</h2>
+<p>Martes 16 de noviembre a las 20:00.</p>
+</div>
+<div id="nota" class="section level2">
+<h2>Nota</h2>
+<p>Esta tarea tendrá solo tres preguntas. La pregunta 3,sobre diseños con discontinuidad, será añadida pronto.</p>
+</div>
+<div id="archivos" class="section level2">
+<h2>Archivos</h2>
+<p><a href="/tareas/tarea_3/datos_jcf_analisis.csv">datos_jcf_analisis.csv</a></p>
+<p><a href="/tareas/tarea_3/limpiar_jcf_analisis.r">limpiar_jcf_analisis.r</a></p>
+</div>
+<div id="pregunta-1" class="section level2">
+<h2>Pregunta 1</h2>
+<p>Hace unas semanas se presentaron los resultados de <a href="https://www.gob.mx/cms/uploads/attachment/file/669952/Estudio_EL_EFECTO_DEL_PROGRAMA_JCF_DURANTE_LA_PANDEMIA.pdf">una evaluación</a> del impacto del programa Jóvenes Construyendo el Futuro (JCF), realizada usando métodos de matching. Las tablas 1 y 2 del reporte muestran el ATE estimado en el ingreso trimestral entre los jóvenes que no asisten a la escuela y no están empleados y el ATE en la probabilidad de encontrar un trabajo entre los jóvenes en general, respectivamente. En este ejercicio extenderemos los resultados encontrados.</p>
+<p>Los datos en <em>datos_jcf_analisis.csv</em> están listos para analizarse. Estos se construyeron a partir de la ENIGH 2020, que incluyó un módulo especial para el programa JCF y que pueden descargar de <a href="https://www.inegi.org.mx/programas/enigh/nc/2020/#Microdatos">aquí</a>. Para limpiar los datos use el script en <em>limpiar_jcf_analisis.r</em>. Para ejecutar este script debería descargar de la página de INEGI antes citada los archivos <em>ingresos_jcf.csv</em>, <em>ingresos.csv</em>, <em>poblacion.csv</em>, <em>viviendas.csv</em>, <em>hogares.csv</em> y <em>concentradohogar.csv</em>. Esto sería necesario si quisiera agregar nuevas variables al análisis, pero bien puede trabajar con los datos en <em>datos_jcf_analisis.csv</em> que ya están <em>limpios</em>.</p>
+<p>El propensity score (PS) usado en la evaluación usa los siguientes regresores: <strong>mujer</strong> (dummy de sexo), <strong>indigena</strong> (dummy de pertenencia a una etnia), <strong>rural</strong> (dummy del ámbito rural), <strong>escoacum</strong> (años de escolaridad), <strong>casadounion</strong> (dummy para casados o en unión libre), <strong>jefehog</strong> (dummy para jefes del hogar), <strong>haymenores</strong> (dummy para la presencia de menores de edad en el hogar), <strong>proggob</strong> (dummy para beneficiarios de programas de gobierno), y <strong>tot_integ</strong> (número de miembros del hogar), así como dummies de estado, <strong>cve_ent</strong>.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[10 puntos] Estime el TOT (TT o ATT) del programa en el ingreso trimestral, <strong>ingtot_tri</strong>. Note que el estudio reporta el ATE. Para estimar el impacto en el ingreso trimestral se comparan a los beneficiarios de JCF con los jóvenes que no asisten a la escuela y no están empleados. Los beneficiarios tienen <em>jcf2==1</em> y los jóvenes que no asisten a la escuela y no están empleados tienen <em>jcf2==0</em>. Realice la inferencia estadística usando el método de simulación de King, Tomz y Wittenberg (2000) <a href="https://eps-2021.netlify.app/clases/clase_18.html#27">visto en clase</a>. ¿De qué tamaño es el TOT estimado y es este efecto estadísticamente significativo?</p></li>
+<li><p>[5 puntos] En el matching de la parte a., evalúe qué tan bueno es el procedimiento en balancear las características observadas una vez realizado el matching. Cree un <em>love plot</em> y realice pruebas formales para contrastar las diferencias en características observables antes y después del matching.</p></li>
+<li><p>[10 puntos] Para la probabilidad de encontrar empleo, se comparan a los beneficiarios de JCF con los jóvenes en general. Los beneficiarios tienen <em>jcf==1</em>, mientras que el resto de los jóvenes tienen <em>jcf==0</em>. Realice la estimación del TOT y la inferencia, de manera análoga a lo realizado en la parte a.</p></li>
+<li><p>[5 puntos] Evalúe qué tan bueno es el procedimiento de la parte c. en balancear las características observadas una vez realizado el matching. Cree un <em>love plot</em> y realice pruebas formales para contrastar las diferencias en características observables antes y después del matching.</p></li>
+<li><p>[5 puntos] Estime ahora el TOT en el ingreso trimestral, como en la parte a., pero usando un caliper de 0.1 y 3 vecinos a ser emparejados. ¿Cómo cambian sus resultados respecto a los de la parte a.?</p></li>
+<li><p>[15 puntos] Proponga una estrategia de PSM para evaluar el efecto del programa en la probabilidad de encontrar empleo, superior a la de las partes b. y c. Para ello, puede escoger un modelo para el PS y un algoritmo de emparejamiento. El modelo del PS puede modificarse de diversas maneras: añadiendo polinomios de las variables continuas, incluyendo interacciones, agregando variables disponibles en los datos, o construyendo nuevas variables a partir de los datos en bruto, modificando el script <em>limpiar_jcf_analisis.r</em>. Reporte qué tan bueno es su procedimiento para construir grupos balanceados y compare los resultados que obtiene con los de las partes b. y c.</p></li>
+</ol>
+</div>
+<div id="pregunta-2" class="section level2">
+<h2>Pregunta 2</h2>
+<p>Suponga que se convierte en asesor de la instancia gubernamental encargada de la seguridad alimentaria. Al gobierno le interesa que la seguridad alimentaria de las familias productoras de maíz para autoconsumo no se vea afectada negativamente por la presencia de cierta plaga y dará una transferencia per cápita a todos los pequeños productores de maíz cuyos cultivos se considere están afectados por dicha plaga. Para determinar qué hogares reciben la transferencia se decide usar un índice de prevalencia de la plaga y se selecciona un umbral por arriba del cual está demostrado que los rendimientos del cultivo del maíz se ven seriamente afectados. Esta inspección se llevará a cabo por autoridades federales y el umbral es conocido solo por estas autoridades. Cuando se determine que la prevalencia está por encima del umbral, el monto del programa será transferido de manera inmediata, electrónicamente.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>[5 puntos] ¿Qué aspectos del programa permitirían emplear un diseño de regresión discontinua para evaluar la efectividad de este sobre la seguridad alimentaria y cómo mostraría su validez empíricamente?</p></li>
+<li><p>[5 puntos] ¿Cómo emplearía el diseño de este programa para evaluar su efectividad con un modelo de regresión discontinua nítida? Elabore una gráfica donde explique una situación en la que el programa muestra ser efectivo. Describa cómo usaría una regresión para hacer inferencia respecto a la efectividad del programa.</p></li>
+<li><p>[5 puntos] ¿Qué factores podrían invalidar el uso de este método para evaluar el programa?</p></li>
+<li><p>Suponga que otro de los asesores juzga como <em>demasiado paternalista</em> la transferencia y propone que, en su lugar, se otorgue un cupón válido para canjearse por bultos de un plaguicida. Asumiendo que en una encuesta posterior usted podría conocer la cantidad precisa de plaguicida aplicado, ¿cómo emplearía un diseño de regresión discontinua difusa para evaluar el efecto del uso del plaguicida sobre la seguridad alimentaria? En particular, describa:</p>
+<ol style="list-style-type: lower-roman">
+<li>[5 puntos] ¿Cómo estimaría la forma reducida? ¿Cuál es el coeficiente relevante y cuál es su interpretación?</li>
+<li>[5 puntos] ¿Cómo estimaría la primera y la segunda etapa? ¿Cuáles son los coeficientes relevantes y cuál es su interpretación?</li>
+<li>[5 puntos] ¿Cuáles son los supuestos necesarios para estimar este modelo usando mínimos cuadrados en dos etapas?</li>
+</ol></li>
+</ol>
+</div>
+<div id="pregunta-3" class="section level2">
+<h2>Pregunta 3</h2>
+<p>PENDIENTE</p>
+</div>
