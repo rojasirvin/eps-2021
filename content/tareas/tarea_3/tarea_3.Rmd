@@ -50,7 +50,7 @@ a. [10 puntos] Estime el TOT (TT o ATT) del programa en el ingreso trimestral, *
 
 a. [5 puntos] En el matching de la parte a., evalúe qué tan bueno es el procedimiento en balancear las características observadas una vez realizado el matching. Cree un *love plot* y realice pruebas formales para contrastar las diferencias en características observables antes y después del matching.
 
-a. [10 puntos] Para la probabilidad de encontrar empleo, se comparan a los beneficiarios de JCF con los jóvenes en general. Los beneficiarios tienen *jcf==1*, mientras que el resto de los jóvenes tienen *jcf==0*. Realice la estimación del TOT y la inferencia, de manera análoga a lo realizado en la parte a.
+a. [10 puntos] Para la probabilidad de encontrar empleo, **encontro**, se comparan a los beneficiarios de JCF con los jóvenes en general. Los beneficiarios tienen *jcf==1*, mientras que el resto de los jóvenes tienen *jcf==0*. Realice la estimación del TOT y la inferencia, de manera análoga a lo realizado en la parte a.
 
 a. [5 puntos] Evalúe qué tan bueno es el procedimiento de la parte c. en balancear las características observadas una vez realizado el matching. Cree un *love plot* y realice pruebas formales para contrastar las diferencias en características observables antes y después del matching.
 
