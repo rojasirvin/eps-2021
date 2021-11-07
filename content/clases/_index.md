@@ -39,6 +39,10 @@ Clase 9. Aplicaciones de métodos experimentales
 
 [Clase 12](https://eps-2021.netlify.app/clases/clase_12.html#1). Múltiples hipótesis
 
+  - Rojas Valdes, R.I., Wydick, B., & Lybbert, T.J. (2021). Can Hope Elevate Microfinance? Evidence from Oaxaca, Mexico. *Oxford Economic Papers*.
+    - [Diapositivas](/uploads/Rojas_et_al_diapositivas.pdf)
+    - [Resumen](/uploads/Rojas_et_al_resumen.jpg)
+
 [Clase 13](https://eps-2021.netlify.app/clases/clase_13.html#1). Diferencia en diferencias
 
 Clase 14. Examen parcial
@@ -57,4 +61,14 @@ Clase 19. Aplicaciones de métodos de matching
 
 [Clase 21](https://eps-2021.netlify.app/clases/clase_21.html#1). Discontinuidades difusas
 
-clase 22. Aplicaciones de diseños con discontinuidades
+Clase 22. Aplicaciones de diseños con discontinuidades
+
+ - Del Valle, A., de Janvry, A., & Sadoulet, E. (2020). Rules for recovery: Impact of indexed disaster funds on shock coping in Mexico. *American Economic Journal: Applied Economics*, 12(4), 164-95.
+  - [Diapositivas](/uploads/DelValle_et_al_diapositivas.pdf)
+  - [Resumen](/uploads/DelValle_et_al_resumen.pdf)
+  
+ - Dell, M. (2015). Trafficking networks and the Mexican drug war. *American Economic Review*, 105(6), 1738-79.
+  - [Diapositivas](/uploads/Dell_diapositivas.pptx)
+  - [Resumen](/uploads/Dell_resumen.pdf)
+  
+ - 
