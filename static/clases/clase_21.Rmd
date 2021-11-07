@@ -67,7 +67,7 @@ xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
 
 .title[
-# Clase 20. Discontinuidades difusas
+# Clase 21. Discontinuidades difusas
 ]
 .subtitle[
 ## Evaluación de Programas
@@ -432,7 +432,7 @@ $$y_i=\beta_0+\beta_1 x_i + \beta_2 x_i^2 + \ldots + \beta_p x_i^p + \delta\ D_i
 
   + Aguilar, A., Gutierrez, E., & Seira, E. (2021). The effectiveness of sin food taxes: Evidence from Mexico. *Journal of Health Economics*, 77, 102455.
 
-- El jueves estudiaremos en R:
+- Finalmente replicaremos en R:
 
   + Anagol, S., & Fujiwara, T. (2016). The runner-up effect. *Journal of Political Economy*, 124(4), 927-991.
   

@@ -51,6 +51,8 @@ Clase 16. Aplicaciones de diferencia en diferencias
 
 [Clase 18](https://eps-2021.netlify.app/clases/clase_18.html#1). Métodos de matching en R
 
+Clase 19. Aplicaciones de métodos de matching
+
 [Clase 19](https://eps-2021.netlify.app/clases/clase_19.html#1). Diseños con discontinuidades
 
 [Clase 20](https://eps-2021.netlify.app/clases/clase_20.html#1). Discontinuidades difusas
