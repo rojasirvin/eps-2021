@@ -51,24 +51,44 @@ Clase 14. Examen parcial
 
 Clase 16. Aplicaciones de diferencia en diferencias
 
+  - Gutiérrez Vázquez, E. Y., & Parrado, E. A. (2016). Abortion legalization and childbearing in Mexico. *Studies in family planning*, 47(2), 113-128
+    - [Diapositivas](/uploads/Guitierrez_Parrado_diapositivas.pdf)
+    - [Resumen](/uploads/Guitierrez_Parrado_resumen.pdf)
+    
+  - Campos, R. M., Esquivel, G., & Santillán, A. S. (2017). El impacto del salario mínimo en los ingresos y el empleo en México. *Revista CEPAL*.
+
 [Clase 17](https://eps-2021.netlify.app/clases/clase_17.html#1). Métodos de matching
 
 [Clase 18](https://eps-2021.netlify.app/clases/clase_18.html#1). Métodos de matching en R
 
 Clase 19. Aplicaciones de métodos de matching
 
+  - Becerril, J., & Abdulai, A. (2010). The impact of improved maize varieties on poverty in Mexico: a propensity score-matching approach. *World development*, 38(7), 1024-1035.
+
+  - García-Díaz, R., Sosa-Rubí, S. G., Serván-Mori, E., & Nigenda, G. (2018). Welfare effects of health insurance in Mexico: The case of Seguro Popular de Salud. *PloS one*, 13(7), e0199876.
+    - [Diapositivas](/uploads/GarciaDiaz_et_al_diapositivas.pptx)
+    - [Resumen](/uploads/GarciaDiaz_et_al_resumen.pdf)
+    
+  - Espinosa, V., & Rubin, D. B. (2015). Did the military interventions in the Mexican drug war increase violence?. *The American Statistician*, 69(1), 17-27.
+    - [Diapositivas](/uploads/Espinosa_Rubin_diapositivas.pdf)
+    - [Resumen](/uploads/Espinosa_Rubin_resumen.pdf)
+
+  - Chang, A., Miranda-Moreno, L., Cao, J., & Welle, B. (2017). The effect of BRT implementation and streetscape redesign on physical activity: A case study of Mexico City. *Transportation Research Part A: Policy and Practice*, 100, 337-347.
+    - [Diapositivas](/uploads/Chang_et_al_diapositivas.pdf)
+    - [Resumen](/uploads/Chang_et_al_resumen.pdf)
+  
 [Clase 20](https://eps-2021.netlify.app/clases/clase_20.html#1). Diseños con discontinuidades
 
 [Clase 21](https://eps-2021.netlify.app/clases/clase_21.html#1). Discontinuidades difusas
 
 Clase 22. Aplicaciones de diseños con discontinuidades
 
- - Del Valle, A., de Janvry, A., & Sadoulet, E. (2020). Rules for recovery: Impact of indexed disaster funds on shock coping in Mexico. *American Economic Journal: Applied Economics*, 12(4), 164-95.
-  - [Diapositivas](/uploads/DelValle_et_al_diapositivas.pdf)
-  - [Resumen](/uploads/DelValle_et_al_resumen.pdf)
+  - Aguilar, A., Gutierrez, E., & Seira, E. (2021). The effectiveness of sin food taxes: Evidence from Mexico. Journal of Health Economics, 77, 102455.
+
+  - Dell, M. (2015). Trafficking networks and the Mexican drug war. *American Economic Review*, 105(6), 1738-79.
+    - [Diapositivas](/uploads/Dell_diapositivas.pptx)
+    - [Resumen](/uploads/Dell_resumen.pdf)
   
- - Dell, M. (2015). Trafficking networks and the Mexican drug war. *American Economic Review*, 105(6), 1738-79.
-  - [Diapositivas](/uploads/Dell_diapositivas.pptx)
-  - [Resumen](/uploads/Dell_resumen.pdf)
-  
- - 
+  - Del Valle, A., de Janvry, A., & Sadoulet, E. (2020). Rules for recovery: Impact of indexed disaster funds on shock coping in Mexico. *American Economic Journal: Applied Economics*, 12(4), 164-95.
+    - [Diapositivas](/uploads/DelValle_et_al_diapositivas.pdf)
+    - [Resumen](/uploads/DelValle_et_al_resumen.pdf)
