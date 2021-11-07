@@ -37,6 +37,7 @@ Esta tarea tendrá solo tres preguntas. La pregunta 3, sobre diseños con discon
 
 [limpiar_jcf_analisis.r](/tareas/tarea_3/limpiar_jcf_analisis.r)
 
+[headstar.csv](/tareas/tarea_3/headstar.csv)
 
 ## Pregunta 1
 
@@ -76,4 +77,12 @@ a. Suponga que otro de los asesores juzga como *demasiado paternalista* la trans
 
 ## Pregunta 3
 
-PENDIENTE
+Los datos del archivo *headstar.csv* contiene información de 2,810 condados de los Estados Unidos. La variable **mort_age59_related_postHS** indica la mortalidad infantil en cada uno de los condados. El programa Head Star otorgó fondos de su componente de salud a todos los condados con un índice de pobreza superior a 59.1968. La variable **povrate60** es el índice de pobreza para cada condado. Se desea estimar el efecto del programa en la mortalidad infantil empleando un diseño de regresión discontinua.
+
+a. [5 puntos] Genere una gráfica donde muestre evidencia de una discontinuidad en la tasa de mortalidad para aquellos condados que no recibieron fondos del programa.
+
+a. [5 puntos] Estime la versión más básica de un modelo de regresión discontinua. Reporte el coeficiente estimado del efecto del tratamiento y su significancia estadística. Use una ventana de 10 puntos en el índice de pobreza antes y después del corte. Interprete su resultado.
+
+a. [5 puntos] Estime la misma especificación que en la parte b., pero ahora con una ventana de 5 puntos en el índice de pobreza. Interprete sus resultados.
+
+a. [5 puntos] Regrese a una ventana de 10 puntos como en la parte b., pero ahora incluya un polinomio de grado 2 para el índice de pobreza y permita un coeficiente distinto para el índice de pobreza antes y después del corte. Interprete sus resultados.
