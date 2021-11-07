@@ -56,7 +56,7 @@ xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
 
 .title[
-# Clase 19. Diseños con discontinuidades
+# Clase 20. Diseños con discontinuidades
 ]
 .subtitle[
 ## Evaluación de Programas
