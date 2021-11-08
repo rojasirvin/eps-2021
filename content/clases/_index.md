@@ -92,3 +92,6 @@ Clase 22. Aplicaciones de diseños con discontinuidades
   - Del Valle, A., de Janvry, A., & Sadoulet, E. (2020). Rules for recovery: Impact of indexed disaster funds on shock coping in Mexico. *American Economic Journal: Applied Economics*, 12(4), 164-95.
     - [Diapositivas](/uploads/DelValle_et_al_diapositivas.pdf)
     - [Resumen](/uploads/DelValle_et_al_resumen.pdf)
+    
+
+[Clase 23](https://eps-2021.netlify.app/clases/clase_23.html#1). Diseños con discontinuidades en R

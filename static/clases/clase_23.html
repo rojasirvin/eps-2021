@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Regresión discontinua en R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Irvin Rojas" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="libs/cide.css" type="text/css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: title-slide
+
+
+
+&lt;style type="text/css"&gt;
+.huge .remark-code { /*Change made here*/
+  font-size: 200% !important;
+}
+.tiny .remark-code { /*Change made here*/
+  font-size: 60% !important;
+}
+&lt;/style&gt;
+
+.title[
+# Clase 23. Regresión discontinua en R
+]
+.subtitle[
+## Evaluación de Programas
+]
+.author[
+### Irvin Rojas &lt;br&gt; [rojasirvin.com](https://www.rojasirvin.com/) &lt;br&gt; [&lt;i class="fab fa-github"&gt;&lt;/i&gt;](https://github.com/rojasirvin) [&lt;i class="fab fa-twitter"&gt;&lt;/i&gt;](https://twitter.com/RojasIrvin) [&lt;i class="ai ai-google-scholar"&gt;&lt;/i&gt;](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&amp;hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas &lt;br&gt; División de Economía
+]
+
+---
+
+class: inverse, middle, center
+  
+# Implementación de regresión discontinua
+    
+---
+
+# El *efecto seguidor*
+ 
+- En esta aplicación estudiaremos el *efecto seguidor* o *runner-up effect*
+
+- Anagol, S., y Fujiwara, T. (2016). [The runner-up effect](https://www.journals.uchicago.edu/doi/abs/10.1086/686746). *Journal of Political Economy*, 124(4), 927-991).
+
+- En este estudio, se estima el efecto de ser etiquetado como el *seguidor*
+	 
+- Los segundos y tercer lugares pueden acabar muy cerca el uno del otro en una elección pero el segundo lugar recibe la etiqueta de *seguidor*, lo que genera un salto en la probabilidad de volver a contender y ganar
+
+
+- Usamos regresión discontinua cuando el estado de tratamiento depende del valor que tome una variable de selección con respecto a un corte
+	 
+- El corte puede ser una regla explícita o una discontinuidad generada por un experimento natural
+
+---
+
+# El *efecto seguidor*
+ 
+- En esta aplicación la variable de selección es la distancia entre el segundo y tercer lugar en las elecciones municipales en Brasil
+	 
+- Esta variable es positiva para los segundos lugares y negativa para los terceros lugares
+	 
+- Esto define un umbral `\(x_0=0\)`
+	 
+- Los candidatos muy cercanos al umbral tuvieron un desempeño parecido
+	 
+- Si existen discontinuidades, deberían ser aparentes en una gráfica
+
+
+---
+
+# El *efecto seguidor*
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/RDrunnerup_brazil.png" alt="Fuente: Anagol &amp;amp; Fujiwara (2016)" width="55%" /&gt;
+&lt;p class="caption"&gt;Fuente: Anagol &amp; Fujiwara (2016)&lt;/p&gt;
+&lt;/div&gt;
+
+---
+
+# Datos de elecciones en Brasil
+
+.pull-left[
+
+```r
+data.brasil&lt;-read_csv(
+  "./brazil_runner_up.csv",
+  locale = locale(encoding = "latin1"))
+```
+
+- Aquí uso la librería *gtsummary*
+
+```r
+tab1 &lt;- data.brasil %&gt;%
+  select(run, cand_ran_again,cand_winner) %&gt;% 
+  tbl_summary(
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{n} / {N} ({p}%)"),
+    digits = all_continuous() ~ 2,
+    label = run ~ "Diferencia de votos",
+    missing_text = "(Missing)"
+  )
+```
+]
+
+.pull-right[
+<div id="ovifchoiww" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#ovifchoiww .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ovifchoiww .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ovifchoiww .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ovifchoiww .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ovifchoiww .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ovifchoiww .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ovifchoiww .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ovifchoiww .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ovifchoiww .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ovifchoiww .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ovifchoiww .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ovifchoiww .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ovifchoiww .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ovifchoiww .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ovifchoiww .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ovifchoiww .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ovifchoiww .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#ovifchoiww .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ovifchoiww .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#ovifchoiww .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ovifchoiww .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ovifchoiww .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ovifchoiww .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ovifchoiww .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ovifchoiww .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#ovifchoiww .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ovifchoiww .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#ovifchoiww .gt_left {
+  text-align: left;
+}
+
+#ovifchoiww .gt_center {
+  text-align: center;
+}
+
+#ovifchoiww .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ovifchoiww .gt_font_normal {
+  font-weight: normal;
+}
+
+#ovifchoiww .gt_font_bold {
+  font-weight: bold;
+}
+
+#ovifchoiww .gt_font_italic {
+  font-style: italic;
+}
+
+#ovifchoiww .gt_super {
+  font-size: 65%;
+}
+
+#ovifchoiww .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>N = 25,254</strong><sup class="gt_footnote_marks">1</sup></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">Diferencia de votos</td>
+<td class="gt_row gt_center">0.00 (28.23)</td></tr>
+    <tr><td class="gt_row gt_left">cand_ran_again</td>
+<td class="gt_row gt_center">5,525 / 20,608 (27%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">(Missing)</td>
+<td class="gt_row gt_center">4,646</td></tr>
+    <tr><td class="gt_row gt_left">cand_winner</td>
+<td class="gt_row gt_center">2,400 / 20,608 (12%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">(Missing)</td>
+<td class="gt_row gt_center">4,646</td></tr>
+  </tbody>
+  
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td colspan="2">
+        <p class="gt_footnote">
+          <sup class="gt_footnote_marks">
+            <em>1</em>
+          </sup>
+           
+          Mean (SD); n / N (%)
+          <br />
+        </p>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+]
+
+---
+
+# Gráficos de discontinuidades
+
+.pull-left[
+
+```r
+desc1 &lt;- data.brasil %&gt;% 
+  ggplot(aes(x=bin_run,y=bin_cand_ran_again))+
+  geom_point()+
+  geom_vline(xintercept=0, linetype="dashed", color = "red", size=1)
+```
+]
+.pull-right[
+![](figures/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Gráficos de discontinuidades
+
+- Corremos regresiones con un polinomio cuadrado de la edad para cada lado de la discontinuidad
+
+
+```r
+m1 &lt;- lm(cand_ran_again ~ run+I(run^2), data=subset(data.brasil,run&gt;-48 &amp; run&lt;0))
+m2 &lt;- lm(cand_ran_again ~ run+I(run^2), data=subset(data.brasil,run&gt;=0 &amp; run&lt;48))
+```
+
+- Luego calculamos los valores ajustados
+
+```r
+data.brasil &lt;- data.brasil %&gt;% 
+  mutate(cand_ran_again_hat_left=ifelse(run&gt;-48 &amp; run&lt;0,predict(m1,.),NA)) %&gt;% 
+  mutate(cand_ran_again_hat_right=ifelse(run&gt;=0 &amp; run&lt;48,predict(m2,.),NA))
+```
+---
+
+# Gráficos de discontinuidades
+
+.pull-left[
+- Hacemos el gráfico de puntos y le sobreponemos los valores ajustados
+
+
+```r
+g1 &lt;- data.brasil %&gt;% 
+  ggplot(aes(x=bin_run,y=bin_cand_ran_again))+
+  geom_point()+
+  geom_vline(xintercept=0, linetype="dashed", color = "red", size=1)+
+  geom_line(aes(x=run, y=cand_ran_again_hat_left))
+```
+]
+
+.pull-right[
+![](figures/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+]
+
+---
+# Gráficos de discontinuidades
+
+.pull-left[
+
+- El gráfico completo
+
+
+```r
+#Con los dos segmentos
+g2 &lt;- data.brasil %&gt;% 
+  ggplot(aes(x=bin_run,y=bin_cand_ran_again))+
+  geom_point()+
+  geom_vline(xintercept=0, linetype="dashed", color = "red", size=1)+
+  geom_line(aes(x=run, y=cand_ran_again_hat_left))+
+  geom_line(aes(x=run, y=cand_ran_again_hat_right))
+```
+]
+
+.pull-right[
+![](figures/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Gráficos de discontinuidades
+
+.pull-left[
+
+- Un gráfico similar se logra para la probabilidad de ganar
+
+
+```r
+w1 &lt;- lm(bin_cand_winner ~ run+I(run^2), data=subset(data.brasil,run&gt;-48 &amp; run&lt;0))
+w2 &lt;- lm(bin_cand_winner ~ run+I(run^2), data=subset(data.brasil,run&gt;=0 &amp; run&lt;48))
+
+data.brasil &lt;- data.brasil %&gt;% 
+  mutate(cand_win_hat_left=ifelse(run&gt;-48 &amp; run&lt;0,predict(w1,.),NA)) %&gt;% 
+  mutate(cand_win_hat_right=ifelse(run&gt;=0 &amp; run&lt;48,predict(w2,.),NA))
+
+g3 &lt;- data.brasil %&gt;% 
+  ggplot(aes(x=bin_run,y=bin_cand_winner))+
+  geom_point()+
+  geom_vline(xintercept=0, linetype="dashed", color = "red", size=1)+
+  geom_line(aes(x=run, y=cand_win_hat_left))+
+  geom_line(aes(x=run, y=cand_win_hat_right))
+```
+]
+
+.pull-right[
+![](figures/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Gráficos de discontinuidades
+
+.pull-left[
+- Personalizamos para generar un gráfico parecido al del artículo
+
+
+```r
+g4 &lt;- data.brasil %&gt;%
+  filter(bin_cand_ran_again&lt;.55 , bin_cand_winner &lt;.55) %&gt;% 
+      ggplot()+
+      geom_point(aes(x=bin_run,y=bin_cand_ran_again),shape=17,fill="black")+
+      geom_point(aes(x=bin_run,y=bin_cand_winner))+
+  geom_line(aes(x=run, y=cand_win_hat_left))+
+  geom_line(aes(x=run, y=cand_win_hat_right))+
+  geom_line(aes(x=run, y=cand_ran_again_hat_left))+
+  geom_line(aes(x=run, y=cand_ran_again_hat_right))+
+  geom_vline(xintercept=0, color = "black", size=1)+
+  xlab("Vote Share Difference Between 2nd and 3rd; t (%)")+
+  ylab("")+
+  scale_x_continuous(breaks = c(-50,0,50))+
+  scale_y_continuous(breaks=seq(0, 0.5, 0.05))
+```
+]
+
+.pull-right[
+![](figures/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+]
+---
+
+# Análisis paramétrico
+
+- La forma de estimar el efecto del tratamiento paramétricamente es:
+	 
+`$$y_{ict}=\beta \mathcal{I}(x_{ict}&gt;0)+f(x_{ict})+\varepsilon_{ict}$$`
+
+- Arrelgamos los datos
+
+
+```r
+#Multiplicamos variables por 100
+perc.vars &lt;- c( "cand_ran_again", "cand_winner", "cand_ran_lag", "cand_winner_lag",
+                "cand_maj_party", "party_winner", "party_ran_again")
+
+data.brasil[perc.vars] &lt;- lapply(
+  data.brasil[perc.vars],
+  function(x) x*100
+)
+```
+
+- El *corte* en este caso es el 0
+
+
+```r
+data.brasil &lt;- data.brasil %&gt;% 
+  mutate(D=ifelse(run&gt;0,1,0))
+```
+---
+
+# Análisis paramétrico
+
+.pull-left[
+- Aquí uso la librería *lfe*
+
+- La sintaxis de la fórmula es
+
+
+```r
+y ~ x1 x2 | Efectos fijos | Instrumentos | cluster
+```
+
+- En nuestro caso
+
+
+```r
+rd1 &lt;- felm(cand_winner ~ D  + run |0 | 0 | id_munic, data=data.brasil)
+```
+]
+
+.tiny[
+.pull-right[
+
+```
+## 
+## Call:
+##    felm(formula = cand_winner ~ D + run | 0 | 0 | id_munic, data = data.brasil) 
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -24.570 -18.516  -6.227  -1.137  99.909 
+## 
+## Coefficients:
+##             Estimate Cluster s.e. t value Pr(&gt;|t|)    
+## (Intercept)  7.92092      0.48313  16.395  &lt; 2e-16 ***
+## D            7.45009      0.93695   7.951 1.94e-15 ***
+## run          0.18546      0.01596  11.619  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 30.9 on 20605 degrees of freedom
+##   (4646 observations deleted due to missingness)
+## Multiple R-squared(full model): 0.07226   Adjusted R-squared: 0.07217 
+## Multiple R-squared(proj model): 0.07226   Adjusted R-squared: 0.07217 
+## F-statistic(full model, *iid*):802.4 on 2 and 20605 DF, p-value: &lt; 2.2e-16 
+## F-statistic(proj model): 792.7 on 2 and 4470 DF, p-value: &lt; 2.2e-16
+```
+]
+]
+---
+# Análisis paramétrico
+
+.pull-left[
+- Podemos especificar el cuadrado de **run**
+
+
+```r
+rd2 &lt;- felm(cand_winner ~ D + run+I(run^2) |0 | 0 | id_munic, data=data.brasil)
+```
+
+- O alguna otra función de **run**
+
+```r
+#Especificando un coeficiente para run antes y despues
+rd3 &lt;- felm(cand_winner ~ D  + run + run*D |0 | 0 | id_munic, data=data.brasil)
+
+#O una combinación de no linealidades y cambios de pendiente
+rd4 &lt;- felm(cand_winner ~ D  + run + I(run^2) + run*D + I(run^2)*D |0 | 0 | id_munic, data=data.brasil)
+```
+]
+
+.tiny[
+.pull-right[
+
+```
+## 
+## Call:
+##    felm(formula = cand_winner ~ D + run + I(run^2) | 0 | 0 | id_munic,      data = data.brasil) 
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -24.731 -18.468  -6.159  -1.190  99.814 
+## 
+## Coefficients:
+##              Estimate Cluster s.e. t value Pr(&gt;|t|)    
+## (Intercept) 7.845e+00    4.415e-01  17.769  &lt; 2e-16 ***
+## D           7.450e+00    9.370e-01   7.951 1.94e-15 ***
+## run         1.855e-01    1.596e-02  11.619  &lt; 2e-16 ***
+## I(run^2)    9.613e-05    3.043e-04   0.316    0.752    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 30.9 on 20604 degrees of freedom
+##   (4646 observations deleted due to missingness)
+## Multiple R-squared(full model): 0.07226   Adjusted R-squared: 0.07213 
+## Multiple R-squared(proj model): 0.07226   Adjusted R-squared: 0.07213 
+## F-statistic(full model, *iid*):  535 on 3 and 20604 DF, p-value: &lt; 2.2e-16 
+## F-statistic(proj model): 747.2 on 3 and 4470 DF, p-value: &lt; 2.2e-16
+```
+]
+]
+---
+
+# Análisis paramétrico
+
+.pull-left[
+- Para un resumen de los resultados puedo usar *stargazer*
+
+
+```r
+tab1 &lt;- stargazer(rd1, rd2, rd3, rd4,
+          title="Comparación de especificaciones de RD", type="text", 
+          df=FALSE, digits=2)
+```
+]
+
+.pull-right[
+.tiny[
+
+```
+##  [1] ""                                                     
+##  [2] "Comparación de especificaciones de RD"                
+##  [3] "====================================================="
+##  [4] "                           Dependent variable:       "
+##  [5] "                    ---------------------------------"
+##  [6] "                               cand_winner           "
+##  [7] "                      (1)     (2)      (3)     (4)   "
+##  [8] "-----------------------------------------------------"
+##  [9] "D                   7.45*** 7.45***  7.45*** 10.46***"
+## [10] "                    (0.94)   (0.94)  (0.94)   (1.40) "
+## [11] "                                                     "
+## [12] "run                 0.19*** 0.19***  0.21*** 0.41*** "
+## [13] "                    (0.02)   (0.02)  (0.01)   (0.06) "
+## [14] "                                                     "
+## [15] "I(run2)                      0.0001          0.004***"
+## [16] "                            (0.0003)         (0.001) "
+## [17] "                                                     "
+## [18] "D:run                                 -0.04  -0.85***"
+## [19] "                                     (0.03)   (0.12) "
+## [20] "                                                     "
+## [21] "D:I(run2)                                    0.01*** "
+## [22] "                                             (0.003) "
+## [23] "                                                     "
+## [24] "Constant            7.92*** 7.84***  8.42*** 9.93*** "
+## [25] "                    (0.48)   (0.44)  (0.48)   (0.74) "
+## [26] "                                                     "
+## [27] "-----------------------------------------------------"
+## [28] "Observations        20,608   20,608  20,608   20,608 "
+## [29] "R2                   0.07     0.07    0.07     0.08  "
+## [30] "Adjusted R2          0.07     0.07    0.07     0.07  "
+## [31] "Residual Std. Error  30.90   30.90    30.90   30.86  "
+## [32] "====================================================="
+## [33] "Note:                     *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01"
+```
+]
+]
+---
+
+# Resultados
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/RDrunnerup_brazil_regression.png" alt="Fuente: Anagol &amp;amp; Fujiwara (2016)" width="100%" /&gt;
+&lt;p class="caption"&gt;Fuente: Anagol &amp; Fujiwara (2016)&lt;/p&gt;
+&lt;/div&gt;
+
+
+- Vemos las consecuencias de elegir un ancho de ventana más pequeño
+
+  - El resultado con un ancho de ventana con la muestra completa es de un efecto de 10.46 (error estándar de 1.40)
+  
+  - Con un ancho de ventana de alrededor de 6 puntos porcentuales entre el primer y segundo lugar el error es de 2.54
+
+
+---
+
+# *rdrobust*
+
+.pull-left[
+- Hay toda una literatura para analizar el *trade-off* entre sesgo y varianza en la elección del ancho de ventana
+
+- [Calonic, Cattaneo &amp; Titiunik, (2015)](https://rdpackages.github.io/references/Calonico-Cattaneo-Titiunik_2015_R.pdf) proponen distintas formas de implementar algoritmos para estimar la discontinudad de la regresión con procedimientos totalmente dependiente de los datos (*data driven*), *rdrobust*
+
+- Una de las funciones más útiles de *rdrobust* es crear el gráfico de la discontinuidad, usando un polinomio de orden 4 por defecto
+]
+
+.pull-right[
+
+```r
+rdres &lt;- rdplot(y = data.brasil$cand_winner, x = data.brasil$run, title = "Efecto seguidor",
+        y.label = "Probabilidad de ganar en t+1",
+        x.label = "Distancia con respecto al 3er lugar en t")
+```
+
+
+]
+
+
+---
+
+# *rdrobust*
+
+.pull-left[
+
+- Nos da detalles de cómo realiza la estimación y la selección del número de *bins*
+.tiny[
+
+```r
+summary(rdres)
+```
+]
+]
+
+
+.pull-right[
+
+- Pueden personalizar su gráfico para hacerlo mucho mejor que la versión por defecto
+
+![](figures/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# *rdrobust*
+
+- Otra función es *rdselect*, que permite la estimación del ancho de banda óptimo
+
+- Hay un *trade-off* entre sesgo y varianza en la selee
+
+- Entre más grande sea la ventana, tenemos más observaciones y nuestros estimadores serán más precisos
+
+- Pero al mismo tiempo, entre más grande sea la ventana, más grande será el sesgo en la estimación de la pendiente de la línea de regresión al incluir observaciones cada vez más disimiles
+
+- Esta teoría esta formalizada en [Imbens y Kalyanaraman (2012)](https://watermark.silverchair.com/rdr043.pdf?token=AQECAHi208BE49Ooan9kkhW_Ercy7Dm3ZL_9Cf3qfKAc485ysgAAAvwwggL4BgkqhkiG9w0BBwagggLpMIIC5QIBADCCAt4GCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMNLn6ofuEpZYIbPhSAgEQgIICr_9ZaTO9ZtUyeddqejFel2IauNOEoeJKXH5QDHk3IgFt03mG523iBXeq4wIS5CBcK1W7AjY4H3-kJb6r2H09xeES5zsTEXnhxrKoyFmOnWDjj679CIRFcQkZIzasP83tUkwZM0LVPjiVeJAC-HZiR3D1h75wwgwK1od1oycJIc2wZRxcgr4QeUhWtpe6JO34YqiDPOYN7sMSqfVdwXJS53-EXnr0qCQM9PFY5T8cxeDDGhEXhG0DVs3lTwzHDZEbbX8-7EkLeBMaic7aqNaQgiQuc9DaLM1m23p9cpW0JeaiLLvdKm13hHLP3csRaf_TVKFCGGADjweQYGu49CTdNhnDbFyh0W0eVDirPndKSM-2REG7Y-6AZCeCbYl3TmfBLpIXDjN3pPAzLJmbWbik6vrvv9n6if_1eT2CjD3wMRxY01jFHYRZaXlttxTOWS3uBkNo0hNtHZLdvgw6tXH6yA38TPXfG4RIA3JfKtDOGL-9Ph7P02tSvjF2YSjGmoBo9IRjyhgL_7Ur_saa4_z2NWx-FCOmDVGSL2cxG1Nkam58oF7R0aochpxm1VUp1LYizL3UzuhpG_KpRJ1zSQGGXyCpV5gc8HZQ8p-nhnY5wtUSZ5qgILv6sDsccldEJ90LbmSz5fdlPo7X45pYT60oid5aDJql3noGb_UW2KwAXgVxqMSfCTvCAj4TgQna3LtcWWbye0whzQzC1C7Ctu0NuEMt9_0rD-YXnJj69HV-lz7dPKgIEur0IhW_Nq9hPg_EfiWnm8HbUIAiH0OujoTGB2mR-wYYOp_GwXLoCc0ABqX36IdUQIDdgw8rSE0hIAhtD2nMKnwdDzGGKATehLPFR-3tlTWnWGrHiPJVfsFHIiSS5jkRqH349-9nIiRdRDSYiqibOiXHsSP5TUTpi8iAig)
+
+
+---
+
+# *rdrobust*
+
+- En la *antiguedad*, es decir, cuando revisé y repliqué por primera vez este artículo, la función *rdbwselect* en Stata permitía recuperar el ancho de banda óptimo aquí reportado (12.57)
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/RDrunnerup_brazil_regression.png" alt="Fuente: Anagol &amp;amp; Fujiwara (2016)" width="100%" /&gt;
+&lt;p class="caption"&gt;Fuente: Anagol &amp; Fujiwara (2016)&lt;/p&gt;
+&lt;/div&gt;
+---
+
+# *rdrobust*
+
+.pull-left[
+- Usando *rdbwselect* se pueden calcular distintos anchos de ventana
+
+- Después de las varias actualizaciones al paquete, ya no he podido obtener exactamente el mismo resultado
+]
+
+.pull-right[
+.tiny[
+
+```
+## Call: rdbwselect
+## 
+## Number of Obs.                20608
+## BW type                         All
+## Kernel                      Uniform
+## VCE method                       NN
+## 
+## Number of Obs.                10304        10304
+## Order est. (p)                    1            1
+## Order bias  (q)                   2            2
+## Unique Obs.                   10292        10292
+## 
+## =======================================================
+##                   BW est. (h)    BW bias (b)
+##             Left of c Right of c  Left of c Right of c
+## =======================================================
+##      mserd    11.398     11.398     19.626     19.626
+##     msetwo    17.883     10.568     31.155     18.697
+##     msesum    13.231     13.231     22.733     22.733
+##   msecomb1    11.398     11.398     19.626     19.626
+##   msecomb2    13.231     11.398     22.733     19.626
+##      cerrd     7.232      7.232     19.626     19.626
+##     certwo    11.347      6.705     31.155     18.697
+##     cersum     8.395      8.395     22.733     22.733
+##   cercomb1     7.232      7.232     19.626     19.626
+##   cercomb2     8.395      7.232     22.733     19.626
+## =======================================================
+```
+]
+]
+---
+
+# *rdrobust*
+
+.pull-left[
+- Noten que si especificamos el ancho de ventana de 12.57, obtenemos el resultado preferido por los autores en el artículo
+
+
+```r
+rd5 &lt;- felm(cand_winner ~ D  + run |0 | 0 | id_munic, data=subset(data.brasil,bw&lt;12.57))
+rd6 &lt;- felm(cand_winner ~ D  + run |0 | 0 | id_munic, data=subset(data.brasil,bw&lt;12.57/2))
+rd7 &lt;- felm(cand_winner ~ D  + run |0 | 0 | id_munic, data=subset(data.brasil,bw&lt;12.57*2))
+
+tab2 &lt;- stargazer(rd5, rd6, rd7,
+          title="Comparación de especificaciones de RD (2)", type="text", 
+          df=FALSE, digits=2)
+```
+]
+
+
+.pull-right[
+.tiny[
+
+```
+##  [1] ""                                                 
+##  [2] "Comparación de especificaciones de RD (2)"        
+##  [3] "================================================="
+##  [4] "                         Dependent variable:     "
+##  [5] "                    -----------------------------"
+##  [6] "                             cand_winner         "
+##  [7] "                       (1)       (2)       (3)   "
+##  [8] "-------------------------------------------------"
+##  [9] "D                    8.31***   7.01***   8.84*** "
+## [10] "                     (1.81)    (2.54)    (1.29)  "
+## [11] "                                                 "
+## [12] "run                   0.18      0.36     0.14*** "
+## [13] "                     (0.13)    (0.35)    (0.04)  "
+## [14] "                                                 "
+## [15] "Constant             8.86***   9.89***   7.67*** "
+## [16] "                     (0.94)    (1.34)    (0.67)  "
+## [17] "                                                 "
+## [18] "-------------------------------------------------"
+## [19] "Observations          5,946     3,136    10,482  "
+## [20] "R2                    0.02      0.02      0.04   "
+## [21] "Adjusted R2           0.02      0.02      0.04   "
+## [22] "Residual Std. Error   33.24     33.76     32.01  "
+## [23] "================================================="
+## [24] "Note:                 *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01"
+```
+]
+]
+
+
+---
+
+# Próxima sesión
+
+- Empezaremos a estudiar control sintético
+
+- Usaremos un par de clásicos para introducir el concepto (de hecho replicarán el primero en la tarea 3) y dar la formulación básica del modelo
+
+  - Abadie, A., Diamond, A., &amp; Hainmueller, J. (2010). Synthetic control methods for comparative case studies: Estimating the effect of California’s tobacco control program. *Journal of the American statistical Association*, 105(490), 493-505.
+  
+  - Abadie, A., Diamond, A., &amp; Hainmueller, J. (2015). Comparative politics and the synthetic control method. *American Journal of Political Science*, 59(2), 495-510.  
+
+- El resumen de lo que deben saber está en
+
+  - Abadie, A. (2019). Using synthetic controls: Feasibility, data requirements, and methodological aspects. *Journal of Economic Literature*.  
+
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script src="libs/cols_macro.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

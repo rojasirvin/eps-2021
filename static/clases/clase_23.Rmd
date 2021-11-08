@@ -1,0 +1,574 @@
+---
+title: "Regresión discontinua en R"
+author: "Irvin Rojas"
+institute: "CIDE"
+date: "9 de noviembre de 2021"
+header-includes:
+  - \usepackage{tikz}
+  - \usepackage{mathbbm}
+  - \usetikzlibrary{shapes, shadows,arrows}
+output:
+  xaringan::moon_reader:
+    css: [default, "libs/cide.css", metropolis-fonts, "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css", "https://use.fontawesome.com/releases/v5.7.2/css/all.css", "https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css"]
+    seal: false
+    chakra: "https://remarkjs.com/downloads/remark-latest.min.js"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      titleSlideClass: ["middle", "center"]
+      ratio: "16:9"
+      beforeInit: ["https://platform.twitter.com/widgets.js", "libs/cols_macro.js"]
+      navigation:
+        scroll: false
+
+
+---
+class: title-slide
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.path = "figures/")
+
+library(tidyverse)
+library(pacman)
+library(janitor)
+library(sandwich)
+#library(nnet)
+#library(mlogit)
+library(readr)
+library(clubSandwich)
+library(modelsummary)
+library(estimatr)
+library(lubridate)
+library(ExPanDaR) #for describing panel data
+library(lfe)
+library(modelsummary)
+library(estimatr)
+#library(Matching)
+#library(MatchIt)
+#library(Zelig)
+library(gtsummary)
+library(stargazer)
+library(rdrobust)
+
+xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
+```
+
+```{css, echo = FALSE}
+.huge .remark-code { /*Change made here*/
+  font-size: 200% !important;
+}
+.tiny .remark-code { /*Change made here*/
+  font-size: 60% !important;
+}
+```
+
+.title[
+# Clase 23. Regresión discontinua en R
+]
+.subtitle[
+## Evaluación de Programas
+]
+.author[
+### Irvin Rojas <br> [rojasirvin.com](https://www.rojasirvin.com/) <br> [<i class="fab fa-github"></i>](https://github.com/rojasirvin) [<i class="fab fa-twitter"></i>](https://twitter.com/RojasIrvin) [<i class="ai ai-google-scholar"></i>](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas <br> División de Economía
+]
+
+---
+
+class: inverse, middle, center
+  
+# Implementación de regresión discontinua
+    
+---
+
+# El *efecto seguidor*
+ 
+- En esta aplicación estudiaremos el *efecto seguidor* o *runner-up effect*
+
+- Anagol, S., y Fujiwara, T. (2016). [The runner-up effect](https://www.journals.uchicago.edu/doi/abs/10.1086/686746). *Journal of Political Economy*, 124(4), 927-991).
+
+- En este estudio, se estima el efecto de ser etiquetado como el *seguidor*
+	 
+- Los segundos y tercer lugares pueden acabar muy cerca el uno del otro en una elección pero el segundo lugar recibe la etiqueta de *seguidor*, lo que genera un salto en la probabilidad de volver a contender y ganar
+
+
+- Usamos regresión discontinua cuando el estado de tratamiento depende del valor que tome una variable de selección con respecto a un corte
+	 
+- El corte puede ser una regla explícita o una discontinuidad generada por un experimento natural
+
+---
+
+# El *efecto seguidor*
+ 
+- En esta aplicación la variable de selección es la distancia entre el segundo y tercer lugar en las elecciones municipales en Brasil
+	 
+- Esta variable es positiva para los segundos lugares y negativa para los terceros lugares
+	 
+- Esto define un umbral $x_0=0$
+	 
+- Los candidatos muy cercanos al umbral tuvieron un desempeño parecido
+	 
+- Si existen discontinuidades, deberían ser aparentes en una gráfica
+
+
+---
+
+# El *efecto seguidor*
+
+```{r, out.width="55%",fig.cap='Fuente: Anagol & Fujiwara (2016)',fig.align='center'}
+knitr::include_graphics("figures/RDrunnerup_brazil.png")
+```
+
+---
+
+# Datos de elecciones en Brasil
+
+.pull-left[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+data.brasil<-read_csv(
+  "./brazil_runner_up.csv",
+  locale = locale(encoding = "latin1"))
+```
+
+- Aquí uso la librería *gtsummary*
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+tab1 <- data.brasil %>%
+  select(run, cand_ran_again,cand_winner) %>% 
+  tbl_summary(
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{n} / {N} ({p}%)"),
+    digits = all_continuous() ~ 2,
+    label = run ~ "Diferencia de votos",
+    missing_text = "(Missing)"
+  )
+```
+]
+
+.pull-right[
+```{r echo=F, include=T, eval=T, message=F, warning=F}
+tab1
+```
+]
+
+---
+
+# Gráficos de discontinuidades
+
+.pull-left[
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+desc1 <- data.brasil %>% 
+  ggplot(aes(x=bin_run,y=bin_cand_ran_again))+
+  geom_point()+
+  geom_vline(xintercept=0, linetype="dashed", color = "red", size=1)
+```
+]
+.pull-right[
+```{r echo=F, include=T, eval=T, message=F, warning=F}
+desc1
+```
+]
+
+---
+
+# Gráficos de discontinuidades
+
+- Corremos regresiones con un polinomio cuadrado de la edad para cada lado de la discontinuidad
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+m1 <- lm(cand_ran_again ~ run+I(run^2), data=subset(data.brasil,run>-48 & run<0))
+m2 <- lm(cand_ran_again ~ run+I(run^2), data=subset(data.brasil,run>=0 & run<48))
+
+```
+
+- Luego calculamos los valores ajustados
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+data.brasil <- data.brasil %>% 
+  mutate(cand_ran_again_hat_left=ifelse(run>-48 & run<0,predict(m1,.),NA)) %>% 
+  mutate(cand_ran_again_hat_right=ifelse(run>=0 & run<48,predict(m2,.),NA))
+```
+---
+
+# Gráficos de discontinuidades
+
+.pull-left[
+- Hacemos el gráfico de puntos y le sobreponemos los valores ajustados
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+g1 <- data.brasil %>% 
+  ggplot(aes(x=bin_run,y=bin_cand_ran_again))+
+  geom_point()+
+  geom_vline(xintercept=0, linetype="dashed", color = "red", size=1)+
+  geom_line(aes(x=run, y=cand_ran_again_hat_left))
+```
+]
+
+.pull-right[
+```{r echo=F, include=T, eval=T, message=F, warning=F}
+g1
+```
+]
+
+---
+# Gráficos de discontinuidades
+
+.pull-left[
+
+- El gráfico completo
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+#Con los dos segmentos
+g2 <- data.brasil %>% 
+  ggplot(aes(x=bin_run,y=bin_cand_ran_again))+
+  geom_point()+
+  geom_vline(xintercept=0, linetype="dashed", color = "red", size=1)+
+  geom_line(aes(x=run, y=cand_ran_again_hat_left))+
+  geom_line(aes(x=run, y=cand_ran_again_hat_right))
+
+
+```
+]
+
+.pull-right[
+```{r echo=F, include=T, eval=T, message=F, warning=F}
+g2
+```
+]
+
+---
+
+# Gráficos de discontinuidades
+
+.pull-left[
+
+- Un gráfico similar se logra para la probabilidad de ganar
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+w1 <- lm(bin_cand_winner ~ run+I(run^2), data=subset(data.brasil,run>-48 & run<0))
+w2 <- lm(bin_cand_winner ~ run+I(run^2), data=subset(data.brasil,run>=0 & run<48))
+
+data.brasil <- data.brasil %>% 
+  mutate(cand_win_hat_left=ifelse(run>-48 & run<0,predict(w1,.),NA)) %>% 
+  mutate(cand_win_hat_right=ifelse(run>=0 & run<48,predict(w2,.),NA))
+
+g3 <- data.brasil %>% 
+  ggplot(aes(x=bin_run,y=bin_cand_winner))+
+  geom_point()+
+  geom_vline(xintercept=0, linetype="dashed", color = "red", size=1)+
+  geom_line(aes(x=run, y=cand_win_hat_left))+
+  geom_line(aes(x=run, y=cand_win_hat_right))
+```
+]
+
+.pull-right[
+```{r echo=F, include=T, eval=T, message=F, warning=F}
+g3
+```
+]
+
+---
+
+# Gráficos de discontinuidades
+
+.pull-left[
+- Personalizamos para generar un gráfico parecido al del artículo
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+g4 <- data.brasil %>%
+  filter(bin_cand_ran_again<.55 , bin_cand_winner <.55) %>% 
+      ggplot()+
+      geom_point(aes(x=bin_run,y=bin_cand_ran_again),shape=17,fill="black")+
+      geom_point(aes(x=bin_run,y=bin_cand_winner))+
+  geom_line(aes(x=run, y=cand_win_hat_left))+
+  geom_line(aes(x=run, y=cand_win_hat_right))+
+  geom_line(aes(x=run, y=cand_ran_again_hat_left))+
+  geom_line(aes(x=run, y=cand_ran_again_hat_right))+
+  geom_vline(xintercept=0, color = "black", size=1)+
+  xlab("Vote Share Difference Between 2nd and 3rd; t (%)")+
+  ylab("")+
+  scale_x_continuous(breaks = c(-50,0,50))+
+  scale_y_continuous(breaks=seq(0, 0.5, 0.05))
+
+```
+]
+
+.pull-right[
+```{r echo=F, include=T, eval=T, message=F, warning=F}
+g4
+```
+]
+---
+
+# Análisis paramétrico
+
+- La forma de estimar el efecto del tratamiento paramétricamente es:
+	 
+$$y_{ict}=\beta \mathcal{I}(x_{ict}>0)+f(x_{ict})+\varepsilon_{ict}$$
+
+- Arrelgamos los datos
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+#Multiplicamos variables por 100
+perc.vars <- c( "cand_ran_again", "cand_winner", "cand_ran_lag", "cand_winner_lag",
+                "cand_maj_party", "party_winner", "party_ran_again")
+
+data.brasil[perc.vars] <- lapply(
+  data.brasil[perc.vars],
+  function(x) x*100
+)
+```
+
+- El *corte* en este caso es el 0
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+data.brasil <- data.brasil %>% 
+  mutate(D=ifelse(run>0,1,0))
+```
+---
+
+# Análisis paramétrico
+
+.pull-left[
+- Aquí uso la librería *lfe*
+
+- La sintaxis de la fórmula es
+
+```{r echo=T, include=T, eval=F, message=F, warning=F}
+y ~ x1 x2 | Efectos fijos | Instrumentos | cluster
+```
+
+- En nuestro caso
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+rd1 <- felm(cand_winner ~ D  + run |0 | 0 | id_munic, data=data.brasil)
+```
+]
+
+.tiny[
+.pull-right[
+```{r echo=F, include=T, eval=T, message=F, warning=F}
+summary(rd1)
+```
+]
+]
+---
+# Análisis paramétrico
+
+.pull-left[
+- Podemos especificar el cuadrado de **run**
+
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+rd2 <- felm(cand_winner ~ D + run+I(run^2) |0 | 0 | id_munic, data=data.brasil)
+```
+
+- O alguna otra función de **run**
+```{r echo=T, include=T, eval=T, message=F, warning=F}
+#Especificando un coeficiente para run antes y despues
+rd3 <- felm(cand_winner ~ D  + run + run*D |0 | 0 | id_munic, data=data.brasil)
+
+#O una combinación de no linealidades y cambios de pendiente
+rd4 <- felm(cand_winner ~ D  + run + I(run^2) + run*D + I(run^2)*D |0 | 0 | id_munic, data=data.brasil)
+```
+]
+
+.tiny[
+.pull-right[
+```{r echo=F, include=T, eval=T, message=F, warning=F}
+summary(rd2)
+```
+]
+]
+---
+
+# Análisis paramétrico
+
+.pull-left[
+- Para un resumen de los resultados puedo usar *stargazer*
+
+```{r echo=T, include=T, results=F, eval=T, message=F, warning=F}
+tab1 <- stargazer(rd1, rd2, rd3, rd4,
+          title="Comparación de especificaciones de RD", type="text", 
+          df=FALSE, digits=2)
+```
+]
+
+.pull-right[
+.tiny[
+```{r echo=F, include=T, eval=T, message=F, warning=F}
+tab1
+```
+]
+]
+---
+
+# Resultados
+
+```{r, out.width="100%",fig.cap='Fuente: Anagol & Fujiwara (2016)',fig.align='center'}
+knitr::include_graphics("figures/RDrunnerup_brazil_regression.png")
+```
+
+
+- Vemos las consecuencias de elegir un ancho de ventana más pequeño
+
+  - El resultado con un ancho de ventana con la muestra completa es de un efecto de 10.46 (error estándar de 1.40)
+  
+  - Con un ancho de ventana de alrededor de 6 puntos porcentuales entre el primer y segundo lugar el error es de 2.54
+
+
+---
+
+# *rdrobust*
+
+.pull-left[
+- Hay toda una literatura para analizar el *trade-off* entre sesgo y varianza en la elección del ancho de ventana
+
+- [Calonic, Cattaneo & Titiunik, (2015)](https://rdpackages.github.io/references/Calonico-Cattaneo-Titiunik_2015_R.pdf) proponen distintas formas de implementar algoritmos para estimar la discontinudad de la regresión con procedimientos totalmente dependiente de los datos (*data driven*), *rdrobust*
+
+- Una de las funciones más útiles de *rdrobust* es crear el gráfico de la discontinuidad, usando un polinomio de orden 4 por defecto
+]
+
+.pull-right[
+```{r echo=T, include=T, results=F, eval=F, message=F, warning=F}
+rdres <- rdplot(y = data.brasil$cand_winner, x = data.brasil$run, title = "Efecto seguidor",
+        y.label = "Probabilidad de ganar en t+1",
+        x.label = "Distancia con respecto al 3er lugar en t")
+```
+
+```{r echo=F, include=F, results=F, eval=T, message=F, warning=F}
+rdres <- rdplot(y = data.brasil$cand_winner, x = data.brasil$run, title = "Efecto seguidor",
+        y.label = "Probabilidad de ganar en t+1",
+        x.label = "Distancia con respecto al 3er lugar en t")
+```
+]
+
+
+---
+
+# *rdrobust*
+
+.pull-left[
+
+- Nos da detalles de cómo realiza la estimación y la selección del número de *bins*
+.tiny[
+```{r echo=T, include=T, results=F, eval=F, message=F, warning=F}
+summary(rdres)
+```
+]
+]
+
+
+.pull-right[
+
+- Pueden personalizar su gráfico para hacerlo mucho mejor que la versión por defecto
+
+```{r echo=F, include=T, results=T, eval=T, message=F, warning=F, fig.height=4}
+rdres$rdplot
+```
+]
+
+---
+
+# *rdrobust*
+
+- Otra función es *rdselect*, que permite la estimación del ancho de banda óptimo
+
+- Hay un *trade-off* entre sesgo y varianza en la selee
+
+- Entre más grande sea la ventana, tenemos más observaciones y nuestros estimadores serán más precisos
+
+- Pero al mismo tiempo, entre más grande sea la ventana, más grande será el sesgo en la estimación de la pendiente de la línea de regresión al incluir observaciones cada vez más disimiles
+
+- Esta teoría esta formalizada en [Imbens y Kalyanaraman (2012)](https://watermark.silverchair.com/rdr043.pdf?token=AQECAHi208BE49Ooan9kkhW_Ercy7Dm3ZL_9Cf3qfKAc485ysgAAAvwwggL4BgkqhkiG9w0BBwagggLpMIIC5QIBADCCAt4GCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMNLn6ofuEpZYIbPhSAgEQgIICr_9ZaTO9ZtUyeddqejFel2IauNOEoeJKXH5QDHk3IgFt03mG523iBXeq4wIS5CBcK1W7AjY4H3-kJb6r2H09xeES5zsTEXnhxrKoyFmOnWDjj679CIRFcQkZIzasP83tUkwZM0LVPjiVeJAC-HZiR3D1h75wwgwK1od1oycJIc2wZRxcgr4QeUhWtpe6JO34YqiDPOYN7sMSqfVdwXJS53-EXnr0qCQM9PFY5T8cxeDDGhEXhG0DVs3lTwzHDZEbbX8-7EkLeBMaic7aqNaQgiQuc9DaLM1m23p9cpW0JeaiLLvdKm13hHLP3csRaf_TVKFCGGADjweQYGu49CTdNhnDbFyh0W0eVDirPndKSM-2REG7Y-6AZCeCbYl3TmfBLpIXDjN3pPAzLJmbWbik6vrvv9n6if_1eT2CjD3wMRxY01jFHYRZaXlttxTOWS3uBkNo0hNtHZLdvgw6tXH6yA38TPXfG4RIA3JfKtDOGL-9Ph7P02tSvjF2YSjGmoBo9IRjyhgL_7Ur_saa4_z2NWx-FCOmDVGSL2cxG1Nkam58oF7R0aochpxm1VUp1LYizL3UzuhpG_KpRJ1zSQGGXyCpV5gc8HZQ8p-nhnY5wtUSZ5qgILv6sDsccldEJ90LbmSz5fdlPo7X45pYT60oid5aDJql3noGb_UW2KwAXgVxqMSfCTvCAj4TgQna3LtcWWbye0whzQzC1C7Ctu0NuEMt9_0rD-YXnJj69HV-lz7dPKgIEur0IhW_Nq9hPg_EfiWnm8HbUIAiH0OujoTGB2mR-wYYOp_GwXLoCc0ABqX36IdUQIDdgw8rSE0hIAhtD2nMKnwdDzGGKATehLPFR-3tlTWnWGrHiPJVfsFHIiSS5jkRqH349-9nIiRdRDSYiqibOiXHsSP5TUTpi8iAig)
+
+
+---
+
+# *rdrobust*
+
+- En la *antiguedad*, es decir, cuando revisé y repliqué por primera vez este artículo, la función *rdbwselect* en Stata permitía recuperar el ancho de banda óptimo aquí reportado (12.57)
+
+```{r, out.width="100%",fig.cap='Fuente: Anagol & Fujiwara (2016)',fig.align='center'}
+knitr::include_graphics("figures/RDrunnerup_brazil_regression.png")
+```
+---
+
+# *rdrobust*
+
+.pull-left[
+- Usando *rdbwselect* se pueden calcular distintos anchos de ventana
+
+- Después de las varias actualizaciones al paquete, ya no he podido obtener exactamente el mismo resultado
+]
+
+.pull-right[
+.tiny[
+```{r, out.width="100%",fig.cap='Fuente: Anagol & Fujiwara (2016)',fig.align='center'}
+
+summary(rdbwselect(y = data.brasil$cand_winner,
+                   x = data.brasil$run,
+                   kernel = 'uniform',
+                   cluster=data.brasil$id_munic, all=T))
+```
+]
+]
+---
+
+# *rdrobust*
+
+.pull-left[
+- Noten que si especificamos el ancho de ventana de 12.57, obtenemos el resultado preferido por los autores en el artículo
+
+```{r echo=T, include=T, eval=T, results=F, message=F, warning=F}
+rd5 <- felm(cand_winner ~ D  + run |0 | 0 | id_munic, data=subset(data.brasil,bw<12.57))
+rd6 <- felm(cand_winner ~ D  + run |0 | 0 | id_munic, data=subset(data.brasil,bw<12.57/2))
+rd7 <- felm(cand_winner ~ D  + run |0 | 0 | id_munic, data=subset(data.brasil,bw<12.57*2))
+
+tab2 <- stargazer(rd5, rd6, rd7,
+          title="Comparación de especificaciones de RD (2)", type="text", 
+          df=FALSE, digits=2)
+```
+]
+
+
+.pull-right[
+.tiny[
+```{r echo=F, include=T, eval=T, message=F, warning=F}
+tab2
+```
+]
+]
+
+
+---
+
+# Próxima sesión
+
+- Empezaremos a estudiar control sintético
+
+- Usaremos un par de clásicos para introducir el concepto (de hecho replicarán el primero en la tarea 3) y dar la formulación básica del modelo
+
+  - Abadie, A., Diamond, A., & Hainmueller, J. (2010). Synthetic control methods for comparative case studies: Estimating the effect of California’s tobacco control program. *Journal of the American statistical Association*, 105(490), 493-505.
+  
+  - Abadie, A., Diamond, A., & Hainmueller, J. (2015). Comparative politics and the synthetic control method. *American Journal of Political Science*, 59(2), 495-510.  
+
+- El resumen de lo que deben saber está en
+
+  - Abadie, A. (2019). Using synthetic controls: Feasibility, data requirements, and methodological aspects. *Journal of Economic Literature*.  
+
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+
+
