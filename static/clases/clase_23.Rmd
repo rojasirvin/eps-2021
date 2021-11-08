@@ -542,6 +542,17 @@ tab2
 ]
 ]
 
+---
+
+# Más materiales
+
+- Consideren echarle un ojo al tutorial que Matias Catteneo dio [en el Chamberlain Seminar](https://www.chamberlainseminar.org/past-seminars/autumn-2020#h.41tsl12q6tcb)
+
+.center[
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=rKH88HK0S-o" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+]
+
+- El tutorial está en Stata, pero lo importante son las ideas, que pueden implementarse en cualquier software
 
 ---
 
