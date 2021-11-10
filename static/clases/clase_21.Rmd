@@ -405,20 +405,25 @@ $$E(D_i|x_i)=\gamma_{00}+\gamma_{01}x_i+\gamma_{02}x_i+\ldots+\gamma_{0p}x_i^p +
 
 # RD difusa: resumen
  
-- En la primera etapa podríamos $\{x_iTi, x_i^2 T_i,...,x_i^p T_i\}$ como instrumentos para $D_i$
+- En la primera etapa podríamos usar $\{x_iTi, x_i^2 T_i,...,x_i^p T_i\}$ como instrumentos para $D_i$
 
 - Una primera etapa con interacciones sugeriría emplear una segunda etapa también con interacciones
 
-- La versión más simple solo $T_i$ como instrumento
+- La versión más simple solo usa $T_i$ como instrumento
 
 - La primera etapa será
 
-$$D_i=\gamma_0+\gamma_1 x_i + \gamma_2 x_i^2 + \ldots + \gamma_p x_i^p + \pi T_i + \xi_{i}$$
+$$D_i=\gamma_0+\gamma_1 x_i + \gamma_2 x_i^2 + \ldots + \gamma_p x_i^p + \rho T_i + \xi_{i}$$
 
 
-- La forma reducida de este modelo es:
+- La forma reducida o ITT de este modelo es:
 
-$$y_i=\beta_0+\beta_1 x_i + \beta_2 x_i^2 + \ldots + \beta_p x_i^p + \delta\ D_i + u_{i}$$
+$$y_i=\beta_0+\beta_1 x_i + \beta_2 x_i^2 + \ldots + \beta_p x_i^p + \delta\ T_i + u_{i}$$
+- Mientras que la ecuación estructural
+
+
+$$y_i=\pi_0+\pi_1 x_i + \pi_2 x_i^2 + \ldots + \pi_p x_i^p + \lambda\ D_i + u_{i}$$
+se estima por MC2E usando $T_i$ como instrumento de $D_i$
 
 ---
 
