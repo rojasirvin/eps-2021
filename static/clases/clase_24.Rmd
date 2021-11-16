@@ -340,13 +340,13 @@ para $t\in \{T_0+1,\ldots,T\}$
 
 - Una combinación lineal de la variable de resultados pre-intervención es
 
-$$\tilde{Y}_i^K=\sum_{s=1}^{T_0}k_sY_{is},\quad\quad K=(k1,\ldots,k_{T_0})'$$
+$$\tilde{Y}_i^K=\sum_{s=1}^{T_0}k_sY_{is},\quad\quad K=(k_1,\ldots,k_{T_0})'$$
 - Por ejemplo, podemos incluir el valor de la variable de resultados en algunos años pre-intervención o el promedio de todos los años pre-intervención
 
 
 - Tenemos lo mismo, pero para las unidades no tratadas, en la matrix $X_0$
 
-- Definimos una medida de discrepancia entre $X_1$ y $X_0W$, $X_1-X_0W$
+- Definimos $X_1-X_0W$ como una medida de discrepancia entre $X_1$ y $X_0W$
 
 ---
 
@@ -372,7 +372,7 @@ donde $V$ es una matriz positiva definida
 - Entonces, podemos encontrar la $V$ óptima como
 
 $$V^*=\arg\min_{V\in\mathcal{V}}(\mathcal{Y}_1-\mathcal{Y}_0W^*(V))'(\mathcal{Y}_1-\mathcal{Y}_0W^*(V))$$
-- Y entonces, los pesos para el control sintético estarán dados por $W^*(V*)$
+- Y entonces, los pesos para el control sintético estarán dados por $W^*(V^*)$
 
 ---
 
@@ -656,9 +656,16 @@ knitr::include_graphics("figures/Mariels_synthetic.png")
 
 # Próxima sesión
 
-- Estimaremos el control sintético del estudio sobre la Proposición 99
+- El martes veremos dos aplicaciones de control sintético
 
-- El resumen de lo que deben saber está en
+  - Abadie, A., Diamond, A., & Hainmueller, J. (2015). Comparative politics and the synthetic control method. *American Journal of Political Science*, 59(2), 495-510.
+  
+  - Mitze, T., Kosfeld, R., Rode, J., & Wälde, K. (2020). Face masks considerably reduce COVID-19 cases in Germany. *Proceedings of the National Academy of Sciences*, 117(51), 32293-32301.
+
+
+- El jueves estimaremos el control sintético del estudio sobre la Proposición 99
+
+- Un resumen de lo que deben saber está en
 
   - Abadie, A. (2019). Using synthetic controls: Feasibility, data requirements, and methodological aspects. *Journal of Economic Literature*.  
 
