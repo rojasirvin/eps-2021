@@ -99,3 +99,5 @@ Clase 22. Aplicaciones de diseños con discontinuidades
 [Clase 24](https://eps-2021.netlify.app/clases/clase_24.html#1). Control sintético
 
 Clase 25. Aplicaciones de control sintético
+
+[Clase 26](https://eps-2021.netlify.app/clases/clase_26.html#1). Control sintético en R
