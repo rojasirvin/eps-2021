@@ -29,7 +29,6 @@ library(summarytools)
 xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
 
-  
 ## Pregunta 1
 
 Hace unas semanas se presentaron los resultados de [una evaluación](https://www.gob.mx/cms/uploads/attachment/file/669952/Estudio_EL_EFECTO_DEL_PROGRAMA_JCF_DURANTE_LA_PANDEMIA.pdf) del impacto del programa Jóvenes Construyendo el Futuro (JCF), realizada usando métodos de matching. Las tablas 1 y 2 del reporte muestran el ATE estimado en el ingreso trimestral entre los jóvenes que no asisten a la escuela y no están empleados y el ATE en la probabilidad de encontrar un trabajo entre los jóvenes en general, respectivamente. En este ejercicio extenderemos los resultados encontrados.

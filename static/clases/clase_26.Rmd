@@ -543,6 +543,17 @@ placebos %>%
 
 ---
 
+# Recomendación
+
+- Vale la pena este tutorial directamente del padre del control sintético
+
+.center[
+<iframe width="560" height="315" src="https://www.youtube.com/embed/3YgV2LYYZc0?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+]
+
+
+---
+
 # Próxima sesión
 
 - La siguiente semana hablaremos sobre modelos econométricos estructurales aplicados a evaluación
