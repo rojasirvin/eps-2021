@@ -11,3 +11,5 @@ weight: 40
 [Tarea 2]({{< ref "/tareas/tarea_2/" >}})
 
 [Tarea 3]({{< ref "/tareas/tarea_3/" >}})
+
+[Tarea 4]({{< ref "/tareas/tarea_4/" >}})
