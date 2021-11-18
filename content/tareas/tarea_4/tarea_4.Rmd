@@ -1,0 +1,105 @@
+---
+title: "Tarea 4"
+summary: "Miércoles 1 de diciembre a las 20:00"
+weight: 1
+type: book
+toc: false
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(janitor)
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+## Instrucciones
+  
+Las tareas deben entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Para evitar confusiones, escriban en su tarea con quiénes colaboraron. Las tareas deberán entregarse en Teams antes de la fecha y hora señalada. No se aceptarán tareas fuera de tiempo. Por favor, **no comprima los archivos** en carpetas comprimidas. Las tareas deberán contener dos archivos:
+
+Un primer documento de respuestas donde se incluyan las respuestas a las preguntas teóricas y conceptuales. Este documento puede ser redactado en Word o cualquier otro software, o si lo prefiere, a mano, pero deberá estar impreso en .pdf. En este documento también se deben incluir las respuestas a preguntas sobre conclusiones que se desprenden de las secciones prácticas. Por ejemplo, si una pregunta pide obtener la media de la variable x en cierta base de datos, entonces el documento de respuestas debe incluir la pregunta y respuesta correspondiente: “la media de la variable x es 32.6”. En este documento también deberán incluirse las tablas y gráficas que se soliciten.
+
+Un segundo archivo deberá contener el código replicable usado para generar los resultados de la sección práctica. El código debe también crear las tablas y gráficas solicitadas. Los archivos de código se verificarán para comprobar su replicabilidad.
+
+Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.
+
+## Fecha de entrega
+
+Miércoles 1 de diciembre a las 20:00.
+
+## Archivos
+
+[basque.csv](/tareas/tarea_4/basque.csv)
+
+## Pregunta 1
+
+El archivo *basque.csv* contiene los datos empleados por Abadie y Gardeazabal (2003) para estimar el efecto del terrorismo en el PIB per cápita (**gdpcap**) en el País Vasco usando el método de control sintético. Los autores consideran como periodo pre intervención a 1955 - 1969.
+
+a. [10 puntos] Estime el control sintético del PIB per cápit del País Vasco usando como *grupo donador* al resto de las regiones de España. Esto es, encuentre la matriz $W$ que otorga pesos a las distintas regiones usando una serie de predictores observables. Para este propósito, use como predictores el promedio de las siguientes variables para el periodo 1964-1969:
+
+    - La inversión como porcentaje del PIB, **invest**
+    - El porcentaje de la población analfabeta, **school.illit**
+    - El porcentaje de la población con educación primaria, **school.prim**
+    -	El porcentaje de la población con educación media, **school.med**
+    -	El porcentaje de la población con educación superior, **school.high**
+    -	El porcentaje de la población con educación más que superior, **school.post.high**
+    
+     Además, use como *predictores especiales* los siguientes valores:
+
+    -	El promedio del PIB per capita, **gdpcap**, de 1960 a 1969
+    -	La densidad de población, **popdens**, de 1969
+    -	El promedio de la participación de la agricultura, **sec.agriculture**, de 1961 a 1969
+    -	El promedio de la participación de la energía, **sec.energy**, de 1961 a 1969
+    - El promedio de la participación de la industria, **sec.industry**, de 1961 a 1969
+    -	El promedio de la participación de la construcción, **sec.construction**, de 1961 a 1969
+    -	El promedio de la participación de los servicios, **sec.services.venta**, de 1961 a 1969
+    -	El promedio de la participación de los servicios no comerciables, **sec.services.nonventa**, de 1961 a 1969
+
+    Note que el País Vasco está identificado con el número 17 de la variable **regionno**. Realice el procedimiento de optimización para minimizar las discrepancias entre la unidad tratada y su sintético usando el periodo 1960-1969.
+
+    ¿Qué regiones y con qué pesos contribuyen a construir el País Vasco sintético?
+
+a. [10 puntos] Obtenga un gráfico en donde represente las series de tiempo del PIB per cápita del País Vasco que efectivamente se realizó, la de su correspondiente control sintético y la del promedio simple del resto de las regiones españolas. Esto es, coloque en un solo gráfico la información de las diapositivas 25 y 26 de la [clase 25](https://eps-2021.netlify.app/clases/clase_24.html#25).
+
+a. [10 puntos] Genere una gráfica de brechas que muestre el efecto del terrorismo sobre el PIB per capita. La brecha es la diferencia entre la serie de tiempo realizada y su contraparte sintética.
+
+a. [10] Realice un ejercicio de placebos en el espacio, similar al que llevamos a cabo en el laboratorio. La idea es estimar el control sintético para todas las regiones. Una vez que tenga el PIB per capita sintético para las 17 regiones, genere un histograma donde represente la razón del error de predicción cuadrado medio. Para ello, para cada región, debe obtener el error de predicción cuadrado promedio para los periodos pre y post intervención y luego obtener la razón de estos. ¿Cómo es la razón del error de predicción cuadrado medio para el País Vasco y qué nos dice de la significancia estadística del efecto estimado?
+
+
+# Pregunta 2
+
+Basado en [Low, H., y Meghir, C. (2017)](https://www.aeaweb.org/articles?id=10.1257/jep.31.2.33), The use of structural models in econometrics. *Journal of Economic Perspectives*, 31(2), 33-58.
+
+
+a. [5 puntos] ¿Cuáles son las diferencias entre un modelo econométrico estructural y uno de forma reducida?
+
+a. [5 puntos] ¿Qué se entiende por un modelo completamente especificado?
+
+a. [5 puntos] ¿Cómo se puede combinar la información proveniente de una intervención experimental con un modelo estructural? Mencione un ejemplo de una combinación exitosa de esta naturaleza.
+
+a. [5 puntos] ¿En qué consiste el método de momentos para la estimación de modelos estructurales?
+
+
+# Pregunta 3
+
+Basado en [Athey e Imbens (2019)](https://www.annualreviews.org/doi/abs/10.1146/annurev-economics-080217-053433?casa_token=2OgFBRfIJ8QAAAAA:siffKhlv7TXe9eW8rETtmCktelnct6Yd83jlQxQ5pdbOaYyV3rAhiYD0yJdaKo9unt4zu-Y20rSoSEdHgA), Machine learning methods that economists should know about. *Annual Review of Economics*, 11.
+
+a. [5 puntos] ¿Cuál es la diferencia entre machine learning y los modelos econométricos estándar?
+
+a. [5 puntos] ¿Para qué sirven y en qué consisten las técnicas LASSO y de regresión ridge?
+
+a. [5 puntos] ¿En qué consisten los árboles de regresión y los bosques aleatorios?
+
+a. [5 puntos] ¿Cómo puede emplearse machine learning para la estimación de efectos de tratamiento?
+
+
+# Pregunta 4
+
+Basado en [Varían (2014)](https://www.aeaweb.org/articles?id=10.1257/jep.28.2.3), Big data: New tricks for econometrics. *Journal of Economic Perspectives*, 28(2), 3-28
+
+a. [5 puntos] ¿Qué es la predicción fuera de la muestra?
+
+a. [5 puntos] ¿A qué se refiere el problema de sobreajuste en la predicción?
+
+a. [5 puntos] ¿Cómo se puede evaluar el efecto de una campaña de publicidad en internet empleando las técnicas descritas en el texto?
+
+a. [5 puntos] ¿Cuál es la principal fuente de incertidumbre en el modelo en el contexto de big data?
