@@ -168,9 +168,6 @@ pre code {
 </div>
 
 
-<div id="respuestas" class="section level2">
-<h2>Respuestas</h2>
-</div>
 <div id="pregunta-1" class="section level2">
 <h2>Pregunta 1</h2>
 <p>Hace unas semanas se presentaron los resultados de <a href="https://www.gob.mx/cms/uploads/attachment/file/669952/Estudio_EL_EFECTO_DEL_PROGRAMA_JCF_DURANTE_LA_PANDEMIA.pdf">una evaluación</a> del impacto del programa Jóvenes Construyendo el Futuro (JCF), realizada usando métodos de matching. Las tablas 1 y 2 del reporte muestran el ATE estimado en el ingreso trimestral entre los jóvenes que no asisten a la escuela y no están empleados y el ATE en la probabilidad de encontrar un trabajo entre los jóvenes en general, respectivamente. En este ejercicio extenderemos los resultados encontrados.</p>
@@ -402,37 +399,36 @@ data.jcf &lt;- data.jcf %&gt;%
   tb()
 ## Error in pryr::where(obj_name) : length(name) == 1 is not TRUE
 ## # A tibble: 14 x 8
-##    variable         mean       sd   min   med    max n.valid pct.valid
-##    &lt;chr&gt;           &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;
-##  1 casadounion    0.374   4.84e-1     0    0  1   e0   60660     100  
-##  2 escoacum      11.3     3.13e+0     0   12  2.3 e1   60659     100. 
-##  3 factor.x     407.      4.11e+2    10  282  5.28e3   60660     100  
-##  4 haymenores     0.542   4.98e-1     0    1  1   e0   60660     100  
-##  5 indigena       0.301   4.59e-1     0    0  1   e0   60660     100  
-##  6 ingtot_tri  9486.      1.46e+4     0 3688. 7.27e5   60660     100  
-##  7 jcf            0.0142  1.18e-1     0    0  1   e0   60660     100  
-##  8 jcf2           0.0567  2.31e-1     0    0  1   e0   15152      25.0
-##  9 jcf3           0.0223  1.48e-1     0    0  1   e0   38446      63.4
-## 10 jefehog        0.125   3.31e-1     0    0  1   e0   60660     100  
-## 11 mujer          0.504   5.00e-1     0    1  1   e0   60660     100  
-## 12 proggob        0.269   4.44e-1     0    0  1   e0   60660     100  
-## 13 rural          0.372   4.83e-1     0    0  1   e0   60660     100  
-## 14 tot_integ      4.72    2.02e+0     1    4  2.5 e1   60660     100</code></pre>
+##    variable         mean        sd   min   med     max n.valid pct.valid
+##    &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;
+##  1 casadounion    0.374      0.484     0    0       1    60660     100  
+##  2 escoacum      11.3        3.13      0   12      23    60659     100. 
+##  3 factor.x     407.       411.       10  282    5284    60660     100  
+##  4 haymenores     0.542      0.498     0    1       1    60660     100  
+##  5 indigena       0.301      0.459     0    0       1    60660     100  
+##  6 ingtot_tri  9486.     14550.        0 3688. 727411.   60660     100  
+##  7 jcf            0.0142     0.118     0    0       1    60660     100  
+##  8 jcf2           0.0567     0.231     0    0       1    15152      25.0
+##  9 jcf3           0.0223     0.148     0    0       1    38446      63.4
+## 10 jefehog        0.125      0.331     0    0       1    60660     100  
+## 11 mujer          0.504      0.500     0    1       1    60660     100  
+## 12 proggob        0.269      0.444     0    0       1    60660     100  
+## 13 rural          0.372      0.483     0    0       1    60660     100  
+## 14 tot_integ      4.72       2.02      1    4      25    60660     100</code></pre>
 <p><em>Uso matchit para construir las muestras emparejadas:</em></p>
 <pre class="r"><code>sub.data &lt;- data.jcf %&gt;%
-    dplyr::select(ingtot_tri, jcf2, mujer, indigena, cve_ent, rural, escoacum,
-        casadounion, jefehog, haymenores, proggob, tot_integ, factor.x)
+    dplyr::select(ingtot_tri, jcf2, mujer, indigena, cve_ent, rural, escoacum, casadounion, jefehog,
+        haymenores, proggob, tot_integ, factor.x)
 
 sub.data &lt;- sub.data[complete.cases(sub.data), ]
 
-m.out.a &lt;- matchit(formula = jcf2 ~ mujer + indigena + factor(cve_ent) +
-    rural + escoacum + casadounion + jefehog + haymenores + proggob + tot_integ,
-    method = &quot;nearest&quot;, distance = &quot;glm&quot;, replace = FALSE, data = sub.data)</code></pre>
+m.out.a &lt;- matchit(formula = jcf2 ~ mujer + indigena + factor(cve_ent) + rural + escoacum + casadounion +
+    jefehog + haymenores + proggob + tot_integ, method = &quot;nearest&quot;, distance = &quot;glm&quot;, replace = FALSE,
+    data = sub.data)</code></pre>
 <p><em>La simulación de King, Tomz y Wittenberg (2000):</em></p>
 <pre class="r"><code>set.seed(1711)
 
-z.out.a &lt;- zelig(formula = ingtot_tri ~ jcf2, data = match.data(m.out.a),
-    model = &quot;ls&quot;)
+z.out.a &lt;- zelig(formula = ingtot_tri ~ jcf2, data = match.data(m.out.a), model = &quot;ls&quot;)
 ## How to cite this model in Zelig:
 ##   R Core Team. 2007.
 ##   ls: Least Squares Regression for Continuous Dependent Variables
@@ -698,18 +694,16 @@ love.plot(bal.tab(m.out.b), threshold = 0.1)</code></pre>
 <li><p>[5 puntos] Estime ahora el TOT en el ingreso trimestral, como en la parte a., pero usando un caliper de 0.1 y 3 vecinos a ser emparejados. ¿Cómo cambian sus resultados respecto a los de la parte a.?</p>
 <p><em>El procedimiento es:</em></p>
 <pre class="r"><code>sub.data &lt;- data.jcf %&gt;%
-    dplyr::select(ingtot_tri, jcf2, mujer, indigena, cve_ent, rural, escoacum,
-        casadounion, jefehog, haymenores, proggob, tot_integ, factor.x)
+    dplyr::select(ingtot_tri, jcf2, mujer, indigena, cve_ent, rural, escoacum, casadounion, jefehog,
+        haymenores, proggob, tot_integ, factor.x)
 
 sub.data &lt;- sub.data[complete.cases(sub.data), ]
 
-m.out.e &lt;- matchit(formula = jcf2 ~ mujer + indigena + factor(cve_ent) +
-    rural + escoacum + casadounion + jefehog + haymenores + proggob + tot_integ,
-    method = &quot;nearest&quot;, caliper = 0.1, ratio = 3, distance = &quot;glm&quot;, replace = FALSE,
-    data = sub.data)
+m.out.e &lt;- matchit(formula = jcf2 ~ mujer + indigena + factor(cve_ent) + rural + escoacum + casadounion +
+    jefehog + haymenores + proggob + tot_integ, method = &quot;nearest&quot;, caliper = 0.1, ratio = 3, distance = &quot;glm&quot;,
+    replace = FALSE, data = sub.data)
 
-z.out.e &lt;- zelig(formula = ingtot_tri ~ jcf2, data = match.data(m.out.a),
-    model = &quot;ls&quot;)
+z.out.e &lt;- zelig(formula = ingtot_tri ~ jcf2, data = match.data(m.out.a), model = &quot;ls&quot;)
 ## How to cite this model in Zelig:
 ##   R Core Team. 2007.
 ##   ls: Least Squares Regression for Continuous Dependent Variables
