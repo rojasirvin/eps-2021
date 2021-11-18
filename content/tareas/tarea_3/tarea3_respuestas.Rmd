@@ -1,0 +1,650 @@
+---
+title: "Respuestas a la tarea 3"
+summary: " "
+weight: 2
+type: book
+toc: false
+---
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+library(pacman)
+library(janitor)
+library(sandwich)
+#library(nnet)
+#library(mlogit)
+library(readr)
+library(clubSandwich)
+#library(modelsummary)
+library(estimatr)
+library(data.table)
+library(rdrobust)
+library(MatchIt)
+library(Zelig)
+library(cobalt)
+library(collapse)
+library(summarytools)
+
+xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
+```
+
+  
+## Instrucciones
+  
+La tarea debe entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las secciones teóricas deben estar desarrolladas en un procesador de textos y enviadas en formato .docx o .pdf. Las secciones prácticas deberán contener archivos de código replicable y archivos de salida en R (o similares, en caso de usar otro software) para considerarse completas. Las tareas deben entregarse antes de la fecha límite a través de Teams. Puede crear una carpeta comprimida que contenga todos sus archivos y subir esta carpeta en Teams. Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.
+
+## Pregunta 1
+
+Hace unas semanas se presentaron los resultados de [una evaluación](https://www.gob.mx/cms/uploads/attachment/file/669952/Estudio_EL_EFECTO_DEL_PROGRAMA_JCF_DURANTE_LA_PANDEMIA.pdf) del impacto del programa Jóvenes Construyendo el Futuro (JCF), realizada usando métodos de matching. Las tablas 1 y 2 del reporte muestran el ATE estimado en el ingreso trimestral entre los jóvenes que no asisten a la escuela y no están empleados y el ATE en la probabilidad de encontrar un trabajo entre los jóvenes en general, respectivamente. En este ejercicio extenderemos los resultados encontrados.
+
+Los datos en *datos_jcf_analisis.csv* están listos para analizarse. Estos se construyeron a partir de la ENIGH 2020, que incluyó un módulo especial para el programa JCF y que pueden descargar de [aquí](https://www.inegi.org.mx/programas/enigh/nc/2020/#Microdatos). Para limpiar los datos use el script en *limpiar_jcf_analisis.r*. Para ejecutar este script debería descargar de la página de INEGI antes citada los archivos *ingresos_jcf.csv*, *ingresos.csv*, *poblacion.csv*, *viviendas.csv*, *hogares.csv* y *concentradohogar.csv*. Esto sería necesario si quisiera agregar nuevas variables al análisis, pero bien puede trabajar con los datos en *datos_jcf_analisis.csv* que yo están *limpios*.
+
+El propensity score (PS) usado en la evaluación usa los siguientes regresores: **mujer** (dummy de sexo), **indigena** (dummy de pertenencia a una etnia), **rural** (dummy del ámbito rural), **escoacum** (años de escolaridad), **casadounion** (dummy para casados o en unión libre), **jefehog** (dummy para jefes del hogar), **haymenores** (dummy para la presencia de menores de edad en el hogar), **proggob** (dummy para beneficiarios de programas de gobierno), y **tot_integ** (número de miembros del hogar), así como dummies de estado, **cve_ent**.
+
+a. [10 puntos] Estime ahora el TOT (TT o ATT) del programa en el ingreso trimestral, **ingtot_tri**. Para estimar el impacto en el ingreso trimestral se comparan a los beneficiarios de JCF con los jóvenes que no asisten a la escuela y no están empleados. Los beneficiarios tienen *jcf2==1* y los jóvenes que no asisten a la escuela y no están empleados tienen *jcf2==0*. Realice la inferencia estadística usando el método de simulación de King, Tomz y Wittenberg (2000) [visto en clase](https://eps-2021.netlify.app/clases/clase_18.html#27). ¿De qué tamaño es el TOT estimado y es este efecto estadísticamente significativo?
+
+    *Limpiamos datos originales de la ENIGH:*
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE, cache=T}
+
+setwd("C:/Users/rojas/Dropbox/Evaluación de Programas Sociales/2021/tareas/Tarea 3")
+
+#Ingresos de JCF
+ing.jcf <- read_csv(
+  "./ingresos_jcf.csv",
+  locale = locale(encoding = "latin1")) %>% 
+  rename(ingjcf_1=ing_6, #Arreglar nombres para que los ingresos estén en orden cronológico
+         ingjcf_2=ing_5,
+         ingjcf_3=ing_4,
+         ingjcf_4=ing_3,
+         ingjcf_5=ing_2,
+         ingjcf_6=ing_1,
+         ingjcf_tri=ing_tri,
+         mesjcf_1=mes_6,
+         mesjcf_2=mes_5,
+         mesjcf_3=mes_4,
+         mesjcf_4=mes_3,
+         mesjcf_5=mes_2,
+         mesjcf_6=mes_1) %>% 
+  dplyr::select(-c(clave))
+
+#Ingreso laboral
+ing.lab <- read_csv(
+  "./ingresos.csv",
+  locale = locale(encoding = "latin1")) %>% 
+  filter(clave %in% c("P001","P002","P003","P004",
+                      "P005","P006","P007","P010",
+                      "P011","P012","P013","P014",
+                      "P018","P019","P020","P021","P022")) 
+
+
+ing.lab.fuentes <- ing.lab %>%
+  dplyr::select(folioviv,foliohog,numren,ing_tri,
+         ing_1=ing_6, #Arreglar nombres para que los ingresos estén en orden cronológico
+           ing_2=ing_5,
+           ing_3=ing_4,
+           ing_4=ing_3,
+           ing_5=ing_2,
+           ing_6=ing_1) %>% 
+  group_by(folioviv,foliohog,numren) %>%
+  fsum
+
+ing.lab.meses <- ing.lab %>% 
+  dplyr::select(folioviv,foliohog,numren,
+         mes_1=mes_6,
+         mes_2=mes_5,
+         mes_3=mes_4,
+         mes_4=mes_3,
+         mes_5=mes_2,
+         mes_6=mes_1) %>% 
+  mutate(mes_1=as.numeric(mes_1),
+         mes_2=as.numeric(mes_2),
+         mes_3=as.numeric(mes_3),
+         mes_4=as.numeric(mes_4),
+         mes_5=as.numeric(mes_5),
+         mes_6=as.numeric(mes_6)) %>% 
+  group_by(folioviv,foliohog,numren) %>%
+  fmean
+
+ing.todos <- ing.lab.fuentes %>% 
+  left_join(ing.lab.meses, by=c("folioviv","foliohog","numren")) %>% 
+  full_join(ing.jcf, by=c("folioviv","foliohog","numren")) %>% 
+  mutate(ing_1=ifelse(is.na(ing_1),0,ing_1),
+         ing_2=ifelse(is.na(ing_2),0,ing_2),
+         ing_3=ifelse(is.na(ing_3),0,ing_3),
+         ing_4=ifelse(is.na(ing_4),0,ing_4),
+         ing_5=ifelse(is.na(ing_5),0,ing_5),
+         ing_6=ifelse(is.na(ing_6),0,ing_6),
+         ingjcf_1=ifelse(is.na(ingjcf_1),0,ingjcf_1),
+         ingjcf_2=ifelse(is.na(ingjcf_2),0,ingjcf_2),
+         ingjcf_3=ifelse(is.na(ingjcf_3),0,ingjcf_3),
+         ingjcf_4=ifelse(is.na(ingjcf_4),0,ingjcf_4),
+         ingjcf_5=ifelse(is.na(ingjcf_5),0,ingjcf_5),
+         ingjcf_6=ifelse(is.na(ingjcf_6),0,ingjcf_6),
+         ct_futuro=ifelse(is.na(ct_futuro),0,ct_futuro),
+         ing_1=ifelse(ct_futuro!=9,ing_1-ingjcf_1,ing_1),
+         ing_2=ifelse(ct_futuro!=9,ing_2-ingjcf_2,ing_2),
+         ing_3=ifelse(ct_futuro!=9,ing_3-ingjcf_3,ing_3),
+         ing_4=ifelse(ct_futuro!=9,ing_4-ingjcf_4,ing_4),
+         ing_5=ifelse(ct_futuro!=9,ing_5-ingjcf_5,ing_5),
+         ing_6=ifelse(ct_futuro!=9,ing_6-ingjcf_6,ing_6),
+         ing_tri=ifelse(is.na(ing_tri),0,ing_tri),
+         ingjcf_tri=ifelse(is.na(ingjcf_tri),0,ingjcf_tri),
+         ing_tri=ifelse(ct_futuro!="9",ing_tri-ingjcf_tri,ing_tri),
+         ingtot_tri=ingjcf_tri+ing_tri)
+
+
+poblacion <- read_csv(
+  "./poblacion.csv",
+  locale = locale(encoding = "latin1"),
+  col_types = list(min_8 = col_double())) %>% 
+  mutate(mujer=ifelse(sexo==2,1,0),
+         indigena=ifelse(etnia==1,1,0),
+         analfabeta=ifelse(alfabetism==2,1,0),
+         joven=ifelse(edad>=18 & edad <=29,1,0),
+         jnc=ifelse(edad>=18 & edad <=29 & asis_esc==2 & trabajo_mp==2,1,0),
+         jtrabaja=ifelse(edad>=18 & edad <=29 & trabajo_mp==1,1,0),
+         escoacum=case_when(nivelaprob==0 | nivelaprob==1 ~ 0,
+                            nivelaprob==2 ~ gradoaprob + 1,
+                            nivelaprob==3 ~ gradoaprob + 6,
+                            nivelaprob==4 ~ gradoaprob + 9,
+                            nivelaprob==5 & antec_esc==1 ~ gradoaprob + 6,
+                            nivelaprob==5 & antec_esc==2 ~ gradoaprob + 9,
+                            nivelaprob==5 & antec_esc==3 ~ gradoaprob + 12,
+                            nivelaprob==6 & antec_esc==1 ~ gradoaprob + 6,
+                            nivelaprob==6 & antec_esc==2 ~ gradoaprob + 9,
+                            nivelaprob==6 & antec_esc==3 ~ gradoaprob + 12,
+                            nivelaprob==7 ~ gradoaprob + 12,
+                            nivelaprob==8 ~ gradoaprob + 16,
+                            nivelaprob==9 ~ gradoaprob + 18),
+         casadounion=ifelse(edo_conyug==1 | edo_conyug==2,1,0),
+         mintrab=ifelse(is.na(hor_1) | is.na(min_1),0,(hor_1*60)+min_1),
+         minest=ifelse(is.na(hor_2) | is.na(min_2),0,(hor_2*60)+min_2),
+         mincuid=ifelse(is.na(hor_4) | is.na(min_4),0,(hor_4*60)+min_4),
+         minqueh=ifelse(is.na(hor_6) | is.na(min_6),0,(hor_6*60)+min_6),
+         minrecr=ifelse(is.na(hor_8) | is.na(min_8),0,(as.numeric(hor_8)*60)+min_8),
+         afilss=ifelse(pop_insabi==1 | atemed==1, 1, 0),
+         jefehog=ifelse(parentesco==101,1,0))
+         
+         
+viviendas <- read_csv("./viviendas.csv",
+                      col_types = list(mat_pisos = col_character()),
+                      locale = locale(encoding = "latin1")) %>% 
+  clean_names() %>% 
+  mutate(pisotierra=ifelse(mat_pisos==1, 1 , 0),
+           aguaent=ifelse(disp_agua==1 | disp_agua==2,1,0),
+           drenfosa=ifelse(drenaje==1 | drenaje==2,1,0),
+           sinelec=ifelse(disp_elect==5,1,0))
+
+hogares <- read_csv(
+  "./hogares.csv",
+  locale = locale(encoding = "latin1")) %>% 
+  mutate(sincomida=ifelse(acc_alim2==1,1,0),
+          internet=ifelse(conex_inte==1,1,0))
+
+concentrado <- read_csv(
+  "./concentradohogar.csv",
+  locale = locale(encoding = "latin1")) %>% 
+  mutate(cve_ent=substr(ubica_geo,1,2),
+         cve_mun=substr(ubica_geo,3,6),
+         rural=ifelse(tam_loc==4,1,0),
+         haymenores=ifelse(menores!=0,1,0))
+
+#Un solo conjunto de datos
+
+data.jcf <- poblacion %>% 
+  dplyr::select(-ct_futuro) %>% 
+  left_join(viviendas, by=c("folioviv")) %>% 
+  left_join(hogares, by=c("folioviv", "foliohog")) %>% 
+  left_join(concentrado, by=c("folioviv", "foliohog")) %>% 
+  left_join(ing.todos, by=c("folioviv","foliohog","numren")) %>% 
+  mutate(ing_1=ifelse(is.na(ing_1),0,ing_1),
+         ing_2=ifelse(is.na(ing_2),0,ing_2),
+         ing_3=ifelse(is.na(ing_3),0,ing_3),
+         ing_4=ifelse(is.na(ing_4),0,ing_4),
+         ing_5=ifelse(is.na(ing_5),0,ing_5),
+         ing_6=ifelse(is.na(ing_6),0,ing_6),
+         ingjcf_1=ifelse(is.na(ingjcf_1),0,ingjcf_1),
+         ingjcf_2=ifelse(is.na(ingjcf_2),0,ingjcf_2),
+         ingjcf_3=ifelse(is.na(ingjcf_3),0,ingjcf_3),
+         ingjcf_4=ifelse(is.na(ingjcf_4),0,ingjcf_4),
+         ingjcf_5=ifelse(is.na(ingjcf_5),0,ingjcf_5),
+         ingjcf_6=ifelse(is.na(ingjcf_6),0,ingjcf_6),
+         ingtot_tri=ifelse(is.na(ingtot_tri),0,ingtot_tri),
+         ing_tri=ifelse(is.na(ing_tri),0,ing_tri),
+         ingjcf_tri=ifelse(is.na(ingjcf_tri),0,ingjcf_tri))
+
+  #Definición de grupos de comparación
+data.jcf <- data.jcf %>% 
+  mutate(jcf=ifelse(ct_futuro %in% c(1,2,3,8,9),1,0)) %>% 
+  filter((edad>=18 & edad <=29) | jcf==1) %>% 
+  mutate(ingbene=ifelse(ct_futuro==9,bene_gob-ingjcf_tri,NA),
+        ingbene=ifelse(jcf==0,bene_gob,ingbene),
+        ingbene=ifelse(ingbene<0 | is.na(ingbene),0,ingbene),
+        proggob=ifelse(ingbene>0,1,0)) %>% 
+  mutate(jcf2=ifelse(jnc==1,0,NA),
+         jcf2=ifelse(jcf==1,1,jcf2)) %>% 
+  mutate(jcf3=ifelse(jtrabaja==1 & is.na(jcf2),0,NA),
+         jcf3=ifelse(jcf==1,1,jcf3)) %>% 
+  mutate(trabajo1=ifelse(ing_1>0 & !is.na(ing_1),1,0),
+         trabajo2=ifelse(ing_2>0 & !is.na(ing_2),1,0),
+         trabajo3=ifelse(ing_3>0 & !is.na(ing_3),1,0),
+         trabajo4=ifelse(ing_4>0 & !is.na(ing_4),1,0),
+         trabajo5=ifelse(ing_5>0 & !is.na(ing_5),1,0),
+         trabajo6=ifelse(ing_6>0 & !is.na(ing_6),1,0)) %>% 
+  mutate(benef1=ifelse(ingjcf_1>0 & !is.na(ingjcf_1),1,0),
+         benef2=ifelse(ingjcf_2>0 & !is.na(ingjcf_2),1,0),
+         benef3=ifelse(ingjcf_3>0 & !is.na(ingjcf_3),1,0),
+         benef4=ifelse(ingjcf_4>0 & !is.na(ingjcf_4),1,0),
+         benef5=ifelse(ingjcf_5>0 & !is.na(ingjcf_5),1,0),
+         benef6=ifelse(ingjcf_6>0 & !is.na(ingjcf_6),1,0))
+  
+#Transiciones de empleo
+
+data.jcf <- data.jcf %>%
+  mutate(jcf_a_emp=0,
+         jcf_a_emp=ifelse(trabajo2==1 & benef1==1,1,jcf_a_emp),
+         jcf_a_emp=ifelse(trabajo3==1 & (benef1==1 | benef2==1),1,jcf_a_emp),
+         jcf_a_emp=ifelse(trabajo4==1 & (benef1==1 | benef2==1 | benef3==1),1,jcf_a_emp),
+         jcf_a_emp=ifelse(trabajo5==1 & (benef1==1 | benef2==1 | benef3==1 | benef4==1),1,jcf_a_emp),
+         jcf_a_emp=ifelse(trabajo6==1 & (benef1==1 | benef2==1 | benef3==1 | benef4==1 | benef5==1),1,jcf_a_emp)) %>% 
+  mutate(desemp_a_emp=0,
+         desemp_a_emp=ifelse(trabajo1==0 & (trabajo2==1 | trabajo3==1 | trabajo4==1 | trabajo5==1 | trabajo6==1) & benef1==0 & jcf==0,1,desemp_a_emp),
+         desemp_a_emp=ifelse(trabajo2==0 & (trabajo3==1 | trabajo4==1 | trabajo5==1 | trabajo6==1) & benef2==0 & jcf==0,1,desemp_a_emp),
+         desemp_a_emp=ifelse(trabajo3==0 & (trabajo4==1 | trabajo5==1 | trabajo6==1) & benef3==0 & jcf==0,1,desemp_a_emp),
+         desemp_a_emp=ifelse(trabajo4==0 & (trabajo5==1 | trabajo6==1) & benef4==0 & jcf==0,1,desemp_a_emp),
+         desemp_a_emp=ifelse(trabajo5==0 & (trabajo6==1) & benef5==0 & jcf==0,1,desemp_a_emp)) %>% 
+  mutate(siempre_jcf=ifelse(benef1==1 & benef2==1 & benef3==1 & benef4==1 & benef5==1 & benef6==1,1,0),
+         siempre_emp=ifelse((trabajo1==1 & trabajo2==1 & trabajo3==1 & trabajo4==1 & trabajo5==1 & trabajo6==1) & jcf==0,1,0),
+         encontro=ifelse(jcf_a_emp==1 | desemp_a_emp==1,1,0)) %>% 
+  mutate(transicion=ifelse(benef6==1 | siempre_jcf==1| siempre_emp==1,0,1))
+```
+
+    *Estadística descriptiva:*
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+descr(dplyr::select(data.jcf, jcf, jcf2, jcf3, ingtot_tri,
+                    mujer, indigena, cve_ent, rural,
+                    escoacum, casadounion, jefehog, haymenores,
+                    proggob, tot_integ, factor.x),
+      round.digits = 2,
+      headings = FALSE, # quitar encabezados
+      stats = "common") %>%  # estadísticas más usadas
+  tb()
+```
+
+    *Uso matchit para construir las muestras emparejadas:*
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+sub.data <- data.jcf %>% 
+  dplyr::select(ingtot_tri, jcf2, mujer, indigena, cve_ent, rural, escoacum, 
+           casadounion, jefehog, haymenores, proggob, tot_integ, factor.x)
+
+sub.data <- sub.data[complete.cases(sub.data), ] 
+
+m.out.a <- matchit(formula=jcf2 ~ mujer + indigena + factor(cve_ent) + rural  + escoacum + 
+                   casadounion + jefehog + haymenores + proggob + tot_integ,
+                 method = "nearest",
+                 distance= "glm",
+                 replace = FALSE,
+                 data = sub.data)
+
+```
+
+    *La simulación de King, Tomz y Wittenberg (2000):*
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+set.seed(1711)
+    
+z.out.a <- zelig(formula = ingtot_tri ~ jcf2,
+               data=match.data(m.out.a),
+               model="ls")
+
+#Simulo las dos situaciones
+x.out.a <- setx(z.out.a, jcf2=0)
+x1.out.a <- setx1(z.out.a, jcf2=1)
+
+#Corremos la simulación
+sim.out.a <- sim(z.out.a, x=x.out.a, x1=x1.out.a)
+
+#Vemos los resultados
+summary(sim.out.a)
+```    
+
+    *El TOT estimado es 8473.637 pesos adicionales (e.e. 326.528) para los beneficiarios de JCF, comparados con otros jóvenes que no asisten a la escuela ni están empleados. Este efecto es muy parecido al ATE estimado en el reporte, aunque el error estándar es considerablemente más pequeño.*
+
+a. [5 puntos] En el matching de la parte a., evalúe qué tan bueno es el procedimiento en balancear las características observadas una vez realizado el matching. Cree un *love plot* y realice pruebas formales para contrastar las diferencias en características observables antes y después del matching.
+
+    *Veamos un resumen del emparejamiento:*
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE, cache=T}
+#Con esto elimino las dummies de estado de la salida
+m.out.a[["X"]][["factor(cve_ent)"]] <- NULL
+
+summary(m.out.a, standardize=T)
+    ```
+    
+    *No hay un solo criterio para decidir cuándo el emparejamiento fue exitoso. Una propuesta es observar las diferencias promedio estandarizadas (SMD). Esto nos permite eliminar el tema de la escala y concentrarnos en las diferencias entre los grupos tratados y no tratados, antes y después del emparejamiento. Podemos definitir la SMD como:*
+    
+    $$SMD_X=\frac{\bar{X}_T-\bar{X}_{NT}}{\sqrt{S^2_T+S^2_{NT}}}$$
+    
+    *También vale la pena no perder de vista la razón de varianzas (VR). Se espera que este ratio no sea muy distinto de 1 después de hacer el emparejamiento:*
+    
+    $$VR=\frac{S^2_T}{S^2_{NT}}$$
+    
+    *Una regla de dedo de 0.1 en el SMD para juzgar el balance. Siguiendo esta regla, todas las variables están balanceadas después del emparejamiento. Por ejemplo, la escolaridad acumulada tenía un SDM de 0.4698 en la muestra en bruto, pero con el emparejamiento el SDM se vuelve de solo 0.0749.*
+    
+    *La librería cobalt tiene una función que hace algo similar, de una forma más compacta:*
+    
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE, cache=T}
+#Con esto elimino las dummies de estado de la salida
+bal.tab(m.out.a, m.threshold=0.1, un=T)
+
+    ```
+    
+    *Finalmente, podemos representar esta información en un loveplot:*
+    
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE, cache=T}
+m.out.a[["X"]][["factor(cve_ent)"]] <- NULL
+
+love.plot(bal.tab(m.out.a),
+          threshold = .1)
+    ```
+    
+    *Concluimos que existe un balance apropiado de los covariables usando el modelo del PS propuesto y el tratamiento definido por la variable __jcf2__.*
+
+a. [10 puntos] Para la probabilidad de encontrar empleo, **encontro**, se comparan a los beneficiarios de JCF con los jóvenes en general. Los beneficiarios tienen *jcf==1*, mientras que el resto de los jóvenes tienen *jcf==0*. Realice la estimación del TOT y la inferencia, de manera análoga a lo realizado en la parte a.
+
+    *Seguimos un procedimiento similar al anterior, pero teniendo en cuenta que la variable de tratamiento es __jcf__*:
+    
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE, cache=T}
+sub.data <- data.jcf %>% 
+      filter(transicion==1) %>% 
+      dplyr::select(encontro, jcf, mujer, indigena, cve_ent, rural, escoacum, casadounion, jefehog, haymenores, proggob, tot_integ, factor.x)
+
+sub.data <- sub.data[complete.cases(sub.data), ] 
+
+m.out.b <- matchit(formula = jcf ~ mujer + indigena + factor(cve_ent) + rural  + escoacum + 
+                   casadounion + jefehog + haymenores + proggob + tot_integ,
+                 method = "nearest",
+                 ratio = 1,
+                 distance = "glm",
+                 replace = FALSE,
+                 data = sub.data)
+
+#Y entonces hacemos nuestra comparación
+z.out.b <- zelig(formula = encontro ~ jcf,
+               data=match.data(m.out.b),
+               model="ls")
+
+#Simularemos el valor esperado de las diferencias cuando t==0
+x.out.b <- setx(z.out.b, jcf=0)
+
+#Con respecto a cuando t==1
+x1.out.b <- setx1(z.out.b, jcf=1)
+
+#Corremos la simulación
+sim.out.b <- sim(z.out.b, x=x.out.b, x1=x1.out.b)
+
+#Vemos los resultados
+summary(sim.out.b)
+    ```
+    
+    *El TOT estimado es de un incremento de 23.45% (e.e 3.33) en la probabilidad de encontrar un empleo para los beneficiarios del programa, comparados con el resto de jóvenes. La magnitud del impacto estimado es muy parecida al ATE reportado en el informe, aunque la precisión es menor.*
+
+a. [5 puntos] Evalúe qué tan bueno es el procedimiento de la parte c. en balancear las características observadas una vez realizado el matching. Cree un *love plot* y realice pruebas formales para contrastar las diferencias en características observables antes y después del matching.
+
+    *Veamos las SMDs y el love plot:*
+    
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE, cache=T}
+m.out.b[["X"]][["factor(cve_ent)"]] <- NULL
+
+bal.tab(m.out.b, m.threshold=0.1, un=T)
+
+love.plot(bal.tab(m.out.b),
+          threshold = .1)
+    ```
+
+    *De nuevo parece haber un buen balance en los covariables.*
+
+a. [5 puntos] Estime ahora el TOT en el ingreso trimestral, como en la parte a., pero usando un caliper de 0.1 y 3 vecinos a ser emparejados. ¿Cómo cambian sus resultados respecto a los de la parte a.?
+
+    *El procedimiento es:*
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+sub.data <- data.jcf %>% 
+  dplyr::select(ingtot_tri, jcf2, mujer, indigena, cve_ent, rural, escoacum, 
+           casadounion, jefehog, haymenores, proggob, tot_integ, factor.x)
+
+sub.data <- sub.data[complete.cases(sub.data), ] 
+
+m.out.e <- matchit(formula=jcf2 ~ mujer + indigena + factor(cve_ent) + rural  + escoacum + 
+                   casadounion + jefehog + haymenores + proggob + tot_integ,
+                 method = "nearest",
+                 caliper = 0.1,
+                 ratio = 3,
+                 distance= "glm",
+                 replace = FALSE,
+                 data = sub.data)
+
+z.out.e <- zelig(formula = ingtot_tri ~ jcf2,
+               data=match.data(m.out.a),
+               model="ls")
+
+#Simulo las dos situaciones
+x.out.e <- setx(z.out.e, jcf2=0)
+x1.out.e <- setx1(z.out.e, jcf2=1)
+
+#Corremos la simulación
+sim.out.e <- sim(z.out.e, x=x.out.e, x1=x1.out.e)
+
+#Vemos los resultados
+summary(sim.out.e)
+```   
+
+    *El efecto estimado es de 8466.431 pesos (e.e. 342.3131), apenas distinto de los 8473.637 encontrados en la parte a. El resultado estimado es robusto a usar varios vecinos y un caliper.*
+
+a. [15 puntos] Proponga una estrategia de PSM para evaluar el efecto del programa en la probabilidad de encontrar empleo, superior a la de las partes c. y d. Para ello, escoja un modelo para el PS y un algoritmo de emparejamiento. El modelo del PS puede modificarse de diversas maneras: añadiendo polinomios de las variables continuas, incluyendo interacciones, agregando variables disponibles en los datos, o construyendo nuevas variables a partir de los datos en bruto, modificando el script *limpiar_jcf_analisis.r*. Reporte qué tan bueno es su procedimiento para construir grupos balanceados y compare los resultados que obtiene con los de las partes c. y d.
+
+    *__Aquí cometí un error al escribir la pregunta, porque debería decir "... superior a la de las partes c. y d." Mi idea era que mejoraran el modelo y el balance que se encontró para buscar el impacto en la empleabilidad. No quise deshacer lo que ya hubieran realizado hasta el momento en que me di cuenta. Consideraré este hecho cuando revise sus tareas, dando todo el crédito para lo que hayan hecho y que tenga sentido.__*
+    
+    *Intento encontrar un mejor modelo para evaluar el efecto en la empleabilidad haciendo un par de modificaciones. La primera consiste en introducir un término cuadrático para las variables de escolaridad y tamaño del hogar. La segunda es especificar un mecanismo de emparejamiento genético.*
+    
+    *El algoritmo genético hace los emparejamientos no solo en términos del PS, sino que también pone atención a los covariables mismos. El algoritmo otorga pesos a los covariables y al PS, por lo que los métodos que vimos en clase son un caso particular en los que el peso a los covariables es cero y solo nos enfocamos en el PS. Este método fue introducido por [Diamond y Sekhon (2013)](https://direct.mit.edu/rest/article-abstract/95/3/932/58101/Genetic-Matching-for-Estimating-Causal-Effects-A) y busca optimizar el balance de los covariables.*
+    
+    *La idea del método es especificar una función de distancia entre los covariables del grupo tratado y no tratado, $GMD(W)$ por genetic matching distance, que otorga pesos $W$ a cada covariable y al PS. El algoritmo comienza dando unos pesos iniciales $W$ iguales a todos los covariables y al PS (los genes parentales). Luego, genera $p_w$ mutaciones aleatoria a los pesos, dando lugar a una nueva generación de pesos $W$ de tamaño $p_w$ (pop.size en el código). Se calcula la distancia usando cada una de los candidatos a pesos, es decir, se calcula la función de pérdida $p_w$ veces. Se escoge la $W$ que minimiza la función de pérdida (selección natural) para una generación. Se repite el proceso comenzando con los pesos $W$ que minimizan $GMD(W)$ en la generación previa, hasta que se alcance el número máximo de iteraciones o el balance en los covariables deseado.*
+    
+    *Estimé este procedimiento usando un $p_w=100$, lo cual tardó más o menos una hora en correr. Se recomienda usar un $p_w$ varias veces más grandes que el que yo usé.*
+       
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE, cache=T}
+    
+sub.data <- data.jcf %>% 
+      filter(transicion==1) %>% 
+      dplyr::select(encontro, jcf, mujer, indigena, cve_ent, rural, escoacum, casadounion, jefehog, haymenores, proggob, tot_integ, factor.x)
+
+sub.data <- sub.data[complete.cases(sub.data), ] 
+
+m.out.f <- matchit(formula = jcf ~ mujer + indigena  +  factor(cve_ent) + rural  + escoacum +  escoacum^2+
+                   casadounion + jefehog + haymenores + proggob + tot_integ^2,
+                 method = "genetic",
+                 pop.size = 100,
+                 distance = "glm",
+                 replace = FALSE,
+                 data = sub.data)
+
+
+#Corroboro balance
+m.out.f[["X"]][["factor(cve_ent)"]] <- NULL
+
+bal.tab(m.out.f, m.threshold=0.1, un=T)
+
+love.plot(bal.tab(m.out.f),
+          threshold = .1)
+
+
+z.out.f <- zelig(formula = encontro ~ jcf,
+               data=match.data(m.out.f),
+               model="ls")
+
+#Simulación
+x.out.f <- setx(z.out.f, jcf=0)
+x1.out.f <- setx1(z.out.f, jcf=1)
+sim.out.f <- sim(z.out.f, x=x.out.f, x1=x1.out.f)
+summary(sim.out.f)
+
+    ```
+    
+    *Notemos que el balance mejora, como es claro en el love plot: los puntos azules están muy cerca del cero. El efecto estimado, sin embargo, no es muy distinto al encontrado en la parte c.*
+    
+    *Una de las motivaciones de hacer esta pregunta es que, dado que tenemos dos definiciones diferentes de tratamiento, __jcf__ y __jcf2__, nada nos garantiza que el balance se adecuado si mantenemos fijo el modelo del PS. Esto lo fui pensando al leer la tesina de su compañera [Daniela Díaz](http://repositorio-digital.cide.edu/handle/11651/4723), quien evaluó el efecto de tener distintos productos financieros en medidas de vulnerabilidad. Ella modificó el modelo PS para cada uno de los tratamientos, definidos como tener o no cierto producto financiero.*
+
+
+## Pregunta 2
+
+Suponga que se convierte en asesor de la instancia gubernamental encargada de la seguridad alimentaria. Al gobierno le interesa que la seguridad alimentaria de las familias productoras de maíz para autoconsumo no se vea afectada negativamente por la presencia de cierta plaga y dará una transferencia per cápita a todos los pequeños productores de maíz cuyos cultivos se considere están afectados por dicha plaga. Para determinar qué hogares reciben la transferencia se decide usar un índice de prevalencia de la plaga y se selecciona un umbral por arriba del cual está demostrado que los rendimientos del cultivo del maíz se ven seriamente afectados. Esta inspección se llevará a cabo por autoridades federales y el umbral es conocido solo por estas autoridades. Cuando se determine que la prevalencia está por encima del umbral, el monto del programa será transferido de manera inmediata, electrónicamente.
+
+a. [5 puntos] ¿Qué aspectos del programa permitirían emplear un diseño de regresión discontinua para evaluar la efectividad de este sobre la seguridad alimentaria y cómo mostraría su validez empíricamente?
+    
+    *En este caso podemos usar el método de regresión discontinua por las siguientes razones:*
+    
+    *i.	La variable de selección es continua.*
+    
+    *ii.	Es estatus de tratamiento es una función determinística de la posición de la variable de selección respecto al umbral.*
+    
+    *iii.	La probabilidad de recibir el tratamiento es discontinua en el umbral.*
+    
+    *iv.	Los productores no pueden manipular la prevalencia de la plaga para posicionarse estratégicamente por encima del umbral.*
+
+
+a. [5 puntos] ¿Cómo emplearía el diseño de este programa para evaluar su efectividad con un modelo de regresión discontinua nítida? Elabore una gráfica donde explique una situación en la que el programa muestra ser efectivo. Describa cómo usaría una regresión para hacer inferencia respecto a la efectividad del programa.
+
+    *La forma gráfica de inspeccionar la presencia de una regresión consiste en graficar la variable de resultados en función de la variable de asignación. En este caso, esperaríamos que las familias que están por encima del umbral tengan una diferencia notable en términos de seguridad alimentaria si la transferencia empleada se usa para comprar alimentos. No era estrictamente necesario simular un proceso para obtener una representación gráfica, pero aquí lo hice así. Quizás esto pueda ser de utilidad para futuras aplicaciones:*
+    
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE, cache=T}
+set.seed(1711)
+  
+plaga <- runif(1000, -1, 1)
+y <- 3 + 2*plaga + 5*(plaga>=0) + rnorm(1000, mean = 0, sd = 0.2)
+
+data.sharp <- data.frame(y, plaga, c = 0)
+
+
+data.sharp %>% 
+  ggplot() +
+  geom_point(aes(x=plaga, y=y), size=0.5, alpha=0.5) +
+  geom_abline(intercept = 3, slope = 2, linetype = "dashed") +
+  geom_abline(intercept = 8, slope = 2, linetype = "dashed") +
+  geom_vline(xintercept = 0)
+
+    ```
+    
+    *Un caso que no es una discontinuidad difusa es el representado por la siguiente situación:*
+    
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE, cache=T}
+set.seed(1711)
+
+plaga <- runif(1000, -1, 1)
+y <- ((4+0.5*plaga)*(plaga>=0))+((4+3*plaga)*(plaga<0))+ rnorm(1000, mean = 0, sd = 0.2)
+
+data.kink <- data.frame(y, plaga, c = 0)
+
+data.kink %>% 
+  ggplot() +
+  geom_point(aes(x=plaga, y=y), size=0.5, alpha=0.5) +
+  geom_abline(intercept = 4, slope = 0.5, linetype = "dashed") +
+  geom_abline(intercept = 4, slope = 3, linetype = "dashed") +
+  geom_vline(xintercept = 0)
+
+    ```
+    
+    *A esto se le conoce como [regresión con pliegues](https://blogs.worldbank.org/impactevaluations/tools-trade-regression-kink-design#:~:text=The%20regression%20discontinuity%20design%20exploits,derivative%20of%20the%20assignment%20function.) (o regression kinks). La idea es que en $x_0$ ocurre un cambio en la pendiente de la función de esperanza de $y$. [Card et al. (2016)](https://www.nber.org/papers/w22781) describen la teoría y la práctica de estos diseños que no alcanzamos a cubrir en clase.*
+    
+    *Paramétricamente, la forma más sencilla de identificar el efecto de la discontinuidad es especificando una regresión como sigue:* $$y_i=\alpha+\tau D_i+ \beta x_i+\varepsilon_i$$ *donde $x_i$ es la variable de selección y $D_i$ es una variable indicadora que toma el valor de uno cuando el índice de prevalencia de la plaga rebasa el umbral. Controlar por $x_i$ captura la relación que tiene la prevalencia de la plaga en la seguridad alimentaria, por ejemplo, vía los rendimientos. Se recomiendan al menos dos tipos de procedimientos más completos para comprobar la robustez de los efectos encontrados.*
+    
+    *El primero es incluir un polinomio lo suficientemente flexible de $x_i$:* $$y_i=\alpha+\tau D_i+ Bf(x_i)+\varepsilon_i$$
+
+    *El segundo consiste en permitir que la pendiente sea diferente antes y después de la discontinuidad:* $$y_i=\alpha+\tau D_i+ +\beta_0(x_i-x_0)+\beta_1(x_i-x_0)D_i+\varepsilon_i$$
+    
+    *Más aún, es posible combinar estas dos posibilidades para dar lugar a modelos más flexibles. Se espera que las conclusiones sean robustas al uso de modelos extremadamente complejos.*
+
+
+a. [5 puntos] ¿Qué factores podrían invalidar el uso de este método para evaluar el programa?
+
+    *La principal preocupación es la posibilidad de manipulación de la prevalencia de la plaga para que la medición lo clasifique como receptor del programa. Podemos pensar en situaciones donde esto pudiera suceder con un individuo altamente sofisticado que pudiera manipular la presencia de la plaga de forma estratégica. Pensando que esto es costoso, el individuo estratégicamente debería seleccionar un punto justo por encima del umbral. Aunque difícil de suceder esta posibilidad podría investigarse empíricamente, por ejemplo, verificando que no haya “amontonamientos” justo por encima de la discontinuidad.*
+    
+    *Si existiera corrupción y muchos no elegibles recibieran la transferencia o si las familias no gastaran la transferencia en alimentos que mejoren su seguridad alimentaria el diseño también estaría comprometido.*
+
+a. Suponga que otro de los asesores juzga como *demasiado paternalista* la transferencia y propone que, en su lugar, se otorgue un cupón válido para canjearse por bultos de un plaguicida. Asumiendo que en una encuesta posterior usted podría conocer la cantidad precisa de plaguicida aplicado, ¿cómo emplearía un diseño de regresión discontinua difusa para evaluar el efecto del uso del plaguicida sobre la seguridad alimentaria? En particular, describa:
+    i. [5 puntos] ¿Cómo estimaría la forma reducida? ¿Cuál es el coeficiente relevante y cuál es su interpretación?
+    
+        *El problema puede ser visto entonces como un diseño de regresión discontinua difusa. La discontinuidad define la intensidad del tratamiento, en este caso dada por la cantidad de plaguicida efectivamente aplicado. La forma reducida se estima con una regresión de la variable de resultados sobre el instrumento. Al igual que cuando se estudió la interpretación del LATE, este coeficiente da la correlación entre la seguridad alimentaria y el estado del tratamiento, pero no toma en cuenta que la seguridad alimentaria también depende de la cantidad de plaguicida usado, una decisión endógena.*    
+    
+    i. [5 puntos] ¿Cómo estimaría la primera y la segunda etapa? ¿Cuáles son los coeficientes relevantes y cuál es su interpretación?
+    
+        *La primera etapa consiste en estimar la relación entre la variable endógena y el instrumento. En este caso, el instrumento es una variable indicadora que toma valor de 1 si la prevalencia de la plaga rebasa el umbral. La decisión endógena es la cantidad de plaguicida empleado. Se estima por una regresión de la variable endógena en función del instrumento.*
+            
+        *La segunda etapa consiste en estimar el efecto sobre la seguridad alimentaria de la cantidad plaguicida que predice el instrumento. Conceptualmente es como si se corriera una regresión de la variable de seguridad alimentaria en función de los valores ajustados en la primera etapa de la cantidad de plaguicida empleado. En la práctica, nunca se estiman dos regresiones separadas, sino que se usa la definición del estimador de mínimos cuadrados en dos etapas. El coeficiente es el efecto del uso de plaguicida en la seguridad alimentaria.*
+        
+    i. [5 puntos] ¿Cuáles son los supuestos necesarios para estimar este modelo usando mínimos cuadrados en dos etapas?
+    
+        *Los supuestos econométricos para la estimación del modelo de regresión discontinua difusa son los mismos que para cualquier otro problema de variables instrumentales: 1) Exclusión: el instrumento no pertenece a la ecuación estructural; y 2) Relevancia de la primera etapa: el instrumento está correlacionado con la variable endógena.*
+
+
+
+## Pregunta 3
+
+La base de datos *headstar.csv* contiene información de 2,810 condados de los Estados Unidos. La variable **mort_age59_related_postHS** indica la mortalidad infantil en cada uno de los condados. El programa Head Star otorgó fondos de su componente de salud a todos los condados con un índice de pobreza superior a 59.1968. La variable **povrate60** es el índice de pobreza para cada condado. Se desea estimar el efecto del programa en la mortalidad infantil empleando un diseño de regresión discontinua.
+
+a. [5 puntos] Genere una gráfica donde muestre evidencia de una discontinuidad en la tasa de mortalidad para aquellos condados que no recibieron fondos del programa.
+
+    *Pomdemos usar las técnicas vistas en clase o, alternativamente, el paquete rdplot. Aquí uso rdplot con un polinomio de orden 1 y de orden 2, respectivamente:*
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+data.hs<-read_csv(
+  "./headstar.csv",
+  locale = locale(encoding = "latin1"))
+
+(rdplot(y = data.hs$mort_age59_related_postHS,
+        x = data.hs$povrate60,
+       c=59.1968,
+       p=1))
+    
+    
+(rdplot(y = data.hs$mort_age59_related_postHS,
+        x = data.hs$povrate60,
+       c=59.1968,
+       p=2))
+``` 
+
+a. [5 puntos] Estime la versión más básica de un modelo de regresión discontinua. Reporte el coeficiente estimado del efecto del tratamiento y su significancia estadística. Use una ventana de 10 puntos en el índice de pobreza antes y después del corte. Interprete su resultado.
+
+    *Podemos estimar el salto en la discontinuidad como:*
+    
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+data.hs <- data.hs %>% 
+  mutate(ispoor=ifelse(povrate60>=59.1968,1,0))
+    
+summary(lm(mort_age59_related_postHS ~ povrate60 + ispoor,
+           data=filter(data.hs, povrate60>=59.1968-10 & povrate60<=59.1968+10)))
+```
+
+    *Esto es, aproximadamente una reducción de 1.53 puntos en la mortalidad infantil.*
+
+a. [5 puntos] Estime la misma especificación que en la parte b., pero ahora con una ventana de 5 puntos en el índice de pobreza. Interprete sus resultados.
+    
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+summary(lm(mort_age59_related_postHS ~ povrate60 + ispoor,
+           data=filter(data.hs, povrate60>=59.1968-5 & povrate60<=59.1968+5)))
+```
+
+    *El efecto estimado es de 2.26 puntos menos en la mortalidad infantil, estimado con una mayor precisión que en la parte b.*
+
+a. [5 puntos] Regrese a una ventana de 10 puntos como en la parte b., pero ahora incluya un polinomio de grado 2 para el índice de pobreza y permita un coeficiente distinto para el índice de pobreza antes y después del corte. Interprete sus resultados.
+
+    ```{r tidy=TRUE, include=T,echo=T,collapse=TRUE,warning=FALSE, message=FALSE}
+summary(lm(mort_age59_related_postHS ~ povrate60 + I(povrate60^2) + ispoor + povrate60*ispoor + I(povrate60^2)*ispoor,
+           data=filter(data.hs, povrate60>=59.1968-10 & povrate60<=59.1968+10)))
+```
+
+    *El efecto estimado es un raro -277.33, pero no significativo. El modelo más sencillo parece darnos los resultados más sensatos. De hecho, esta pregunta estuvo basada en un artículo de [Calonico et al. (2019)](https://direct.mit.edu/rest/article-abstract/101/3/442/58514/Regression-Discontinuity-Designs-Using-Covariates?redirectedFrom=fulltext), en el que los autores desarrollan la teoria para introducir covariables en los diseños con discontinuidades. El impacto estimado es de entre -2.51 y -2.41, parecido a lo obtenido en la parte c.*
