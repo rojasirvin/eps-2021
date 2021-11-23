@@ -355,13 +355,13 @@ $$\mu_{tm}=\mu+\epsilon_{tm}$$
 
 - $F$ es el pago si los despiden
 
-- Funciones de pago
+- Función de pago en el grupo de tratamiento
 
 $$\pi_m=500+50\max\{0,d_{m-1}-10\}$$
 
 donde $d_{m-1}$ son los días trabajados en un mes
 
-- Para los tratados el pago es siempre de Rs 1,000
+- Para los no tratados el pago es siempre de Rs 1,000 al final del mes
 
 ---
 
@@ -385,9 +385,9 @@ $$
   
   - Si no te despiden, con probabilidad $(1-p_m(t,d))$, los maestros deciden lo que les de más utilidad de entre
   
-  - No ir a trabajar: $\mu-P+\epsilon_{tm}+EV_m(t+1,d;\epsilon_{t,m+1})$
+    - No ir a trabajar: $\mu-P+\epsilon_{tm}+EV_m(t+1,d;\epsilon_{t,m+1})$
   
-  - Ir a trabajar: $EV_m(t+1,d+1;\epsilon_{t,m+1})$
+    - Ir a trabajar: $EV_m(t+1,d+1;\epsilon_{t,m+1})$
 
 
 ---
