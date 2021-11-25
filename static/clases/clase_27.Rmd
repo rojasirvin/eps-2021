@@ -518,9 +518,6 @@ knitr::include_graphics("figures/Teachers_model_fit_b.png")
 
 # Próxima sesión
 
-
-# Próxima sesión
-
 - Tendremos una presentación sobre otra aplicación de modelos econométricos estructurales
 
   - Attanasio, O. P., Meghir, C., & Santiago, A. (2011). Education choices in Mexico: using a structural model and a randomized experiment to evaluate Progresa. *The Review of Economic Studies*, 79(1), 37-66.
