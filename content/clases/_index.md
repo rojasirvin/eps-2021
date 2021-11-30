@@ -105,3 +105,5 @@ Clase 25. Aplicaciones de control sintético
 [Clase 27](https://eps-2021.netlify.app/clases/clase_27.html#1). Introducción a modelos econométricos estructurales
 
 Clase 28. Aplicaciones de modelos econométricos estructurales
+
+[Clase 29](https://eps-2021.netlify.app/clases/clase_29.html#1). Aprendizaje automático

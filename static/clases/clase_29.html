@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Aprendizaje automático</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Irvin Rojas" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="libs/cide.css" type="text/css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-grid.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: title-slide
+
+
+
+&lt;style type="text/css"&gt;
+.huge .remark-code { /*Change made here*/
+  font-size: 200% !important;
+}
+.tiny .remark-code { /*Change made here*/
+  font-size: 60% !important;
+}
+&lt;/style&gt;
+
+.title[
+# Clase 29. Aprendizaje automático
+]
+.subtitle[
+## Evaluación de Programas
+]
+.author[
+### Irvin Rojas &lt;br&gt; [rojasirvin.com](https://www.rojasirvin.com/) &lt;br&gt; [&lt;i class="fab fa-github"&gt;&lt;/i&gt;](https://github.com/rojasirvin) [&lt;i class="fab fa-twitter"&gt;&lt;/i&gt;](https://twitter.com/RojasIrvin) [&lt;i class="ai ai-google-scholar"&gt;&lt;/i&gt;](https://scholar.google.com/citations?user=FUwdSTMAAAAJ&amp;hl=en)
+]
+
+.affiliation[
+### Centro de Investigación y Docencia Económicas &lt;br&gt; División de Economía
+]
+
+---
+
+class: inverse, middle, center
+
+# Machine Learning y Big Data
+
+---
+
+# Contraste con los modelos usados hasta ahora
+ 
+- Machine Learning (ML): métodos estadísticos que no asumen un modelo para los datos
+
+- El objetivo principal de ML es la predicción de `\(y\)` usando `\(x\)`
+
+- Big Data (BD): conjuntos de datos de gran tamaño, frecuencia y detalle
+
+- ML no es muy funcional con datos estándar
+
+- ML saca el mejor provecho a BD
+ 
+---
+
+# ML avanza más lento en economía
+ 
+- Nos gustan los modelos con ciertas propiedades
+
+--
+
+- ML provee ciertos métodos generales pero se espera que los analistas sean capaces de explotar la particularidad de cada problema
+ 
+- ML tiene muchos menos resultados teóricos generales
+
+---
+
+# ML en economía
+
+- Usamos datos para resolver problemas
+
+- Deberíamos incorporar más herramientas
+
+- En estadística cada vez es más aceptado el uso de ML
+
+- Tenemos una fortaleza adiciónal: tenemos teoría económica
+
+- Podemos adaptar los métodos de la micro aplicada a la disponibilidad de BD y el uso de ML
+
+---
+
+# Objetivos de ML
+ 
+- Supongamos 
+
+`$$Y_i|X_i \sim \mathcal{N}(\alpha+X_i'\beta,\sigma^2)$$`
+
+- Tradicionalmente usamos MCO
+
+--
+
+- ¿Qué si nos interesa `\(Y_{N+1}?\)`
+
+- Definimos
+
+`$$\hat{Y}_{N+1}=\hat{\alpha}+X_{N+1}'\hat{\beta}$$`
+- Planteamos otra función de pérdida
+
+`$$(Y_{N+1}-\hat{Y}_{N+1})^2$$`
+- ¿Cómo obtener `\((\hat{\alpha},\hat{\beta})\)` con *buenas* propiedades asociadas a esta función de pérdida?
+                                             
+---
+
+# Términología
+                                             
+- Datos usados para estimación `\(\rightarrow\)` *muestra de entrenamiento*
+
+- Estimación `\(\rightarrow\)` *entrenamiento*
+
+- Parámetros `\(\rightarrow\)` *pesos*
+
+- `\(X_i\)` `\(\rightarrow\)` *caracaterísticas* o *features*
+
+--
+
+- Observamos `\(X_i\)` y `\(Y_i\)` `\(\rightarrow\)` *aprendizaje supervisado*
+
+- Solo observamos `\(X_i\)` `\(\rightarrow\)` *aprendizaje no supervisado*
+                                             
+---
+
+# Más terminología
+                                             
+- Validación: qué tan bien el modelo predice fuera de la muestra
+
+- Escasez: aunque hay muchas características, pocas `\(X_i\)` tienen poder predictivo
+
+- Promedio de modelos: obtener diversos modelos y hacer un promedio ponderado donde los pesos se basan en el poder predictivo fuera de la muestra
+
+- Regulariación: penalizar modelos complejos para prefereir modelos parsimoniosos (que tienen mejor preodicción fuera de la muestra)
+
+  
+  
+---
+
+class: inverse, middle, center
+
+# Aprendizaje supervisado
+
+
+---
+                                            
+# LASSO, cresta y redes elásticas
+                                             
+
+- Consideremos la media condicional `\(g(x)=X_i'\beta\)`
+
+- `\(K\)` posiblemente grande (inclusive mayor que `\(N\)`)
+
+- Regularización: reducir la cantidad de características
+		
+`$$\beta_{q} =\arg 		\min_{\beta}\sum_{i=1}^{N}(Y_i-X_i'\beta)^2+\lambda(||\beta||_q)^{1/q}$$`
+ 
+con `\(||\beta||_q=\sum_{k=1}^{K}|\beta_k|^q\)`
+
+--
+
+- MCO: `\(\lambda=0\)`
+- LASSO: `\(q=1\)`
+- Cresta: `\(q=2\)`
+ 
+ 
+---
+
+# Árboles de regresión (*CART*)
+ 
+- Partir la muestra usando la característica `\(k\)`, un nivel `\(c\)` y calcular la media
+
+- Errores antes de partir la muestra:
+
+`$$Q= \sum_{i=1}^{N}(Y_i-\bar{Y})^2$$`
+
+- Después de partir la muestra:
+  
+`$$Q(k,c)=\sum_{i:X_{ik}\leq c}(Y_i-\bar{Y}_{k,c,l})^2+\sum_{i:X_{ik}&gt;c}(Y_i-\bar{Y}_{k,c,l})^2$$`
+
+ 
+- Optimizar para todos los posibles `\(k\)` y `\(c\)` de tal modo que se minimice el error cuadrado promedio `\(Q(k,c)\)`
+
+- Repetir esto para las *hojas* resultantes
+
+
+---
+
+# Ejemplo de un árbol de regresión
+ 
+&lt;img src="figures/regression_tree_example.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Ejemplo de un árbol de regresión
+
+ 
+&lt;img src="figures/regression_tree_example2.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Ejemplo de un árbol de regresión
+
+&lt;img src="figures/tree_titanic.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Mejores predicciones
+
+- Añadir aleatoriedad puede ayudar a mejorar predicciones
+
+- *Bootstrap*: escoger con remplazo una muestra de tamaño `\(n\)` para estimar la distribución de un estadístico
+
+- *Bagging*: promediar entre modelos estimados con distintas muestras bootstrap
+
+- *Boosting*: estimar modelos repetidamente dándole cada vez más peso a las observaciones incorrectamente clasificadas y usar una regla para elegir la clasificación final (voyo o promedio entre estimaciones)
+
+
+---
+
+# Bosques aleatorios
+ 
+- Estimar el mismo árbol de regresión con:
+
+  - Una submuestra bootstrap
+  
+  - Optimizando con una submuetra aleatoria de características
+   
+- En vez de predecir `\(Y_i\)` usando un árbol, predecimos usando *bagging* en el bosque
+ 
+ 
+---
+
+# Aprendizaje profundo y redes neuronales
+ 
+- Útiles con una gran cantidad de características
+
+- `\(X_{ik}\)` se usan para modelar `\(K_1\)` variables latentes no observadas:
+  
+`$$Z_{jk}^{(1)}=\sum_{j=1}^K \beta^{(1)}_{kj}X_{ij}$$`
+- Y modelamos:
+  
+`$$Y_i=\sum_{k=1}^{K_1}\beta_k^{(2)}g\left[Z_{jk}^{(1)}\right]+\varepsilon_i$$`
+ 
+- Esta es una red neuronal con una capa oculta y `\(K_1\)` nodos ocultos
+
+- `\(g(\cdot)\)` es una transformación no lineal que introduce no linealidades en el modelo (como `\(g(z)=(1+\exp(-z))^{-1}\)`)
+ 
+---
+
+# *Boosting*
+ 
+- Tomar una predicción, por ejemplo de un árbol
+
+- Crear los residuales `\(Y_i-\hat{Y}_i^{(1)}\)` 
+
+- Usar el error como outcome, empleando el algoritmo original
+
+- Tenemos un nuevo residual `\(Y_i-\hat{Y}_i^{(2)}\)`
+
+- Repetir muchas veces 
+ 
+ 
+---
+
+class: inverse, middle, center
+
+# Aprendizaje no supervisado
+
+---
+
+# Agrupamiento por `\(K\)` medias
+ 
+- No tenemos outcome `\(Y_i\)`
+
+- Dadas las características `\(X_i\)`, queremos particionar el espacio de características en `\(K\)` subespacios o grupos
+
+- Se eligen *centroides* `\(b_1,...,b_K\)` y se asignan a las unidades a un grupo basados en su cercanía a los centroides
+
+- Comenzar con centroides distribuidos en todo el espacio
+
+- Asignar a las unidades al grupo más cercano
+
+- Actualizar los centroides con el promedio de las características en cada grupo
+
+- Repetir varias veces
+ 
+ 
+---
+
+class: inverse, middle, center
+
+# ML e inferencia causal
+
+---
+
+# ML en la estimación del ATE
+ 
+- El efecto del tratamiento es:
+  
+$$
+`\begin{aligned}
+\tau=&amp;E\left[\mu(1,X_i)-\mu(0,X_i)\right] \\
+=&amp;E\left(\frac{Y_i W_i}{e(W_i)}-\frac{Y_i (1-W_i)}{1-e(W_i)} \right)
+\end{aligned}`
+$$
+- ML puede emplearse para estimar el `\(PS\)` de forma que le otorgue peso a las características con el objetivo de generar balance
+
+- Un poco menos exitoso es usar ML para predecir directamente `\(\mu(\cdot)\)`
+   
+---
+
+# Diseños experimentales
+ 
+- Asignar a muchos individuos a una brazo de tratamiento puede ser ineficiente
+
+- Con variables de respuesta de reacción rápida podemos descartar pronto tratamientos inefectivos
+
+---
+
+# Completamiento de matrices
+ 
+- Supongamos que tenemos resultados observados y estados de tratamiento
+- El problema del efecto de tratamiento consiste en rellenar las matrices contrafactuales no observadas
+- Sea `\(L\)` la matriz de valores esperados, entonces:
+  
+`$$Y_{it}=\begin{cases}L_{it}+\varepsilon_{it}  &amp; \mbox{si } W_{it}=1 \\  0  &amp; \mbox{en otro caso }\end{cases}$$`
+     
+- `\(L=USV'\)`, con `\(U\)` de `\(N \times N\)`, `\(V\)` de `\(T \times T\)` y `\(S\)` de `\(N \times T\)` con rango `\(R\)` y con elementos distintos de cero solo en la diagonal principal
+
+- Problema: estimar el producto `\(L=USV'\)` tal que minimice
+
+`$$\min_L\left\{\sum_{(i,t)\in \mathcal{O}}(Y_{it}-L_{it})^2+\lambda||L||_*\right\}$$`
+---
+
+# Ejemplo de la matriz observada
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/matrices_observed.png" alt="Fuente: Athey e Imbens (2019)" width="70%" /&gt;
+&lt;p class="caption"&gt;Fuente: Athey e Imbens (2019)&lt;/p&gt;
+&lt;/div&gt;
+    
+---
+    
+# Ejemplo de matriz a completar
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/matrices_tocomplete.png" alt="Fuente: Athey e Imbens (2019)" width="60%" /&gt;
+&lt;p class="caption"&gt;Fuente: Athey e Imbens (2019)&lt;/p&gt;
+&lt;/div&gt;
+        
+---
+    
+# Otras aplicaciones
+     
+- Control sintético
+
+- Impactos heterogéneos
+     
+---
+    
+# Ejemplo: impacto de publicidad en línea
+     
+- Usar técnicas de ML para modelar las ventas en una serie de tiempo
+
+- Incluso se pueden usar las búsquedas de Google para predecir las ventas
+
+- Implementar la campaña y comparar los valores de ventas predichos con los realizados
+
+- Noten que esto tiene la intuición del control sintético
+
+---
+
+# Ejemplo de predicción en ventas
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/sales_prediction.png" alt="Fuente: Athey e Imbens (2019)" width="50%" /&gt;
+&lt;p class="caption"&gt;Fuente: Athey e Imbens (2019)&lt;/p&gt;
+&lt;/div&gt;
+         
+---
+
+class: inverse, middle, center
+
+# Conclusión
+
+---
+
+# Incorporar ML y BD en el análisis de impacto
+
+- Gran disponibilidad de datos con mucho detalle
+
+- Gran disponibilidad de datos en internet que pueden consecharse
+
+- Los métodos de ML son extendibles a los métodos experimentales y no experimentales del curso
+
+- Hay ciertos costos, quizás los más grandes en términos de programación
+
+- ML y BD se volverán parte de la caja de herramientas de los economistas y otros científicos sociales
+
+---
+
+# Próxima sesión
+
+- Veremos una aplicación de lo que hemos estudiado hoy
+
+  - Oshri, B., et al. (2018). Infrastructure quality assessment in Africa using satellite imagery and deep learning. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery &amp; Data Mining (pp. 616-625).
+
+- Y será nuestra última clase
+
+---
+
+class: center, middle
+
+Presentación creada usando el paquete [**xaringan**](https://github.com/yihui/xaringan) en R.
+
+El *chakra* viene de [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), y [R Markdown](https://rmarkdown.rstudio.com).
+
+Material de clase en versión preliminar.
+
+**No reproducir, no distribuir, no citar.**
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script src="libs/cols_macro.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
