@@ -1,0 +1,493 @@
+---
+title: "Respuestas a la tarea 4"
+summary: " "
+weight: 2
+type: book
+toc: false
+---
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+library(pacman)
+library(janitor)
+library(sandwich)
+#library(nnet)
+#library(mlogit)
+library(readr)
+library(clubSandwich)
+#library(modelsummary)
+library(estimatr)
+library(data.table)
+library(Synth)
+
+xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
+```
+
+  
+## Instrucciones
+  
+La tarea debe entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las secciones teóricas deben estar desarrolladas en un procesador de textos y enviadas en formato .docx o .pdf. Las secciones prácticas deberán contener archivos de código replicable y archivos de salida en R (o similares, en caso de usar otro software) para considerarse completas. Las tareas deben entregarse antes de la fecha límite a través de Teams. Puede crear una carpeta comprimida que contenga todos sus archivos y subir esta carpeta en Teams. Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.
+
+
+El archivo *basque.csv* contiene los datos empleados por Abadie y Gardeazabal (2003) para estimar el efecto del terrorismo en el PIB per cápita (**gdpcap**) en el País Vasco usando el método de control sintético. Los autores consideran como periodo pre intervención a 1955 - 1969.
+
+a. [10 puntos] Estime el control sintético del PIB per cápit del País Vasco usando como *grupo donador* al resto de las regiones de España. Esto es, encuentre la matriz $W$ que otorga pesos a las distintas regiones usando una serie de predictores observables. Para este propósito, use como predictores el promedio de las siguientes variables para el periodo 1964-1969:
+
+    - La inversión como porcentaje del PIB, **invest**
+    - El porcentaje de la población analfabeta, **school.illit**
+    - El porcentaje de la población con educación primaria, **school.prim**
+    -	El porcentaje de la población con educación media, **school.med**
+    -	El porcentaje de la población con educación superior, **school.high**
+    -	El porcentaje de la población con educación más que superior, **school.post.high**
+    
+     Además, use como *predictores especiales* los siguientes valores:
+
+    -	El promedio del PIB per capita, **gdpcap**, de 1960 a 1969
+    -	La densidad de población, **popdens**, de 1969
+    -	El promedio de la participación de la agricultura, **sec.agriculture**, de 1961 a 1969
+    -	El promedio de la participación de la energía, **sec.energy**, de 1961 a 1969
+    - El promedio de la participación de la industria, **sec.industry**, de 1961 a 1969
+    -	El promedio de la participación de la construcción, **sec.construction**, de 1961 a 1969
+    -	El promedio de la participación de los servicios, **sec.services.venta**, de 1961 a 1969
+    -	El promedio de la participación de los servicios no comerciables, **sec.services.nonventa**, de 1961 a 1969
+
+    Note que el País Vasco está identificado con el número 17 de la variable **regionno**. Realice el procedimiento de optimización para minimizar las discrepancias entre la unidad tratada y su sintético usando el periodo 1960-1969.
+
+    ¿Qué regiones y con qué pesos contribuyen a construir el País Vasco sintético?
+    
+    
+    *Implementamos el método de control sintético:*
+
+    ```{r echo=F, eval=T, results=F, message=F, warning=F, cache=T}
+setwd("C:/Users/rojas/Dropbox/Evaluación de Programas Sociales/2021/tareas/Tarea 4")
+
+data_vasco <- data.frame(read_csv("./basque.csv"))
+
+dataprep.out <- dataprep(foo = data_vasco,
+                      predictors = c("invest", "school.illit", "school.prim", "school.med", "school.high", "school.post.high"),
+                      predictors.op = c("mean"),
+                      dependent = c("gdpcap"),
+                      unit.variable = c("regionno"),
+                      time.variable = c("year"),
+                      special.predictors = list(
+                        list("gdpcap", 1960:1969,c("mean")),
+                        list("sec.agriculture", 1961:1969,c("mean")),
+                        list("sec.energy", 1961:1969,c("mean")),
+                        list("sec.industry", 1961:1969,c("mean")),
+                        list("sec.construction", 1961:1969,c("mean")),
+                        list("sec.services.venta", 1961:1969,c("mean")),
+                        list("sec.services.nonventa", 1961:1969,c("mean")),
+                        list("popdens", 1969,c("mean"))),
+                      treatment.identifier = 17,
+                      controls.identifier = c(2:16,18),
+                      time.predictors.prior = c(1964:1969),
+                      time.optimize.ssr = c(1960:1969),
+                      unit.names.variable = c("regionname"),
+                      time.plot = c(1955:1997))
+
+synth.out <- synth(data.prep.obj = dataprep.out)
+
+synth.tables <- synth.tab(
+  dataprep.res = dataprep.out,
+  synth.res = synth.out
+)
+    ```
+    
+    ```{r echo=T, eval=F, results=F, message=F, warning=F, cache=T}
+setwd("C:/Users/rojas/Dropbox/Evaluación de Programas Sociales/2021/tareas/Tarea 4")
+
+data_vasco <- data.frame(read_csv("./basque.csv"))
+
+dataprep.out <- dataprep(foo = data_vasco,
+                      predictors = c("invest", "school.illit", "school.prim", "school.med", "school.high", "school.post.high"),
+                      predictors.op = c("mean"),
+                      dependent = c("gdpcap"),
+                      unit.variable = c("regionno"),
+                      time.variable = c("year"),
+                      special.predictors = list(
+                        list("gdpcap", 1960:1969,c("mean")),
+                        list("sec.agriculture", 1961:1969,c("mean")),
+                        list("sec.energy", 1961:1969,c("mean")),
+                        list("sec.industry", 1961:1969,c("mean")),
+                        list("sec.construction", 1961:1969,c("mean")),
+                        list("sec.services.venta", 1961:1969,c("mean")),
+                        list("sec.services.nonventa", 1961:1969,c("mean")),
+                        list("popdens", 1969,c("mean"))),
+                      treatment.identifier = 17,
+                      controls.identifier = c(2:16,18),
+                      time.predictors.prior = c(1964:1969),
+                      time.optimize.ssr = c(1960:1969),
+                      unit.names.variable = c("regionname"),
+                      time.plot = c(1955:1997))
+
+synth.out <- synth(data.prep.obj = dataprep.out)
+
+synth.tables <- synth.tab(
+  dataprep.res = dataprep.out,
+  synth.res = synth.out
+)
+
+    ```
+
+    *Recuperamos los pesos:*
+
+    ```{r echo=T, eval=T, results=T, warning=F, cache=T}
+print(synth.tables$tab.w)
+    ```
+
+    *El País Vasco sintético se obtiene como una combinación de Cataluña y Madrid, con unos pesos de 0.851 y 0.149, respectivamente.*
+
+
+a. [10 puntos] Obtenga un gráfico en donde represente las series de tiempo del PIB per cápita del País Vasco que efectivamente se realizó, la de su correspondiente control sintético y la del promedio simple del resto de las regiones españolas. Esto es, coloque en un solo gráfico la información de las diapositivas 25 y 26 de la [clase 25](https://eps-2021.netlify.app/clases/clase_24.html#25).
+
+    *Recuperamos las series originales y sintética del País Vasco:*
+
+    ```{r echo=T, eval=T, results=T, warning=F, cache=T}
+    
+Ys <- dataprep.out$Y0plot %*% synth.out$solution.w
+                    
+Y1 <- dataprep.out$Y1plot
+    ```
+    
+    *Por otro lado, podemos calcular el promedio sobre todas las regiones de la matriz $Y0plot$:
+    
+    ```{r echo=T, eval=T, results=T, warning=F, cache=T}
+    Y0media <- matrix(rowMeans(dataprep.out$Y0plot))
+    ```
+
+    *Y ponemos todo en un data frame para graficarlo fácilmente:*
+    
+    ```{r echo=T, eval=T, results=T, warning=F, cache=T}
+data.plot <- as.data.frame(cbind(Y1,Ys, Y0media))
+    
+colnames(data.plot) <- c("Y1","Ys","Y0media")
+data.plot <- data.plot %>% 
+  mutate(year=seq(from=1955, to=1997))
+
+#Gráfico de series
+data.plot %>% 
+  ggplot(aes(x=year))+
+  geom_line(aes(y=Y1, linetype = "País Vasco")) +
+  geom_line(aes(y=Ys, linetype = "Sintético"))+
+  geom_line(aes(y=Y0media, linetype = "Resto de España"))+
+  geom_vline(xintercept=1970, color = "black", size=1, linetype="dashed")+
+  scale_x_continuous(breaks=seq(1955, 1997, 5))+
+   labs(x = "Año",
+        y = "PIB per capita",
+        linetype = "Legend") +
+  scale_linetype_manual(values = c("País Vasco"="solid", "Sintético"="dashed", "Resto de España"="dotted"))
+  
+    ```
+    *El País Vasco era más rico que el promedio del resto de las regiones españolas. Durante el periodo post al inicio de la actividad terrorista, el resto de España siguió creciendo, pero el País Vasco se acercó hacia abajo.*
+
+a. [10 puntos] Genere una gráfica de brechas que muestre el efecto del terrorismo sobre el PIB per capita. La brecha es la diferencia entre la serie de tiempo realizada y su contraparte sintética.
+
+    *El gráfico de brechas se obtiene fácilmente con las funciones de Synth:*
+
+    ```{r echo=T, eval=T, results=T, warning=F, cache=T}
+
+gaps.plot(synth.res = synth.out,
+          dataprep.res = dataprep.out,
+          tr.intake = 1970,
+          Ylab = c("GDP per capita"),
+          Xlab = c("year"), 
+          Ylim = c(-4,4))
+    ```
+    
+    *El gráfico de las trayectorias es:*
+    
+    ```{r echo=F, eval=T, results=T, warning=F, cache=T}
+path.plot(synth.res = synth.out,
+          dataprep.res = dataprep.out,
+          tr.intake = 1955:1997,
+          Ylab = c("GDP per capita"),
+          Xlab = c("year"))
+    ```
+    
+
+a. [10] Realice un ejercicio de placebos en el espacio, similar al que llevamos a cabo en el laboratorio. La idea es estimar el control sintético para todas las regiones. Una vez que tenga el PIB per capita sintético para las 17 regiones, genere un histograma donde represente la razón del error de predicción cuadrado medio. Para ello, para cada región, debe obtener el error de predicción cuadrado promedio para los periodos pre y post intervención y luego obtener la razón de estos. ¿Cómo es la razón del error de predicción cuadrado medio para el País Vasco y qué nos dice de la significancia estadística del efecto estimado?
+
+    *Noten que la región 1 es el total de España. No queremos usar esa región, así que el loop debe ignorarla. El ejercicio placebo es:*
+
+    ```{r echo=F, eval=T, results=F, message=F, warning=F, cache=T}
+    
+placebos <- data.frame(matrix(ncol = 17, nrow = 43))
+
+#Hacemos un ciclo para operacionalizar el trabajo
+for (j in 2:18) {
+  
+tunit <- j
+tunit_m1 <- j-1
+tunit_p1 <- j+1
+
+if (j==2)
+  dpool <- c(3:18)
+else
+  if (j==18)
+    dpool <- c(2:17)
+  else
+    dpool <- c(2:tunit_m1,tunit_p1:18)
+
+dataprep.out <- dataprep(foo = data_vasco,
+                      predictors = c("invest", "school.illit", "school.prim", "school.med", "school.high", "school.post.high"),
+                      predictors.op = c("mean"),
+                      dependent = c("gdpcap"),
+                      unit.variable = c("regionno"),
+                      time.variable = c("year"),
+                      special.predictors = list(
+                        list("gdpcap", 1960:1969,c("mean")),
+                        list("sec.agriculture", 1961:1969,c("mean")),
+                        list("sec.energy", 1961:1969,c("mean")),
+                        list("sec.industry", 1961:1969,c("mean")),
+                        list("sec.construction", 1961:1969,c("mean")),
+                        list("sec.services.venta", 1961:1969,c("mean")),
+                        list("sec.services.nonventa", 1961:1969,c("mean")),
+                        list("popdens", 1969,c("mean"))),
+                      treatment.identifier = j,
+                      controls.identifier = dpool,
+                      time.predictors.prior = c(1964:1969),
+                      time.optimize.ssr = c(1960:1969),
+                      unit.names.variable = c("regionname"),
+                      time.plot = c(1955:1997))
+
+#Repetimos tareas
+synth.out <- synth(data.prep.obj = dataprep.out)
+Ys <- dataprep.out$Y0plot %*% synth.out$solution.w
+Y1 <- dataprep.out$Y1plot
+
+data.plot <- as.data.frame(cbind(Y1,Ys))
+colnames(data.plot) <- c("Y1","Ys")
+data.plot <- data.plot %>% 
+  mutate(gap=Y1-Ys)
+
+#Guardamos donde corresponde
+placebos[,j-1] <- data.plot$gap
+
+#Para ir viendo en dónde vamos
+print(j)
+
+}
+
+
+##Ahora tenemos un panel de regiones placebo
+placebos <- placebos %>% 
+  mutate(year=seq(from=1955, to=1997))
+
+#Pasamos todo a formato long
+placebos <- placebos %>%
+  pivot_longer(cols=starts_with("X"),
+               names_to = "region",
+               values_to = "gdp_synth") %>% 
+  mutate(region=as.numeric(substr(region,2,3))) %>% 
+  mutate(region=region+1) %>% 
+  mutate(treated=ifelse(region==17,1,0)) %>% 
+  mutate(treated=factor(treated, levels=c("0","1"), labels=c("regiones de control", "País Vasco")))
+
+    ```
+
+    ```{r echo=T, eval=F, results=F, message=F, warning=F, cache=T}
+    
+placebos <- data.frame(matrix(ncol = 17, nrow = 43))
+
+#Hacemos un ciclo para operacionalizar el trabajo
+for (j in 2:18) {
+  
+tunit <- j
+tunit_m1 <- j-1
+tunit_p1 <- j+1
+
+if (j==2)
+  dpool <- c(3:18)
+else
+  if (j==18)
+    dpool <- c(2:17)
+  else
+    dpool <- c(2:tunit_m1,tunit_p1:18)
+
+dataprep.out <- dataprep(foo = data_vasco,
+                      predictors = c("invest", "school.illit", "school.prim", "school.med", "school.high", "school.post.high"),
+                      predictors.op = c("mean"),
+                      dependent = c("gdpcap"),
+                      unit.variable = c("regionno"),
+                      time.variable = c("year"),
+                      special.predictors = list(
+                        list("gdpcap", 1960:1969,c("mean")),
+                        list("sec.agriculture", 1961:1969,c("mean")),
+                        list("sec.energy", 1961:1969,c("mean")),
+                        list("sec.industry", 1961:1969,c("mean")),
+                        list("sec.construction", 1961:1969,c("mean")),
+                        list("sec.services.venta", 1961:1969,c("mean")),
+                        list("sec.services.nonventa", 1961:1969,c("mean")),
+                        list("popdens", 1969,c("mean"))),
+                      treatment.identifier = j,
+                      controls.identifier = dpool,
+                      time.predictors.prior = c(1964:1969),
+                      time.optimize.ssr = c(1960:1969),
+                      unit.names.variable = c("regionname"),
+                      time.plot = c(1955:1997))
+
+#Repetimos tareas
+synth.out <- synth(data.prep.obj = dataprep.out)
+Ys <- dataprep.out$Y0plot %*% synth.out$solution.w
+Y1 <- dataprep.out$Y1plot
+
+data.plot <- as.data.frame(cbind(Y1,Ys))
+colnames(data.plot) <- c("Y1","Ys")
+data.plot <- data.plot %>% 
+  mutate(gap=Y1-Ys)
+
+#Guardamos donde corresponde
+placebos[,j-1] <- data.plot$gap
+
+#Para ir viendo en dónde vamos
+print(j)
+
+}
+
+
+##Ahora tenemos un panel de regiones placebo
+placebos <- placebos %>% 
+  mutate(year=seq(from=1955, to=1997))
+
+#Pasamos todo a formato long
+placebos <- placebos %>%
+  pivot_longer(cols=starts_with("X"),
+               names_to = "region",
+               values_to = "gdp_synth") %>% 
+  mutate(region=as.numeric(substr(region,2,3))) %>% 
+  mutate(region=region+1) %>% 
+  mutate(treated=ifelse(region==17,1,0)) %>% 
+  mutate(treated=factor(treated, levels=c("0","1"), labels=c("regiones de control", "País Vasco")))
+
+```
+
+    *No era necesario replicar este gráfico, pero lo hacemos para visualizar qué esperar:*
+    
+    ```{r echo=T, eval=T, results=T, warning=F, cache=T}
+placebos %>%
+  ggplot(aes(x=year, y=gdp_synth, group=region, linetype=treated, color=treated))+
+  geom_line()+
+  scale_linetype_manual(values=c("solid", "solid"))+
+  scale_color_manual(values=c("grey","black")) +
+  ylab("PIB per cápita")+
+  xlab("Año")+
+  geom_vline(xintercept=1970, color = "black", size=.5, linetype="dashed")+
+  geom_hline(yintercept=0, color = "black", size=.5, linetype="dashed")+
+  scale_x_continuous(breaks=seq(1955, 1997, 5))+
+  theme(legend.title = element_blank(),
+        legend.position = c(.14, .90),
+        legend.box.background = element_rect(color="black", size=.3),
+        legend.box.margin = margin(1, 1, 1, 1))
+    ```
+
+    *La mayoría de las regiones tienen buen ajuste pre intervención y la brecha post intervención del País Vasco efectivamente parece atípica. Calculemos el error cuadrático de predicción promedio pre y post intervención:*
+    
+    ```{r echo=T, eval=T, results=T, warning=F, cache=T}
+    mspe <- placebos %>% 
+      mutate(pre = ifelse(year<1970,"pre","post"),
+             spe = gdp_synth^2) %>% 
+      group_by(region, pre) %>% 
+      summarise(mspe = mean(spe)) %>% 
+      ungroup() %>%
+      pivot_wider(id_cols = region,
+                  names_from = pre,
+                  values_from = mspe) %>%
+      mutate(ratio_mspe=post/pre) %>% 
+      mutate(tipo = ifelse(region==17, "País Vasco", "Otras regiones"))
+    ```
+    
+    *Y hago un histograma:*
+    
+    ```{r echo=T, eval=T, results=T, warning=F, cache=T}
+    mspe %>% 
+      ggplot(aes(ratio_mspe, fill=tipo)) +
+      geom_histogram(binwidth  = 20)
+    ```
+
+    *El País Vasco resulta tener la sexta razón de MSPE más grande. Mi interpretación es la siguiente: hay regiones que crecieron debido a cambios estructurales en su economía ocurridas en algún momento posterior a 1970. Cataluña debe ser un típico ejemplo. Entonces, el MSPE post 1970 está capturando las discrepancias entre el sintético que proyecta lo que hubiera pasado si no hubiera habido estos cambios y lo que efectivamente sucedió a estas regiones, que no tiene que ver con el terrorismo.*
+    
+    *Recuerden que el placebo asume que nada pasa en el resto de las unidades. La lección que sacamos de esto es que tengamos cuidado con los placebos en el espacio cuando es posible que las unidades del grupo donador sufran cambios pos intervención, no relacionadas a la intervención.*
+
+# Pregunta 2
+
+Basado en Low, H., y Meghir, C. (2017).[^2]
+
+a. [5 puntos] ¿Cuáles son las diferencias entre un modelo econométrico estructural y uno de forma reducida?
+
+    *Algunas diferencias incluyen:*
+    
+    1. *Los modelos estructurales tienen como primitivas las funciones de utilidad, beneficios y/o pagos de los agentes económicos.*
+  
+    1. *Los modelos de forma reducida no describen los canales por los cuales ocurren los efectos de un cambio en las variables independientes. En cambio, los modelos estructurales son útiles para trazar los canales por medio de los cuales los agentes responden a cambios en las variables relevantes y, potencialmente, incorporan la endogeneidad de las variables de estado.*
+    
+    1. *Los modelos de forma reducida no capturan del todo la dinámica de los efectos. Los modelos estructurales incorporan el aspecto dinámico de muchas decisiones económicas, por ejemplo, incorporando cómo las decisiones presentes afectan la utilidad futura (por ejemplo, al invertir en capital humano). Los modelos estructurales también pueden incorporar incertidumbre al incluir la formación de expectativas que afecta las decisiones en el presente. Finalmente, los modelos estructurales también son útiles para incorporar la interacción estratégica de los agentes.*
+
+a. [5 puntos] ¿Qué se entiende por un modelo completamente especificado?
+
+    *Un modelo complemente especificado expone explícitamente:*
+
+    1. *La forma funcional de las primitivas*
+    1. *El conjunto de opciones sobre el que los agentes optimizan*
+    1. *Las funciones de política/decisión/reacción que definen cómo los agentes deciden con respecto al valor de las variables de estado*
+    1. *Las funciones de transición de las variables de estado*
+    1. *La función valor del problema*
+
+a. [5 puntos] ¿Cómo se puede combinar la información proveniente de una intervención experimental con un modelo estructural? Mencione un ejemplo de una combinación exitosa de esta naturaleza.
+
+    *La variación experimental puede ser empleada para estimar el modelo estructural y para validarlo.*
+
+    *En cuanto a la estimación, la variación exógena, por ejemplo, en Attanasio, Meghir y Santiago (2012), se emplea para identificar la respuesta de los agentes a distintos niveles de la transferencia de PROGRESA (la transferencia varía por sexo y por nivel educativo). La posibilidad de usar la variación exógena en la estimación es limitada dado que muchas veces las intervenciones se manifiestan como variables binarias.*
+
+    *Por otro lado, se puede usar la variación exógena para validar los modelos estructurales. Por ejemplo, usando los datos del grupo de control, se pueden estimar los parámetros en el modelo. Luego se puede usar el modelo para obtener la respuesta esperada a un cambio exógeno en el ingreso (en este caso, PROSPERA) y validar hipótesis*
+
+a. [5 puntos] ¿En qué consiste el método de momentos para la estimación de modelos estructurales?
+
+    *El método de momentos es un método para la estimación de modelos estructurales. La idea es definir momentos muestrales que se desean replicar con el modelo. Por ejemplo, la media y varianza de la deserción en un modelo de asistencia escolar, o ciertos cuartiles en la distribución de años de escolaridad acumulados. La estimación del modelo consiste en encontrar los parámetros que son consistentes con las condiciones de optimización y que mejor aproximen los momentos muestrales seleccionados.*
+
+[^2]: Low, H., & Meghir, C. (2017). The use of structural models in econometrics. *Journal of Economic Perspectives*, 31(2), 33-58.
+
+
+# Pregunta 3
+
+Basado en Athey e Imbens (2019).[^4]
+
+a. [5 puntos] ¿Cuál es la diferencia entre machine learning y los modelos econométricos estándar?
+
+    *La diferencia principal se encuentra en el propósito de la estimación. Con los modelos econométricos tradicionales buscamos los parámetros que rigen la relación entre variables. Consideramos estos parámetros de central importancia para la comprensión de fenómenos económicos. En cambio, las técnicas de machine learning tienen como objetivo primordial la predicción y los modelos se juzgan con base en este criterio. Los parámetros estimados frecuentemente se conocen como pesos, quitando de ellos la connotación de fundamentales para la comprensión de las relaciones económicas.*
+    
+a. [5 puntos] ¿Para qué sirven y en qué consisten las técnicas LASSO y de regresión ridge?
+
+    *LASSO y ridge son técnicas de machine learning para la selección de modelos. Aunque el objetivo principal es la predicción, se prefieren también modelos parsimoniosos a modelos más complicados. Por tanto, los diversos algoritmos empleados para generar predicciones castigan modelos más complejos. Además, cuando se trabaja con datos grandes, frecuentemente se tienen características que no tienen ninguna relación con la variable de interés, sin embargo, es difícil decir cuáles son por simple inspección. Los algoritmos de LASSO y ridge sirven para realizar esta tarea de seleccionar las características empleadas para la predicción penalizando modelos más complejos.*
+
+a. [5 puntos] ¿En qué consisten los árboles de regresión y los bosques aleatorios?
+
+    *Los árboles de regresión son técnicas para hacer predicciones. En cada nodo del árbol se elige una característica y un nivel crítico de la misma que define una variable binaria. Para cada unidad, las dos ramas pueden llevar a una predicción o a una nueva partición usando una nueva variable. Los bosques aleatorios son técnicas que permiten refinar las predicciones de los árboles de regresión. Los bosques se generan a partir de muestras bootstrap con las que se estiman los árboles de regresión, usando subconjuntos de características.*
+    
+a. [5 puntos] ¿Cómo puede emplearse machine learning para la estimación de efectos de tratamiento?
+
+    *Machine learning puede ser auxiliar en distintas técnicas de estimación de efectos de tratamiento. Por ejemplo, pueden usarse para estimar el propensity score y condicionar a que el modelo resultante balancee las características. En el contexto de control sintético, puede emplearse para seleccionar las características que se usan para estimar el control sintético y para seleccionar los individuos del grupo donador que aportan información para construirlo. La disponibilidad de datos grandes permite analizar efectos heterogéneos de los tratamientos, que pueden ser identificados usando técnicas de machine learning.*
+
+[^4]: Athey, S., & Imbens, G. W. (2019). Machine learning methods that economists should know about. *Annual Review of Economics*, 11.
+
+# Pregunta 4
+
+Basado en Varían (2014).[^5]
+
+a. [5 puntos] ¿Qué es la predicción fuera de la muestra?
+
+    *La predicción fuera de la muestra se refiere a la capacidad de los modelos estimados a partir de ciertos datos para predecir con unos nuevos datos no usados para la estimación.*
+    
+a. [5 puntos] ¿A qué se refiere el problema de sobreajuste en la predicción?
+
+    *Se refiere a que al usar un conjunto de datos para estimar y juzgar el desempeño del modelo con base en qué tan bien el modelo replica los mismos datos es poco informativo sobre la capacidad predictiva del modelo fuera de la muestra.*
+    
+a. [5 puntos] ¿Cómo se puede evaluar el efecto de una campaña de publicidad en internet empleando las técnicas descritas en el texto?
+
+    *Una propuesta presentada en el texto consiste en recabar datos sobre usuarios y sus patrones de gasto y actividad en la red previo a la introducción de la campaña. Con estos datos, entrenar un modelo de predicción de ventas que tome en cuenta la estacionalidad y otros factores que las afectan. Luego, una vez arrancada la campaña publicitaria, comparar los valores predichos de ventas con los valores realizados y juzgar como efecto del tratamiento a la diferencia entre estas dos cantidades.*
+    
+a. [5 puntos] ¿Cuál es la principal fuente de incertidumbre en el modelo en el contexto de big data?
+
+    *La principal fuente de incertidumbre se convierte en la elección del modelo. Esto se había reconocido de cierta manera en la econometría tradicional en forma de “pruebas de robustez”. Las técnicas de machine learning han adoptado el promedio de modelos, lo cual rara vez ocurre en la econometría más tradicional, como una forma de tomar en cuenta de manera explícita la incertidumbre sobre los modelos para la predicción.*
+
+[^5]: Varian, H. R. (2014). Big data: New tricks for econometrics. *Journal of Economic Perspectives*, 28(2), 3-28
