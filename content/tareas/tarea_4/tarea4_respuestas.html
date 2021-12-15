@@ -9,9 +9,8 @@ toc: false
 <script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-<div id="instrucciones" class="section level2">
-<h2>Instrucciones</h2>
-<p>La tarea debe entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las secciones teóricas deben estar desarrolladas en un procesador de textos y enviadas en formato .docx o .pdf. Las secciones prácticas deberán contener archivos de código replicable y archivos de salida en R (o similares, en caso de usar otro software) para considerarse completas. Las tareas deben entregarse antes de la fecha límite a través de Teams. Puede crear una carpeta comprimida que contenga todos sus archivos y subir esta carpeta en Teams. Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.</p>
+<div id="pregunta-1" class="section level1">
+<h1>Pregunta 1</h1>
 <p>El archivo <em>basque.csv</em> contiene los datos empleados por Abadie y Gardeazabal (2003) para estimar el efecto del terrorismo en el PIB per cápita (<strong>gdpcap</strong>) en el País Vasco usando el método de control sintético. Los autores consideran como periodo pre intervención a 1955 - 1969.</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>[10 puntos] Estime el control sintético del PIB per cápit del País Vasco usando como <em>grupo donador</em> al resto de las regiones de España. Esto es, encuentre la matriz <span class="math inline">\(W\)</span> que otorga pesos a las distintas regiones usando una serie de predictores observables. Para este propósito, use como predictores el promedio de las siguientes variables para el periodo 1964-1969:</p>
@@ -236,7 +235,7 @@ placebos &lt;- placebos %&gt;%
   geom_histogram(binwidth  = 20)</code></pre>
 <p><img src="/tareas/tarea_4/tarea4_respuestas_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <p><em>El País Vasco resulta tener la sexta razón de MSPE más grande. Mi interpretación es la siguiente: hay regiones que crecieron debido a cambios estructurales en su economía ocurridas en algún momento posterior a 1970. Cataluña debe ser un típico ejemplo. Entonces, el MSPE post 1970 está capturando las discrepancias entre el sintético que proyecta lo que hubiera pasado si no hubiera habido estos cambios y lo que efectivamente sucedió a estas regiones, que no tiene que ver con el terrorismo.</em></p>
-<p><em>Recuerden que el placebo asume que nada pasa en el resto de las unidades. La lección que sacamos de esto es que tengamos cuidado con los placebos en el espacio cuando es posible que las unidades del grupo donador sufran cambios pos intervención, no relacionadas a la intervención.</em></p></li>
+<p><em>Recuerden que el placebo asume que nada pasa en el resto de las unidades. La lección que sacamos de esto es que tengamos cuidado con los placebos en el espacio cuando es posible que las unidades del grupo donador sufran cambios post intervención, no relacionados a la intervención.</em></p></li>
 </ol>
 </div>
 <div id="pregunta-2" class="section level1">

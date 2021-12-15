@@ -24,11 +24,7 @@ library(Synth)
 xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
 
-  
-## Instrucciones
-  
-La tarea debe entregarse de manera individual, pero se recomienda ampliamente colaborar en grupos de estudio. Las secciones teóricas deben estar desarrolladas en un procesador de textos y enviadas en formato .docx o .pdf. Las secciones prácticas deberán contener archivos de código replicable y archivos de salida en R (o similares, en caso de usar otro software) para considerarse completas. Las tareas deben entregarse antes de la fecha límite a través de Teams. Puede crear una carpeta comprimida que contenga todos sus archivos y subir esta carpeta en Teams. Recuerde que en Teams debe asegurarse de que los archivos se han subido correctamente.
-
+# Pregunta 1
 
 El archivo *basque.csv* contiene los datos empleados por Abadie y Gardeazabal (2003) para estimar el efecto del terrorismo en el PIB per cápita (**gdpcap**) en el País Vasco usando el método de control sintético. Los autores consideran como periodo pre intervención a 1955 - 1969.
 
@@ -407,7 +403,7 @@ placebos %>%
 
     *El País Vasco resulta tener la sexta razón de MSPE más grande. Mi interpretación es la siguiente: hay regiones que crecieron debido a cambios estructurales en su economía ocurridas en algún momento posterior a 1970. Cataluña debe ser un típico ejemplo. Entonces, el MSPE post 1970 está capturando las discrepancias entre el sintético que proyecta lo que hubiera pasado si no hubiera habido estos cambios y lo que efectivamente sucedió a estas regiones, que no tiene que ver con el terrorismo.*
     
-    *Recuerden que el placebo asume que nada pasa en el resto de las unidades. La lección que sacamos de esto es que tengamos cuidado con los placebos en el espacio cuando es posible que las unidades del grupo donador sufran cambios pos intervención, no relacionadas a la intervención.*
+    *Recuerden que el placebo asume que nada pasa en el resto de las unidades. La lección que sacamos de esto es que tengamos cuidado con los placebos en el espacio cuando es posible que las unidades del grupo donador sufran cambios post intervención, no relacionados a la intervención.*
 
 # Pregunta 2
 
