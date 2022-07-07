@@ -16,15 +16,9 @@ main:
   - name: Lecturas
     url: '/lecturas'
     weight: 40
-  - name: Tareas
-    url: '/tareas'
-    weight: 50
   - name: Presentaciones
     url: '/presentaciones'
     weight: 60
   - name: Clases
     url: '/clases'
     weight: 70
-  - name: Exámenes
-    url: '/examenes'
-    weight: 80
