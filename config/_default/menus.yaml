@@ -16,3 +16,9 @@ main:
   - name: Clases
     url: '/clases'
     weight: 70
+  - name: Tareas
+    url: '/tareas'
+    weight: 80 
+  - name: Exámenes
+    url: '/examenes'
+    weight: 90
