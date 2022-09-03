@@ -85,6 +85,7 @@ Unidad 3. Temas actuales de evaluación
   - Evaluaciones de impacto a nivel de economía local (LEWIE)
   - Aprendizaje automatizado y _big data_ en la evaluación de impacto
 
+<!---
 
 ## Evaluación del curso
 
@@ -119,3 +120,4 @@ Cada alumno realizará una presentación de uno los artículos aplicados marcado
 El proyecto final consistirá en un protocolo de investigación de una evaluación de impacto. El tema y la metodología es libre, pero se evaluará el potencial para realizarse en el corto plazo. Se aconseja seleccionar un tema para el que se empleen datos de libre acceso. El protocolo deberá incluir, mínimamente: 1) una revisión de literatura, 2) un bosquejo de las motivaciones teóricas del problema, 3) la metodología empírica a emplear, 4) la fuente de datos a usar, y 5) los resultados preliminares. El proyecto debe presentarse en formato escrito con una extensión máxima de 20 cuartillas. Se recomienda ampliamente dar seguimiento al proyecto en horas de oficina para recibir retroalimentación respecto a los avances y resolver posibles dudas y dificultades.
 
 Entrega: fecha por definir, a través de Teams.
+-->
