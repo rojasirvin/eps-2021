@@ -4,7 +4,7 @@
 # This file is formatted using YAML syntax - learn more at https://learnxinyminutes.com/docs/yaml/
 
 title: 'Evaluación de Programas' # Website name
-baseurl: 'https://eps-2021.netlify.app' # Website URL
+baseurl: 'https://curso-eps.netlify.app' # Website URL
 copyright: '© 2021 Irvin Rojas' # Footer text, e.g. '© {year} Me'
 
 ############################
