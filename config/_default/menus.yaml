@@ -10,15 +10,9 @@ main:
   - name: Programa
     url: '/programa'
     weight: 20
-  - name: Reglas
-    url: '/reglas'
-    weight: 30
   - name: Lecturas
     url: '/lecturas'
     weight: 40
-  - name: Presentaciones
-    url: '/presentaciones'
-    weight: 60
   - name: Clases
     url: '/clases'
     weight: 70
