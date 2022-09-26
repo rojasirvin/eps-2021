@@ -7,21 +7,21 @@ date: "`r as.Date(file.mtime(knitr::current_input()))`"
 weight: 70
 ---
 
-[Clase 1](https://eps-2021.netlify.app/clases/clase_1.html#1). Evaluación: diseño y econometría
+[Clase 1](https://curso-eps.netlify.app/clases/clase_1.html#1). Evaluación: diseño y econometría
 
-[Clase 2](https://eps-2021.netlify.app/clases/clase_2.html#1). Inferencia causal
+[Clase 2](https://curso-eps.netlify.app/clases/clase_2.html#1). Inferencia causal
 
-[Clase 3](https://eps-2021.netlify.app/clases/clase_3.html#1). Evaluación experimental
+[Clase 3](https://curso-eps.netlify.app/clases/clase_3.html#1). Evaluación experimental
 
-[Clase 4](https://eps-2021.netlify.app/clases/clase_4.html#1). Regresión y efectos causales
+[Clase 4](https://curso-eps.netlify.app/clases/clase_4.html#1). Regresión y efectos causales
 
-[Clase 5](https://eps-2021.netlify.app/clases/clase_5.html#1). Inferencia estadística
+[Clase 5](https://curso-eps.netlify.app/clases/clase_5.html#1). Inferencia estadística
 
-[Clase 6](https://eps-2021.netlify.app/clases/clase_6.html#1). Parámetros de interés
+[Clase 6](https://curso-eps.netlify.app/clases/clase_6.html#1). Parámetros de interés
 
-[Clase 7](https://eps-2021.netlify.app/clases/clase_7.html#1). Experimentos a escala masiva
+[Clase 7](https://curso-eps.netlify.app/clases/clase_7.html#1). Experimentos a escala masiva
 
-[Clase 8](https://eps-2021.netlify.app/clases/clase_8.html#1). Métodos experimentales en R
+[Clase 8](https://curso-eps.netlify.app/clases/clase_8.html#1). Métodos experimentales en R
 
 Clase 9. Aplicaciones de métodos experimentales
 
@@ -33,21 +33,21 @@ Clase 9. Aplicaciones de métodos experimentales
     - [Diapositivas](/uploads/McIntosh_et_al_diapositivas.pdf)
     - [Resumen](/uploads/McIntosh_et_al_resumen.pdf)
 
-[Clase 10](https://eps-2021.netlify.app/clases/clase_10.html#1). LATE y variables instrumentales
+[Clase 10](https://curso-eps.netlify.app/clases/clase_10.html#1). LATE y variables instrumentales
 
-[Clase 11](https://eps-2021.netlify.app/clases/clase_11.html#1). Errores estándar e inferencia
+[Clase 11](https://curso-eps.netlify.app/clases/clase_11.html#1). Errores estándar e inferencia
 
-[Clase 12](https://eps-2021.netlify.app/clases/clase_12.html#1). Múltiples hipótesis
+[Clase 12](https://curso-eps.netlify.app/clases/clase_12.html#1). Múltiples hipótesis
 
   - Rojas Valdes, R.I., Wydick, B., & Lybbert, T.J. (2021). Can Hope Elevate Microfinance? Evidence from Oaxaca, Mexico. *Oxford Economic Papers*.
     - [Diapositivas](/uploads/Rojas_et_al_diapositivas.pdf)
     - [Resumen](/uploads/Rojas_et_al_resumen.jpg)
 
-[Clase 13](https://eps-2021.netlify.app/clases/clase_13.html#1). Diferencia en diferencias
+[Clase 13](https://curso-eps.netlify.app/clases/clase_13.html#1). Diferencia en diferencias
 
 Clase 14. Examen parcial
 
-[Clase 15](https://eps-2021.netlify.app/clases/clase_15.html#1). Diferencia en diferencias en R
+[Clase 15](https://curso-eps.netlify.app/clases/clase_15.html#1). Diferencia en diferencias en R
 
 Clase 16. Aplicaciones de diferencia en diferencias
 
@@ -57,9 +57,9 @@ Clase 16. Aplicaciones de diferencia en diferencias
     
   - Campos, R. M., Esquivel, G., & Santillán, A. S. (2017). El impacto del salario mínimo en los ingresos y el empleo en México. *Revista CEPAL*.
 
-[Clase 17](https://eps-2021.netlify.app/clases/clase_17.html#1). Métodos de matching
+[Clase 17](https://curso-eps.netlify.app/clases/clase_17.html#1). Métodos de matching
 
-[Clase 18](https://eps-2021.netlify.app/clases/clase_18.html#1). Métodos de matching en R
+[Clase 18](https://curso-eps.netlify.app/clases/clase_18.html#1). Métodos de matching en R
 
 Clase 19. Aplicaciones de métodos de matching
 
@@ -77,9 +77,9 @@ Clase 19. Aplicaciones de métodos de matching
     - [Diapositivas](/uploads/Chang_et_al_diapositivas.pdf)
     - [Resumen](/uploads/Chang_et_al_resumen.pdf)
   
-[Clase 20](https://eps-2021.netlify.app/clases/clase_20.html#1). Diseños con discontinuidades
+[Clase 20](https://curso-eps.netlify.app/clases/clase_20.html#1). Diseños con discontinuidades
 
-[Clase 21](https://eps-2021.netlify.app/clases/clase_21.html#1). Discontinuidades difusas
+[Clase 21](https://curso-eps.netlify.app/clases/clase_21.html#1). Discontinuidades difusas
 
 Clase 22. Aplicaciones de diseños con discontinuidades
 
@@ -94,16 +94,16 @@ Clase 22. Aplicaciones de diseños con discontinuidades
     - [Resumen](/uploads/DelValle_et_al_resumen.pdf)
     
 
-[Clase 23](https://eps-2021.netlify.app/clases/clase_23.html#1). Diseños con discontinuidades en R
+[Clase 23](https://curso-eps.netlify.app/clases/clase_23.html#1). Diseños con discontinuidades en R
 
-[Clase 24](https://eps-2021.netlify.app/clases/clase_24.html#1). Control sintético
+[Clase 24](https://curso-eps.netlify.app/clases/clase_24.html#1). Control sintético
 
 Clase 25. Aplicaciones de control sintético
 
-[Clase 26](https://eps-2021.netlify.app/clases/clase_26.html#1). Control sintético en R
+[Clase 26](https://curso-eps.netlify.app/clases/clase_26.html#1). Control sintético en R
 
-[Clase 27](https://eps-2021.netlify.app/clases/clase_27.html#1). Introducción a modelos econométricos estructurales
+[Clase 27](https://curso-eps.netlify.app/clases/clase_27.html#1). Introducción a modelos econométricos estructurales
 
 Clase 28. Aplicaciones de modelos econométricos estructurales
 
-[Clase 29](https://eps-2021.netlify.app/clases/clase_29.html#1). Aprendizaje automático
+[Clase 29](https://curso-eps.netlify.app/clases/clase_29.html#1). Aprendizaje automático
