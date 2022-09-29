@@ -2,7 +2,6 @@
 title: "Hipótesis múltiples"
 author: "Irvin Rojas"
 institute: "CIDE"
-date: "28 de septiembre de 2021"
 header-includes:
   - \usepackage{tikz}
   - \usetikzlibrary{shapes, shadows,arrows}
@@ -53,7 +52,7 @@ xfun::pkg_load2(c('base64enc', 'htmltools', 'mime'))
 ```
 
 .title[
-# Clase 12. Hipótesis múltiples
+# Hipótesis múltiples
 ]
 .subtitle[
 ## Evaluación de Programas
